@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffectExecutionCalculation.h"
+#include "ProjectNL/GAS/NLAbilitySystemComponent.h"
 #include "GE_DamageExecCalculation.generated.h"
 
 // TODO: 현재는 진짜 이곳에서만 쓰여서 enum 선언함
@@ -27,6 +28,8 @@ protected:
 
 private:
 
+
+	
 	UPROPERTY(EditDefaultsOnly, Category="Value", meta = (AllowPrivateAccess = true))
 	EDamageType DamageType;
 	
@@ -35,4 +38,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Value", meta = (AllowPrivateAccess = true))
 	FGameplayTag DamageCalcTag;
+
+	UPROPERTY(EditDefaultsOnly, Category="Value", meta = (AllowPrivateAccess = true))
+	TSubclassOf<UGameplayEffect> DamageEffect;
 };

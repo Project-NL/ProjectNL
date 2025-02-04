@@ -229,9 +229,8 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner, ABaseWeapon* 
                 InterPrevStartLocation=InterpolatedEnd;
            
         }
-
         ReactToHitActor(Owner, Weapon, HitResults);
-        
+    
         // 추가 삼각형 2: CurrentStartLocation -> PrevEnd -> CurrentEnd
         PerformTriangleTrace(Owner, CurrentMiddleLocation, PrevEndLocation, CurrentEndLocation, HitResults);
         
@@ -244,6 +243,9 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner, ABaseWeapon* 
         // 첫 번째 삼각형: PrevStart -> CurrentStart -> PrevMiddle
         PerformTriangleTrace(Owner, PrevStartLocation, CurrentStartLocation, PrevMiddleLocation, HitResults);
 
+
+    
+        
         // 디버그 라인 그리기
          DrawDebugLine(Owner->GetWorld(), PrevStartLocation, CurrentStartLocation, FColor::Blue, false, 2.0f);
          DrawDebugLine(Owner->GetWorld(), PrevEndLocation, CurrentEndLocation, FColor::Blue, false, 2.0f);

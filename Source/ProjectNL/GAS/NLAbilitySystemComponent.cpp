@@ -60,7 +60,14 @@ void UNLAbilitySystemComponent::InitializeAbilitySystem(
 			GiveAbility(FGameplayAbilitySpec(
 				Ability, Ability->GetAbilityLevel(), -1, this));
 		}
-
+		if (IsValid(InitData.KnockAbility))
+		{
+			UGameplayAbility* Ability = InitData.KnockAbility->GetDefaultObject<
+				UGameplayAbility>();
+			GiveAbility(FGameplayAbilitySpec(
+				Ability, Ability->GetAbilityLevel(), -1, this));
+		}
+		
 		if (!InitData.GameplayEffects.IsEmpty())
 		{
 			for (TSubclassOf<UGameplayEffect> Effect : InitData.GameplayEffects)

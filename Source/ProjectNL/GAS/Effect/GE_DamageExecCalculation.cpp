@@ -22,12 +22,11 @@ void UGE_DamageExecCalculation::Execute_Implementation(const FGameplayEffectCust
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 	
 	const EMovementDirection Direction = static_cast<EMovementDirection>(Spec.GetSetByCallerMagnitude(NlGameplayTags::Data_AttackDirection.GetModuleName()));
-	const bool IsHitStop = static_cast<bool>(Spec.GetSetByCallerMagnitude(NlGameplayTags::Data_IsHitStop.GetModuleName()));
 
-	UE_LOG(LogTemp, Display, TEXT("Damaged Source And Target: %s, %s, %s, %d"), *SourceActor->GetName(), *TargetActor->GetName(), *FEnumHelper::GetClassEnumKeyAsString(Direction), IsHitStop);
+	UE_LOG(LogTemp, Display, TEXT("Damaged Source And Target: %s, %s, %s"), *SourceActor->GetName(), *TargetActor->GetName(), *FEnumHelper::GetClassEnumKeyAsString(Direction));
 	// TODO: SetCaller로 계산된 effect 정보를 기반으로 방어력과 스텟, 무기 공격력 등을 계산 후 최종 데미지를 산정
 	if (UNLAbilitySystemComponent* TargetASC = Cast<UNLAbilitySystemComponent>(TargetAbilitySystemComponent))
 	{
-		TargetASC->ReceiveDamage({ SourceActor, DamageValue, Direction, ETargetHeight::Middle, IsHitStop });
+		TargetASC->ReceiveDamage({ SourceActor,DamageValue, Direction, ETargetHeight::Middle,DamageEffect });
 	}
 }

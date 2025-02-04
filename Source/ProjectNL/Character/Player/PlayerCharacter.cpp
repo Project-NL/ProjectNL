@@ -7,9 +7,11 @@
 #include "ProjectNL/Component/CameraComponent/PlayerCameraComponent.h"
 #include "ProjectNL/Component/CameraComponent/PlayerSpringArmComponent.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
+#include "ProjectNL/GAS/Ability/Active/Default/Knockback/GA_Knockback.h"
 #include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 #include "ProjectNL/Player/BasePlayerState.h"
 #include "ProjectNL/Helper/EnumHelper.h"
+#include "ProjectNL/Player/BasePlayerController.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -66,7 +68,7 @@ void APlayerCharacter::OnRep_PlayerState()
 			this, &ThisClass::MovementSpeedChanged);
 		
 		AbilitySystemComponent->OnDamageReactNotified
-		.AddDynamic(this, &ThisClass::OnDamaged);
+		.AddDynamic(this, &APlayerCharacter::OnDamaged);
 		Initialize();
 	}
 }
@@ -173,10 +175,93 @@ void APlayerCharacter::OnDamaged(const FDamagedResponse& DamagedResponse)
 {
 	if (PlayerAttributeSet)
 	{
+		// 체력 감소 처리
 		PlayerAttributeSet->SetHealth(PlayerAttributeSet->GetHealth() - DamagedResponse.Damage);
 	}
-	// TODO: 이거 별도의 Ability로 빼는 것도 고려할 필요 있음.
-	// 근데 고려만 할 것
-	PlayAnimMontage(EquipComponent->GetDamagedAnim()
-	.GetAnimationByDirection(DamagedResponse.DamagedDirection, DamagedResponse.DamagedHeight));
+	FGameplayTagContainer ActiveTags;
+	AbilitySystemComponent->GetOwnedGameplayTags(ActiveTags);
+	DamageResponse=DamagedResponse;
+	// 태그(Status.Sprint, Status.Dodge, Status.Roll) 활성화 여부 체크
+	if (ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.UnderAttack"))))
+	{
+		return;
+	};
+	// 플레이할 애니메이션 몽타주
+	UAnimMontage* DamagedMontage = EquipComponent->GetDamagedAnim()
+		.GetAnimationByDirection(DamagedResponse.DamagedDirection, DamagedResponse.DamagedHeight);
+    
+	if (!DamagedMontage) return;
+
+	// 애니메이션 재생
+	float MontageDuration = PlayAnimMontage(DamagedMontage);
+	
+	if (MontageDuration > 0.f)
+	{
+		// 애니메이션 인스턴스 가져오기
+		UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+		if (AnimInstance)
+		{
+			// 플레이어의 입력 비활성화
+			ABasePlayerController* PC = Cast<ABasePlayerController>(GetController());
+			if (PC)
+			{
+				PC->SetIgnoreMoveInput(true);  // 키보드 이동 무시
+			}
+			if (DamagedResponse.DamageEffect)
+			{
+				// 이펙트 컨텍스트를 생성
+				FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+        
+				// 이 이펙트의 소스 오브젝트 설정 (보통 '소유자(Owner)'를 설정)
+				EffectContext.AddSourceObject(Owner);
+				
+					AbilitySystemComponent->BP_ApplyGameplayEffectToSelf(DamagedResponse.DamageEffect,
+					1.0f,    
+					EffectContext);
+				
+			}
+
+			// Anim Montage의 End에 대한 Delegate 등록
+			MontageEndedDelegate.BindUObject(
+				this, &APlayerCharacter::OnDamagedMontageEnded);
+			AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate
+																					, DamagedMontage);
+		}
+	}
+	float MontageLength = DamagedMontage->GetPlayLength();
+	OnKnockback(DamagedResponse,MontageLength);
+}
+
+// Montage가 끝나면 호출되는 함수
+void APlayerCharacter::OnDamagedMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	// 여기서 다시 입력 활성화
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (PC)
+	{
+		PC->SetIgnoreMoveInput(false);  // 키보드 이동 무시
+	}
+	// 다음에 중복으로 호출되지 않도록 델리게이트 해제(선택사항)
+	AbilitySystemComponent->
+			RemoveActiveGameplayEffectBySourceEffect(DamageResponse.DamageEffect, AbilitySystemComponent);
+	
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	if (AnimInstance)
+	{
+		AnimInstance->OnMontageEnded.RemoveDynamic(this, &APlayerCharacter::OnDamagedMontageEnded);
+	}
+}
+
+void APlayerCharacter::OnKnockback(const FDamagedResponse& DamagedResponse,	float DamageMontageLength)
+{
+	
+	UGA_Knockback* ActivatedKnockbackAbility =Cast<UGA_Knockback>( 	AbilitySystemComponent->FindAbilitySpecFromClass(InitializeData.KnockAbility)->GetPrimaryInstance());
+
+	ActivatedKnockbackAbility->SetDamageResponse(DamageResponse);
+	ActivatedKnockbackAbility->SetDamageMontageLength(DamageMontageLength);
+	bool bActivated = AbilitySystemComponent->TryActivateAbilityByClass(InitializeData.KnockAbility);
+	if(!bActivated)
+	{
+		return;
+	}
 }

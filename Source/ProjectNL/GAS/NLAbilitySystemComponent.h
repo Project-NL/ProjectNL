@@ -11,16 +11,24 @@ struct FNLAbilitySystemInitializationData;
 enum class EMovementDirection: uint8;
 enum class ETargetHeight: uint8;
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FDamagedResponse
 {
 	GENERATED_BODY()
 
 	AActor* SourceActor;
+	
 	float Damage;
+	
 	EMovementDirection DamagedDirection;
+
 	ETargetHeight DamagedHeight;
+	
+	TSubclassOf<UGameplayEffect> DamageEffect;
+	
 	bool IsHitStop;
+
+
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageStartedNotifiedSignature, const FDamagedResponse&, DamageResponse);
