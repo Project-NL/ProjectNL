@@ -54,7 +54,6 @@ protected:
 
 	// TODO: 추후 별도의 컴포넌트로 전환해도 무방
 	// 해당 플레이어가 어느 방향으로 이동 중 인지를 검증하는 결과 값
-	
 	FVector2D MovementVector = FVector2D().ZeroVector;
 
 	void MovementSpeedChanged(const FOnAttributeChangeData& Data);
@@ -62,12 +61,10 @@ protected:
 	void Initialize();
 
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override;
-
-
-	TObjectPtr<UAnimMontage> DamagedMontage;
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Entity|Category"
 		, meta = (AllowPrivateAccess = "true"))
 	EEntityCategory EntityType;
 
+	
 };

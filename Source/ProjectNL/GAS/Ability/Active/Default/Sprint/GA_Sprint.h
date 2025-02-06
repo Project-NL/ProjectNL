@@ -52,8 +52,7 @@ private:
 	FDateTime ActiveTime;
 	
 	UAbilityTask_WaitDelay* WaitDelayTask;
-	//UPROPERTY(Replicated)
-	EMovementDirection CurrentDirection;
+
 	UFUNCTION()
 	void EndEvade(FGameplayTag EventTag, FGameplayEventData EventData);
 };

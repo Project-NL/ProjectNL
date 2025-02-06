@@ -15,20 +15,19 @@ USTRUCT(BlueprintType)
 struct FDamagedResponse
 {
 	GENERATED_BODY()
-	UPROPERTY()
+
 	AActor* SourceActor;
-	UPROPERTY(EditAnywhere)
+	
 	float Damage;
-	UPROPERTY()
+	
 	EMovementDirection DamagedDirection;
-	UPROPERTY(EditAnywhere)
+
 	ETargetHeight DamagedHeight;
-	UPROPERTY(EditAnywhere)
+	
 	TSubclassOf<UGameplayEffect> DamageEffect;
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UGameplayAbility> KnockbackAbility;
-	UPROPERTY(EditAnywhere)
+	
 	bool IsHitStop;
+
 
 };
 
@@ -48,8 +47,6 @@ public:
 	
 	void ReceiveDamage(const FDamagedResponse& DamagedResponse) const;
 
-
-
 	GETTER_SETTER(bool, IsInitialized)
 
 	FOnDamageStartedNotifiedSignature OnDamageStartedNotified;
@@ -59,5 +56,4 @@ private:
 	uint16 LevelByDamaged = 10;
 	
 	bool IsInitialized = false;
-	
 };

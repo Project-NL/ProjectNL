@@ -27,8 +27,18 @@ protected:
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
 
 private:
+
+
 	
-	// 블루프린트에서 수정 가능하도록 BlueprintReadWrite 추가
-	UPROPERTY(EditAnywhere, Category = "Value", meta = (AllowPrivateAccess = "true"))
-	mutable FDamagedResponse DamageResponse;
+	UPROPERTY(EditDefaultsOnly, Category="Value", meta = (AllowPrivateAccess = true))
+	EDamageType DamageType;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Value", meta = (AllowPrivateAccess = true))
+	float DamageValue;
+
+	UPROPERTY(EditDefaultsOnly, Category="Value", meta = (AllowPrivateAccess = true))
+	FGameplayTag DamageCalcTag;
+
+	UPROPERTY(EditDefaultsOnly, Category="Value", meta = (AllowPrivateAccess = true))
+	TSubclassOf<UGameplayEffect> DamageEffect;
 };

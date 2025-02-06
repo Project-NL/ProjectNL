@@ -88,7 +88,6 @@ void UNLAbilitySystemComponent::InitializeAbilitySystem(
 
 void UNLAbilitySystemComponent::ReceiveDamage(const FDamagedResponse& DamagedResponse) const
 {
-	
 	OnDamageStartedNotified.Broadcast(DamagedResponse);
 
 	if (HasMatchingGameplayTag(NlGameplayTags::Status_Block))
@@ -107,5 +106,3 @@ void UNLAbilitySystemComponent::ReceiveDamage(const FDamagedResponse& DamagedRes
 		const_cast<UNLAbilitySystemComponent*>(this)->ExecuteGameplayCue(NlGameplayTags::GameplayCue_Utility_HitStop, Param);
 	}
 }
-
-

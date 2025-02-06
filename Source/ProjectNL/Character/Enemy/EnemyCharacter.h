@@ -24,6 +24,6 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION()
 	void OnDamaged(const FDamagedResponse& DamagedResponse);
 };

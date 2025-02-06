@@ -26,9 +26,6 @@ void UGA_TargetingEnemy::EndAbility(const FGameplayAbilitySpecHandle Handle, con
 	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-
-	GetAbilitySystemComponentFromActorInfo()->
-			RemoveActiveGameplayEffectBySourceEffect(TargetingSpeedEffect, GetAbilitySystemComponentFromActorInfo());
 }
 
 void UGA_TargetingEnemy::InputPressed(const FGameplayAbilitySpecHandle Handle,

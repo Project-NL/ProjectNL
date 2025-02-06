@@ -11,7 +11,7 @@ class UPlayerAttributeSet;
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
-struct FGameplayAbilitySpec;
+
 UCLASS()
 class PROJECTNL_API APlayerCharacter : public ABaseCharacter,public IInteractionInterface
 {
@@ -36,9 +36,8 @@ protected:
 
 private:
 	//IInteractionInterface
-private:
 	UFUNCTION()
-	virtual void OnDamaged(const FDamagedResponse& DamagedResponse);
+	virtual void OnDamaged(const FDamagedResponse& DamagedResponse) override;
 	virtual void OnDamagedMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
 	virtual void OnKnockback(const FDamagedResponse& DamagedResponse,float DamageMontageLength) override;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input
@@ -66,5 +65,4 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Ability")
 	TSubclassOf<UGameplayAbility> KnockbackAbility;
-
 };
