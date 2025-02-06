@@ -10,6 +10,9 @@
 /**
  * 
  */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPlayMontageEventNotified
+																						, FGameplayTag, EventTag
+																						, FGameplayEventData, EventData);
 UCLASS()
 class PROJECTNL_API UGA_Knockback : public UBaseInputTriggerAbility
 {
@@ -18,8 +21,11 @@ public:
 	UGA_Knockback(const FObjectInitializer& ObjectInitializer);
 
 
-	void SetDamageResponse(FDamagedResponse& DamageResponse);
+	void SetDamageResponse(const FDamagedResponse& DamageResponse);
+	void SetDamageMontage(UAnimMontage* DamageMontage);
 	SETTER(float,DamageMontageLength);
+
+	FOnPlayMontageEventNotified OnPlayMontageWithEventDelegate;
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle
 															, const FGameplayAbilityActorInfo* ActorInfo
@@ -36,14 +42,21 @@ protected:
 	
 	UFUNCTION()
 	void OnCancelled();
+	void OnCancelled(FGameplayTag EventTag, FGameplayEventData EventData);
 
 private:
 
 	UPROPERTY()
 	TObjectPtr<UAT_Knockback> KnockbackTask;
 	
+	UPROPERTY(Replicated)
+	FDamagedResponse DamagedResponse;
+
+	UPROPERTY(Replicated)
 	float DamageMontageLength;
 
-	FDamagedResponse DamagedResponse;
+	UPROPERTY(Replicated)
+	TObjectPtr<UAnimMontage> DamagedMontage;
 	
+
 };

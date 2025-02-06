@@ -25,7 +25,7 @@ void AEnemyCharacter::BeginPlay()
 	.AddDynamic(this, &ThisClass::OnDamaged);
 }
 
-void AEnemyCharacter::OnDamaged(const FDamagedResponse& DamagedResponse)
+void AEnemyCharacter::OnDamaged_Implementation(const FDamagedResponse& DamagedResponse)
 {
 	if (EnemyAttributeSet)
 	{
@@ -36,4 +36,5 @@ void AEnemyCharacter::OnDamaged(const FDamagedResponse& DamagedResponse)
 	PlayAnimMontage(EquipComponent->GetDamagedAnim()
 	.GetAnimationByDirection(DamagedResponse.DamagedDirection, DamagedResponse.DamagedHeight));
 }
+
 

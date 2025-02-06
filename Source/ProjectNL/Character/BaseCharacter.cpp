@@ -4,6 +4,7 @@
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Attribute/BaseAttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "ProjectNL/Component/SkillComponent/TimeRecallComponent.h"
 #include "ProjectNL/Helper/AbilityHelper.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"

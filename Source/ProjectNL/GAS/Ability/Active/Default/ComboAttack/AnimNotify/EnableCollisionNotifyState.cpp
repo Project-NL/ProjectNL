@@ -18,7 +18,7 @@ void UEnableCollisionNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, 
     {
         EquipComponent= Owner->GetEquipComponent();
     }
-    
+  
     ABaseWeapon* MainWeapon{};
     ABaseWeapon* SubWeapon{};
     if (EquipComponent)
@@ -38,18 +38,20 @@ void UEnableCollisionNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, 
         SubWeapon->SetPrevStartLocation(FVector::ZeroVector); 
         SubWeapon->SetPrevEndLocation(FVector::ZeroVector);
     }
-    
-    if (Owner->HasAuthority())
-    {
-        return;
-    }
+  
+
 }
 
 void UEnableCollisionNotifyState::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
 {
     
     Super::NotifyTick(MeshComp, Animation, FrameDeltaTime, EventReference);
-    if (AActor* Owner = MeshComp->GetOwner())
+    AActor* Owner = MeshComp->GetOwner();
+    if (!Owner->HasAuthority())
+    {
+        return;
+    }
+    if (Owner)
     {
         StartTraceTriangle(Owner);
     }
@@ -57,6 +59,7 @@ void UEnableCollisionNotifyState::NotifyTick(USkeletalMeshComponent* MeshComp, U
 
 void UEnableCollisionNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
+   
     ABaseCharacter* Owner = Cast<ABaseCharacter>(MeshComp->GetOwner());
     if (!Owner)
     {
@@ -297,9 +300,10 @@ void UEnableCollisionNotifyState::ReactToHitActor(AActor* Owner, ABaseWeapon* We
                     if (SpecHandle.IsValid())
                     {
                         SourceASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+                        DrawDebugSphere(Owner->GetWorld(), Hit.ImpactPoint, 10, 12, FColor::Yellow, false, 1.0f);
                     }
                     // 충돌 지점 시각화
-                    DrawDebugSphere(Owner->GetWorld(), Hit.ImpactPoint, 10, 12, FColor::Yellow, false, 1.0f);
+                    
                 }
             }
         }

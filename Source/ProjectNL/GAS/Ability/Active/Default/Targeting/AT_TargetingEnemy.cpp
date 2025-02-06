@@ -38,7 +38,7 @@ void UAT_TargetingEnemy::TickTask(float DeltaTime)
 	Super::TickTask(DeltaTime);
 	
 	// 예: 최대 거리 1000.0f (원하는 값으로 조절하세요)
-	CheckNearestEnemyDistance(1700.0f);
+	CheckNearestEnemyDistance(3000.0f);
 	TargetingNearestEnemy(DeltaTime);
 }
 void UAT_TargetingEnemy::TargetingNearestEnemy(float DeltaTime)
@@ -64,10 +64,12 @@ void UAT_TargetingEnemy::TargetingNearestEnemy(float DeltaTime)
 				ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.Dodge"))) ||
 				ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.Roll"))))
 			{
+			//	UE_LOG(LogTemp, Warning, TEXT("[%s] SavedLockonActorRotation: %s"), PlayerCharacter->HasAuthority() ? TEXT("Server") : TEXT("Client"), *NearestEnemy->GetName());
 				SavedLockonActorRotation = PlayerCharacter->GetActorRotation();
 			}
 			else
 			{
+			//	UE_LOG(LogTemp, Warning, TEXT("[%s] Locking on to enemy: %s"), PlayerCharacter->HasAuthority() ? TEXT("Server") : TEXT("Client"), *NearestEnemy->GetName());
 				LockOnTarget(NearestEnemy, DeltaTime);
 			}
 		}
@@ -165,7 +167,7 @@ AActor* UAT_TargetingEnemy::FindNearestTarget() const
 				if (OverlappedActor && OverlappedActor != GetAvatarActor())
 				{
 					// 1.화면에 표시되는지 체크**
-					if (!IsActorOnScreen(OverlappedActor))
+					if (!IsActorOnScreen(OverlappedActor)&&!GetAvatarActor()->HasAuthority())
 						continue;
 
 					// 2. 시야 방해물이 없는지 체크**
@@ -266,6 +268,7 @@ void UAT_TargetingEnemy::ReleaseLockOnTarget()
 			ASC->RemoveActiveGameplayEffectBySourceEffect(TargetingSpeedEffect, ASC);
 		}
 	}
+	
 	
 	OnCanceled.Broadcast();
 }
