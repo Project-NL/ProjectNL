@@ -18,7 +18,7 @@ UGA_Action::UGA_Action(const FObjectInitializer& ObjectInitializer): Super(Objec
 
 FActionSequenceData* UGA_Action::GetActionSequenceData()
 {
-	return &ActionAnimData->ArrActionSequenceDatas[CurrentActionIndex];
+	return &ActionAnimData.ArrActionSequenceDatas[CurrentActionIndex];
 }
 
 void UGA_Action::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -41,7 +41,7 @@ void UGA_Action::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGame
 
 void UGA_Action::OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData)
 {
-	if (CurrentActionIndex < ActionAnimData->ArrActionSequenceDatas.Num())
+	if (CurrentActionIndex < ActionAnimData.ArrActionSequenceDatas.Num())
 	{
 		OnAnimationCompleted(); //다음 액션으로 넘어갑니다.
 	}
@@ -62,7 +62,7 @@ void UGA_Action::StartActionSequence()
 {
 	CurrentActionIndex = 0;
 	ActionSequenceIndex = EActionType::Animation;
-	if (ActionAnimData->ArrActionSequenceDatas.Num() == 0)
+	if (ActionAnimData.ArrActionSequenceDatas.Num() == 0)
 	{
 		//스킬별 액션이 없으면 바로 종료
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true
@@ -98,7 +98,7 @@ void UGA_Action::PlayNextAction()
 {
 	//현재 액션 데이터테이블 배열 위치를 증가시킵니다.
 
-	if (CurrentActionIndex >= ActionAnimData->ArrActionSequenceDatas.Num())
+	if (CurrentActionIndex >= ActionAnimData.ArrActionSequenceDatas.Num())
 	{
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true
 		           , false);
@@ -111,10 +111,10 @@ void UGA_Action::PlayNextAction()
 			ActionSequenceIndex = EActionType::Move; //다음은 이동으로 바꿈
 			FString DelayMessage = FString::Printf(TEXT("CurrentActionIndex for %.2d seconds."), CurrentActionIndex);
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, DelayMessage);
-			if (ActionAnimData->ArrActionSequenceDatas[CurrentActionIndex].ArrActionAnim)
+			if (ActionAnimData.ArrActionSequenceDatas[CurrentActionIndex].ArrActionAnim)
 			{
 				
-				PlayActionAnimation(ActionAnimData->ArrActionSequenceDatas[CurrentActionIndex].ArrActionAnim);
+				PlayActionAnimation(ActionAnimData.ArrActionSequenceDatas[CurrentActionIndex].ArrActionAnim);
 				//액션 애니메이션을 진행합니다.
 			}
 			else
@@ -127,7 +127,7 @@ void UGA_Action::PlayNextAction()
 		{
 			//다음은 딜레이로 바꿈
 			ActionSequenceIndex = EActionType::Delay;
-			if (ActionAnimData->ArrActionSequenceDatas[CurrentActionIndex].ArrMovementDirection !=
+			if (ActionAnimData.ArrActionSequenceDatas[CurrentActionIndex].ArrMovementDirection !=
 				EMovementDirection::NONE)
 			{
 				MoveAction(); //방향 이동	
@@ -142,7 +142,7 @@ void UGA_Action::PlayNextAction()
 	case EActionType::Delay:
 		{
 			ActionSequenceIndex = EActionType::Animation;
-			float DelayTime = ActionAnimData->ArrActionSequenceDatas[CurrentActionIndex].DelayTime;
+			float DelayTime = ActionAnimData.ArrActionSequenceDatas[CurrentActionIndex].DelayTime;
 
 			CurrentActionIndex++;
 			if (DelayTime > 0)
@@ -162,7 +162,7 @@ void UGA_Action::PlayNextAction()
 
 void UGA_Action::MoveAction()
 {
-	UCurveVector* MyCurve = ActionAnimData->ArrActionSequenceDatas[CurrentActionIndex].CurveVector;
+	UCurveVector* MyCurve = ActionAnimData.ArrActionSequenceDatas[CurrentActionIndex].CurveVector;
 	UAT_MoveAlongCurve* MoveTask = UAT_MoveAlongCurve::InitialEvent(
 		this,
 		FName("MoveAlongCurve"),
@@ -222,7 +222,7 @@ void UGA_Action::SetActionDataByDataTable()
 	}
 
 	// ActionAnimData에 값을 설정
-	ActionAnimData = FoundData;
+	ActionAnimData = *FoundData;
 
 	UE_LOG(LogTemp, Log, TEXT("Successfully set ActionAnimData for RowName: %s"), *SkillName.ToString());
 }
