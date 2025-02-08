@@ -1,8 +1,9 @@
 ﻿#include "AbilityHelper.h"
-
+#include "GameplayAbilitySpec.h"
+#include "AbilitySystemComponent.h"
 #include "ProjectNL/Character/Enemy/EnemyCharacter.h"
 #include "ProjectNL/Character/Player/PlayerCharacter.h"
-
+#include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 UAttributeSet* AbilityHelper::GetAttribute(AActor* Owner)
 {
 	if (const APlayerCharacter* Player = Cast<APlayerCharacter>(Owner))
@@ -12,3 +13,6 @@ UAttributeSet* AbilityHelper::GetAttribute(AActor* Owner)
 	
 	return nullptr;
 }
+
+
+
