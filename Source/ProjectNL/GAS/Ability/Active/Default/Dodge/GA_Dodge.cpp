@@ -17,9 +17,10 @@ void UGA_Dodge::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 
 	if (ABaseCharacter* OwnerCharacter = Cast<ABaseCharacter>(ActorInfo->AvatarActor.Get()))
 	{
+		float Angle = FLocateHelper::GetDeltaAngle(OwnerCharacter->GetVelocity(),OwnerCharacter->GetActorForwardVector());
 		const EMovementDirection CurrentDirection =
 			FStateHelper::GetIsCharacterTargetMode(GetAbilitySystemComponentFromActorInfo())
-				? FLocateHelper::GetDirectionByMovementData(OwnerCharacter->GetMovementVector()) : EMovementDirection::F;
+						? FLocateHelper::GetDirectionByAngle(Angle) : EMovementDirection::F;
 			
 		if (UAnimMontage* StepAnim = OwnerCharacter->GetEquipComponent()
 			->GetStepAnim().GetAnimationByDirection(CurrentDirection))

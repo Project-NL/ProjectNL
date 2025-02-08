@@ -124,12 +124,13 @@ void UGA_Guard::OnKnockBack(const FDamagedResponse& DamagedResponse)
 void UGA_Guard::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+
 }
 
 void UGA_Guard::EndBlock(FGameplayTag EventTag, FGameplayEventData EventData)
 {
 	UE_LOG(LogTemp, Warning, TEXT("UGA_Guard EndBlock."));
-	//ActivatedKnockbackAbility->OnPlayMontageWithEventDelegate.Clear();
+	
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 	
 }
@@ -144,6 +145,7 @@ void UGA_Guard::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGamep
 		NlGameplayTags::SetGameplayTag(ASC, NlGameplayTags::Status_Guard, 0, true);
 		NlGameplayTags::SetGameplayTag(ASC, NlGameplayTags::Status_Block, 0, true);
 		ASC->OnDamageStartedNotified.RemoveDynamic(this, &ThisClass::StartBlock);
+		
 	}
 }
 
