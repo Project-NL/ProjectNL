@@ -276,6 +276,8 @@ void APlayerCharacter::OnKnockback(const FDamagedResponse& DamagedResponse, floa
 	ActivatedKnockbackAbility->SetDamageResponse(DamagedResponse);
 	ActivatedKnockbackAbility->SetDamageMontageLength(DamageMontageLength);
 	ActivatedKnockbackAbility->SetDamageMontage(DamagedMontage);
+	//ActivatedKnockbackAbility->OnPlayMontageWithEventDelegate.Clear();
+	
 	// 6. Knockback Ability 활성화 시도
 	bool bActivated = AbilitySystemComponent->TryActivateAbilityByClass(DamagedResponse.KnockbackAbility);
 	if (!bActivated)
