@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ActionAbilityData.h"
 #include "ProjectNL/GAS/Ability/Utility/BaseInputTriggerAbility.h"
+#include "Animation/AnimMontage.h"
 #include "GA_Action.generated.h"
 
 /**
@@ -17,7 +18,7 @@ class PROJECTNL_API UGA_Action : public UBaseInputTriggerAbility
 public:
 	UGA_Action(const FObjectInitializer& ObjectInitializer);
 
-	GETTER(FActionAbilityData*,ActionAnimData);
+	//GETTER(FActionAbilityData*,ActionAnimData);
 
 	FActionSequenceData* GetActionSequenceData();
 protected:
@@ -34,10 +35,10 @@ protected:
 													, bool bReplicateEndAbility
 													, bool bWasCancelled) override;
 
-	UFUNCTION()
+
 	void OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData);
 	
-	UFUNCTION()
+
 	void OnCancelled(FGameplayTag EventTag, FGameplayEventData EventData);
 
 
@@ -45,28 +46,25 @@ protected:
 	 * 시퀀스 액션 
 	 */
 	
-	UFUNCTION()
+
 	void PlayActionAnimation(UAnimMontage* ActionAnimMontage);
 
-	UFUNCTION()
+
 	void StartActionSequence();
 
-	// 다음 액션을 재생하는 함수
-	UFUNCTION()
+
 	void PlayNextAction();
 
-	UFUNCTION()
 	void MoveAction();//움직이는 액션
-	UFUNCTION()
+
 	void DelayAction(float DelayTime);//Delay를 하는 액션
-	// 애니메이션이 끝났을 때(또는 중단되었을 때) 호출
-	UFUNCTION()
+
 	void OnAnimationCompleted();
-	UFUNCTION()
+
 	void OnMoveCompleted();
-	UFUNCTION()
+
 	void OnDelayCompleted();
-	UFUNCTION()
+
 	void SetActionDataByDataTable();
 
 	
