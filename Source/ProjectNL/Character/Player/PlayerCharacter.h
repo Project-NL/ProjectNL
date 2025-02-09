@@ -35,12 +35,11 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 private:
-	//IInteractionInterface
-private:
 	UFUNCTION()
 	virtual void OnDamaged(const FDamagedResponse& DamagedResponse) override;
 	virtual void OnDamagedMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
 	virtual void OnKnockback(const FDamagedResponse& DamagedResponse,float DamageMontageLength) override;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input
 		, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -66,5 +65,4 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Ability")
 	TSubclassOf<UGameplayAbility> KnockbackAbility;
-
 };

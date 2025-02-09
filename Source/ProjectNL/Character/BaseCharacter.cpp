@@ -96,3 +96,9 @@ void ABaseCharacter::MovementSpeedChanged(const FOnAttributeChangeData& Data)
 
 	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
 }
+
+void ABaseCharacter::SetViewItemOnHand(const FItemInfoData& NewItemInfo)
+{
+	
+}
+

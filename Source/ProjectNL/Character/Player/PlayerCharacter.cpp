@@ -208,8 +208,6 @@ void APlayerCharacter::OnDamaged(const FDamagedResponse& DamagedResponse)
 		float MontageLength = DamagedMontage->GetPlayLength();
 		OnKnockback(DamagedResponse,MontageLength);
 	}
-
-	
 }
 
 

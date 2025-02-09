@@ -3,11 +3,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "ProjectNL/DataTable/ItemInfoData.h"
 #include "ProjectNL/GAS/NLAbilitySystemComponent.h"
 #include "ProjectNL/GAS/NLAbilitySystemInitializationData.h"
 #include "ProjectNL/Helper/UtilHelper.h"
 #include "BaseCharacter.generated.h"
 
+class UInventoryComponent;
 class UEquipComponent;
 class UTimeRecallComponent;
 enum class EEntityCategory : uint8;
@@ -24,6 +26,8 @@ public:
 	{
 		return AbilitySystemComponent;
 	}
+	
+	void SetViewItemOnHand(const FItemInfoData& NewItemInfo);
 
 	UFUNCTION(Server, Reliable)
 	void Server_ApplyGameplayEffectToSelf(TSubclassOf<UGameplayEffect> Effect, const uint32 Level = 1);
@@ -36,6 +40,7 @@ public:
 	GETTER(FVector2D, MovementVector)
 	GETTER_SETTER(EEntityCategory, EntityType)
 	GETTER(UTimeRecallComponent*, TimeRecallComponent)
+	GETTER(UInventoryComponent*, InventoryComponent)
 protected:
 	virtual void BeginPlay() override;
 
@@ -44,6 +49,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UEquipComponent> EquipComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UInventoryComponent> InventoryComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UTimeRecallComponent> TimeRecallComponent;
