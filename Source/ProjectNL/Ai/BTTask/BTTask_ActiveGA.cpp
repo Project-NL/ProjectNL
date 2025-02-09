@@ -80,7 +80,7 @@ EBTNodeResult::Type UBTTask_ActiveGA::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	UGA_Action* ActionAbility = Cast<UGA_Action>(ActivatedAbility);
 	if (ActionAbility)
 	{
-		ActionAbility->SetSkillName(SkillName);
+//		ActionAbility->SetSkillName(SkillName);
 	}
 	
 	bool bActivated = TargetASC->TryActivateAbility(AbilityHandle);

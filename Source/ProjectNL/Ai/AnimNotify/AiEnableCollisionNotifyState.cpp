@@ -30,7 +30,7 @@ void UAiEnableCollisionNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp
 	{
 		return;
 	}
-	ActionSequenceData = GAActionAbility->GetActionSequenceData();
+//	ActionSequenceData = GAActionAbility->GetActionSequenceData();
 	
 
 	ABaseWeapon* MainWeapon{};
@@ -78,7 +78,7 @@ void UAiEnableCollisionNotifyState::NotifyTick(
 			{
 				return;
 			}
-			ActionSequenceData = GAActionAbility->GetActionSequenceData();
+//			ActionSequenceData = GAActionAbility->GetActionSequenceData();
 		}
 		else {
 			
