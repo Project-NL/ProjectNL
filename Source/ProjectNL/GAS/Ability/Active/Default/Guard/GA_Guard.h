@@ -7,7 +7,7 @@
 class UBlockStartNotify;
 class UAT_PutDamageWithEvent;
 class UPlayMontageWithEvent;
-
+class UGA_Knockback;
 UCLASS()
 class PROJECTNL_API UGA_Guard : public UBaseInputTriggerAbility
 {
@@ -24,17 +24,19 @@ protected:
 	virtual void InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
 
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
-	void CancelAbility(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-	                   FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility);
-
+	
 private:
 	TObjectPtr<UPlayMontageWithEvent> AnimationTask;
 
 	TObjectPtr<UBlockStartNotify> BlockStartNotify;
 
+	UGA_Knockback* ActivatedKnockbackAbility;
+
 	UFUNCTION()
 	void StartBlock(const FDamagedResponse& DamagedResponse);
 
+	UFUNCTION()
+	void OnKnockBack(const FDamagedResponse& DamagedResponse);
 	UFUNCTION()
 	void EndBlock(FGameplayTag EventTag, FGameplayEventData EventData);
 };

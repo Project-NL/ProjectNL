@@ -92,7 +92,6 @@ enum class EPlayerCombatWeaponState: uint8
 UENUM(BlueprintType)
 enum class EMovementDirection: uint8
 {
-	NONE UMETA(DisplayName = "Nonm"),
 	F UMETA(DisplayName = "Forward")
 	, FL UMETA(DisplayName = "ForwardLeft")
 	, FR UMETA(DisplayName = "ForwardRight")

@@ -18,25 +18,25 @@ UAT_Knockback* UAT_Knockback::InitialEvent(UGameplayAbility* OwningAbility, FDam
 void UAT_Knockback::Activate()
 {
 	Super::Activate();
-
 	// AvatarActor(일반적으로 Character나 Pawn)를 가져온다.
 	AActor* AvatarActor = GetAvatarActor();
+	
 	if (!AvatarActor)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("UAT_KnockbackAvatarActor 실패."));
 		OnCanceled.Broadcast();
 		EndTask();  // 에러 처리
 		return;
 	}
-
 	// 공격자(혹은 소스) 액터
 	AActor* SourceActor = DamagedResponse.SourceActor;
 	if (!SourceActor)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("UAT_KnockbackSourceActor 실패."));
 		OnCanceled.Broadcast();
 		EndTask();  
 		return;
 	}
-
 	// 넉백 시작 위치(피격자의 현재 위치)
 	StartLocation = AvatarActor->GetActorLocation();
 
@@ -64,7 +64,7 @@ void UAT_Knockback::Activate()
 void UAT_Knockback::TickTask(float DeltaTime)
 {
 	Super::TickTask(DeltaTime);
-
+	UE_LOG(LogTemp, Warning, TEXT("UAT_Knockback TickTask 성공."));
 	if (!bKnockbackActive)
 	{
 		return;

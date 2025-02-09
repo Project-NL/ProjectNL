@@ -2,6 +2,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "Abilities/Tasks/AbilityTask_WaitDelay.h"
+#include "Net/UnrealNetwork.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Ability/Utility/PlayMontageWithEvent.h"
 #include "ProjectNL/Helper/EnumHelper.h"
@@ -79,12 +80,23 @@ void UGA_Sprint::InputReleased(const FGameplayAbilitySpecHandle Handle, const FG
 	{
 		if (ABaseCharacter* OwnerCharacter = Cast<ABaseCharacter>(ActorInfo->AvatarActor.Get()))
 		{
-			const EMovementDirection CurrentDirection =
-				FStateHelper::GetIsCharacterTargetMode(GetAbilitySystemComponentFromActorInfo())
-					? FLocateHelper::GetDirectionByMovementData(OwnerCharacter->GetMovementVector()) : EMovementDirection::F;
+			
+			float Angle = FLocateHelper::GetDeltaAngle(OwnerCharacter->GetVelocity(),OwnerCharacter->GetActorForwardVector());
+			//if (K2_HasAuthority())
+		//	{
+			
+				CurrentDirection =
+				   FStateHelper::GetIsCharacterTargetMode(GetAbilitySystemComponentFromActorInfo())
+					   ? FLocateHelper::GetDirectionByAngle(Angle) : EMovementDirection::F;
+		//	}
 			// [추가] CurrentDirection 로그 남기기
+			UE_LOG(LogTemp, Log, TEXT("Angle : %f"),
+			Angle);
 			UE_LOG(LogTemp, Log, TEXT("CurrentDirection : %s"),
 				*UEnum::GetValueAsString(CurrentDirection));
+			// MovementVector 로그 남기기
+			FVector2D MovementVector = OwnerCharacter->GetMovementVector();
+			UE_LOG(LogTemp, Log, TEXT("MovementVector : X = %f, Y = %f"), MovementVector.X, MovementVector.Y);
 			if (UAnimMontage* EvadeAnim = OwnerCharacter->GetEquipComponent()
 				->GetEvadeAnim().GetAnimationByDirection(CurrentDirection))
 			{
@@ -152,4 +164,10 @@ void UGA_Sprint::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGame
 	GetAbilitySystemComponentFromActorInfo()->
 		RemoveActiveGameplayEffectBySourceEffect(RollEffect, GetAbilitySystemComponentFromActorInfo());
 }
-
+// void UGA_Sprint::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+// {
+// 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+//
+// 	DOREPLIFETIME(UGA_Sprint, CurrentDirection);
+// 	
+// }
