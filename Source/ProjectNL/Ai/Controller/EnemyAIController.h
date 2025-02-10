@@ -13,6 +13,7 @@
 class UBlackboardData;
 class UBehaviorTree;
 class UAISenseConfig_Sight;
+class APlayerCharacter;
 UCLASS()
 class PROJECTNL_API AEnemyAIController : public AAIController
 {
@@ -37,6 +38,10 @@ protected:
 	void OnPerceptionUpdated(AActor* UpdatedActor, FAIStimulus Stimulus);
 	UFUNCTION()
 	void UpdateClosestEnemy();
+
+
+
+	
 private:
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	UAIPerceptionComponent* AIPerceptionComponent;
@@ -44,7 +49,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	UAISenseConfig_Sight* SightConfig;
 
-	
+	APlayerCharacter* NearestEnemy;
 	
 	UPROPERTY(EditAnywhere, Category = "BB")
 	TObjectPtr<UBlackboardData> BBAsset;
