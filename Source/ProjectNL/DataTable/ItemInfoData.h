@@ -34,7 +34,7 @@ enum class EOptionDataKey : uint32
 
 // 아이템 정보를 담아 추후 아이템을 구성할 때 사용할 요소
 USTRUCT(BlueprintType)
-struct PROJECT_02_API FItemInfoData : public FTableRowBase
+struct PROJECTNL_API FItemInfoData : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	
@@ -77,7 +77,7 @@ private:
 
 // 실제 플레이어가 저장할 정보 값
 USTRUCT(BlueprintType)
-struct PROJECT_02_API FItemMetaInfo
+struct PROJECTNL_API FItemMetaInfo
 {
 	GENERATED_USTRUCT_BODY()
 	
