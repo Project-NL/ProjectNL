@@ -17,6 +17,13 @@ ABasePlayerState::ABasePlayerState()
 		"Player Attribute Set");
 }
 
+void ABasePlayerState::BeginPlay()
+{
+	Super::BeginPlay();
+
+	InitializeData();
+}
+
 UAbilitySystemComponent* ABasePlayerState::GetAbilitySystemComponent() const
 {
 	return Cast<UNLAbilitySystemComponent>(AbilitySystemComponent.Get());

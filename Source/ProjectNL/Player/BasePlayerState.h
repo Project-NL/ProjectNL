@@ -16,6 +16,7 @@ class PROJECTNL_API ABasePlayerState : public APlayerState, public IAbilitySyste
 public:
 	ABasePlayerState();
 
+	virtual void BeginPlay() override;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Ability System")
 	TObjectPtr<UNLAbilitySystemComponent> AbilitySystemComponent;
 
@@ -24,13 +25,13 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
-
+	
 	void InitializeData();
 	
 	FORCEINLINE uint8 GetInventorySlotCount() const  { return InventorySlotCount; }
 	FORCEINLINE uint8 GetHotSlotCount() const  { return HotSlotCount; }
 	FORCEINLINE uint8 GetTotalSlotCount() const  { return HotSlotCount + InventorySlotCount; }
-	FORCEINLINE TArray<FItemMetaInfo> GetPlayerInventoryList() const { return PlayerInventoryList; }
+	FORCEINLINE const TArray<FItemMetaInfo> &GetPlayerInventoryList()  { return PlayerInventoryList; }
 	
 	uint32 AddItem(const FItemMetaInfo& ItemInfo);
 
@@ -56,11 +57,11 @@ private:
 	TArray<uint32> InitialItemList;
 
 	UPROPERTY()
-	TArray<FItemMetaInfo> PlayerInventoryList;
+	TArray<FItemMetaInfo> PlayerInventoryList;//인벤토리 
 
 	// TODO: 아래와 같은 설정은 추후 Data Asset으로 이전해보기
 	UPROPERTY(EditDefaultsOnly, Category = "Options", meta = (AllowPrivateAccess = true))
-	uint8 InventorySlotCount = 0;
+	uint8 InventorySlotCount = 10;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Options", meta = (AllowPrivateAccess = true))
 	uint8 HotSlotCount = 0;

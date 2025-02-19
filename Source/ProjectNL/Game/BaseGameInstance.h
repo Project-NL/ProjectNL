@@ -13,8 +13,9 @@ class PROJECTNL_API UBaseGameInstance : public UGameInstance
 	UBaseGameInstance();
 
 public:
-	FORCEINLINE TArray<FItemInfoData> GetItemInfoList() const{ return ItemInfoList; }
-	
+    const TArray<FItemInfoData>& GetItemInfoList();
+	virtual void Init() override;
+
 private:
 	UPROPERTY()
 	TArray<FItemInfoData> ItemInfoList;

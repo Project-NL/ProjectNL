@@ -8,12 +8,26 @@ UBaseGameInstance::UBaseGameInstance()
 	LoadItemData();
 }
 
+const TArray<FItemInfoData>& UBaseGameInstance::GetItemInfoList()
+{
+	 return ItemInfoList; 
+}
+
+
+void UBaseGameInstance::Init()
+{
+	Super::Init();
+
+	//LoadItemData();
+}
+
 
 void UBaseGameInstance::LoadItemData()
 {
 	// DataTable 만들면 주소 변경
 	const static ConstructorHelpers::FObjectFinder<UDataTable>
-		ItemInfoDataTable(TEXT("/Script/Engine.DataTable'/Game/Sangmin/DataTable/DT_ItemData.DT_ItemData'"));
+
+		ItemInfoDataTable(TEXT("/Script/Engine.DataTable'/Game/Blueprints/Item/DT_Item.DT_Item'"));
 
 	if (ItemInfoDataTable.Succeeded())
 	{

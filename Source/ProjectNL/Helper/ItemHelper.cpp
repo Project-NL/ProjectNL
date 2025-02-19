@@ -3,10 +3,11 @@
 #include "ProjectNL/DataTable/ItemInfoData.h"
 #include "ProjectNL/Game/BaseGameInstance.h"
 
-FItemInfoData FItemHelper::GetItemInfoById(const UWorld* World, const uint16 Id)
+FItemInfoData& FItemHelper::GetItemInfoById(const UWorld* World, const uint16 Id)
 {
-	const UBaseGameInstance* GI = static_cast<UBaseGameInstance*>(World->GetGameInstance());
-	return GI->GetItemInfoList()[Id];
+	 UBaseGameInstance* GI = static_cast<UBaseGameInstance*>(World->GetGameInstance());
+	TArray<FItemInfoData> ItemInfoDatas =GI->GetItemInfoList();
+	return ItemInfoDatas[Id];
 }
 
 FItemMetaInfo FItemHelper::GetInitialItemMetaDataById
