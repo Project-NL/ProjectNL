@@ -24,7 +24,8 @@ void UInventoryWidget::NativePreConstruct()
 		}
 	}
 
-	RefreshInventory();
+	// PreConstruct 환경에서는 PlayerState를 가져오지 못함.
+	// RefreshInventory();
 }
 
 void UInventoryWidget::NativeConstruct()

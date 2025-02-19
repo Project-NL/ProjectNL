@@ -22,6 +22,14 @@ void ABasePlayerState::BeginPlay()
 	Super::BeginPlay();
 
 	InitializeData();
+
+	// 테스트용 임시코드
+	for (const uint32 ItemId : InitialItemList)
+	{
+		FItemMetaInfo NewItemData = FItemHelper::GetInitialItemMetaDataById(GetWorld(), ItemId);
+		NewItemData.SetCurrentCount(FItemHelper::GetItemInfoById(GetWorld(), ItemId).GetMaxItemCount());
+		AddItem(NewItemData);
+	}
 }
 
 UAbilitySystemComponent* ABasePlayerState::GetAbilitySystemComponent() const
@@ -82,6 +90,11 @@ void ABasePlayerState::SwapItemInInventory(const uint16 Prev, const uint16 Next)
 // PlayerController로 옮길 생각 해야함.
 void ABasePlayerState::SetPlayerHandItemByPS(const uint16 NewIndex)
 {
+	if (GetHotSlotCount() == 0)
+	{
+		return;
+	}
+	
 	// 핫슬롯을 넘은 경우는 처리할 필요 없다.
 	if (NewIndex > GetHotSlotCount())
 	{
