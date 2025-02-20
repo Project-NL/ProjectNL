@@ -8,9 +8,9 @@ void UInventorySlotWidget::SetupSlot(int32 SlotIndex, const FItemMetaInfo& ItemD
 {
 	// FItemHelper를 이용해 아이템의 정보를 가져옵니다.
 	
-	const FItemInfoData& ItemInfo = FItemHelper::GetItemInfoById(GetWorld(), ItemData.GetId());
+	const FItemInfoData ItemInfo = FItemHelper::GetItemInfoById(GetWorld(), ItemData.GetId());
 	// 썸네일 이미지 설정 (아이템 정보에 따라)
-	if (ItemInfo.GetThumbnail().IsValid())
+	if (ItemInfo.GetThumbnail().LoadSynchronous())
 	{
 		// 텍스처를 로드한 후 Image 위젯에 설정 (동기적으로 로드)
 		UTexture2D* Texture = ItemInfo.GetThumbnail().LoadSynchronous();

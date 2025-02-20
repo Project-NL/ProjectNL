@@ -47,7 +47,7 @@ void ASpawnableItem::OnOverlapBegin(
 		{
 				// 인벤토리에 아이템 추가 (인벤토리 컴포넌트의 AddItem 함수 구현에 따라 반환값 체크)
 				int8 bAdded = BasePlayerState->AddItem(ItemMetaInfo);
-				if (bAdded)
+				if (bAdded>0)
 				{
 					// 아이템 추가에 성공하면, 아이템 액터를 파괴합니다.
 					Destroy();
