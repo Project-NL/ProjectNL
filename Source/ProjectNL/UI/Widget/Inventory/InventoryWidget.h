@@ -2,8 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "ProjectNL/DataTable/ItemInfoData.h"
 #include "InventoryWidget.generated.h"
 
+class UEquipInventoryComponent;
 // 전방 선언
 class UUniformGridPanel;
 class UInventorySlotWidget;
@@ -27,6 +29,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	FText InventoryTitle;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	EItemType ItemType;
+
 protected:
 	// UMG 에디터에서 Grid Panel과 바인딩할 변수
 	UPROPERTY(meta = (BindWidget))
@@ -40,7 +45,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	TSubclassOf<UInventorySlotWidget> InventorySlotWidgetClass;
 
+	
 private:
 	// 인벤토리 데이터를 가지고 있는 PlayerState를 캐싱
 	ABasePlayerState* PlayerState;
+	UEquipInventoryComponent* EquipInventoryComponent;
+
+	TArray<FItemMetaInfo> *InventoryList ;
 };

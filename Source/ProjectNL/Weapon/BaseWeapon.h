@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ProjectNL/Helper/UtilHelper.h"
+#include "ProjectNL/Item/SpawnableItem.h"
 #include "BaseWeapon.generated.h"
 
 class UGameplayEffect;
@@ -11,7 +12,7 @@ enum class EUEquippedHandType : uint8;
 enum class EWeaponAttachPosition : uint8;
 
 UCLASS()
-class PROJECTNL_API ABaseWeapon : public AActor
+class PROJECTNL_API ABaseWeapon : public ASpawnableItem
 {
 	GENERATED_BODY()
 
@@ -33,8 +34,10 @@ public:
 	GETTER_SETTER(FVector, PrevStartLocation)
 	GETTER_SETTER(FVector, PrevEndLocation)
 
+	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 protected:
 	virtual void BeginPlay() override;
+
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Assets
@@ -62,4 +65,6 @@ private:
 	// 캐릭터별로 관리할 변수 선언
 	FVector PrevStartLocation;
 	FVector PrevEndLocation;
+
+	bool bAddInventory;
 };

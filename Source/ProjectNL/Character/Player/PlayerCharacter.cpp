@@ -7,6 +7,7 @@
 #include "ProjectNL/Component/CameraComponent/PlayerCameraComponent.h"
 #include "ProjectNL/Component/CameraComponent/PlayerSpringArmComponent.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
+#include "ProjectNL/Component/InventoryComponent/EquipInventoryComponent.h"
 #include "ProjectNL/GAS/Ability/Active/Default/Knockback/GA_Knockback.h"
 #include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 #include "ProjectNL/Player/BasePlayerState.h"
@@ -42,6 +43,8 @@ APlayerCharacter::APlayerCharacter()
 	// Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	PlayerCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+
+	EquipInventoryComponent =CreateDefaultSubobject<UEquipInventoryComponent>(TEXT("EquipInventoryComponent"));
 	SetEntityType(EEntityCategory::Player);
 }
 
@@ -69,6 +72,8 @@ void APlayerCharacter::OnRep_PlayerState()
 		
 		AbilitySystemComponent->OnDamageReactNotified
 		.AddDynamic(this, &APlayerCharacter::OnDamaged);
+
+		EquipInventoryComponent->InitializeData();
 		Initialize();
 	}
 }
@@ -95,7 +100,9 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 		
 		AbilitySystemComponent->OnDamageReactNotified
 		.AddDynamic(this, &ThisClass::APlayerCharacter::OnDamaged);
-		
+
+		EquipInventoryComponent->InitializeData();
+
 		Initialize();
 	}
 }
@@ -286,6 +293,10 @@ void APlayerCharacter::OnKnockback(const FDamagedResponse& DamagedResponse, floa
 		return;
 	}
    
+}
+UEquipInventoryComponent* APlayerCharacter::GetEquipInventoryComponent()
+{
+	return EquipInventoryComponent;
 }
 
 

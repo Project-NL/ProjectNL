@@ -3,6 +3,8 @@
 #include "InventorySlotWidget.h"
 #include "Components/TextBlock.h"
 #include "GameFramework/PlayerController.h"
+#include "ProjectNL/Character/Player/PlayerCharacter.h"
+#include "ProjectNL/Component/InventoryComponent/EquipInventoryComponent.h"
 #include "ProjectNL/Player/BasePlayerState.h"
 
 
@@ -10,21 +12,26 @@ void UInventoryWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
 
-	if (InventoryLabel)
-	{
-		InventoryLabel->SetText(InventoryTitle);
-	}
-
-	// 소유한 PlayerController에서 PlayerState를 가져옵니다.
-	if (APlayerController* PC = GetOwningPlayer())
-	{
-		if (ABasePlayerState* PS = PC->GetPlayerState<ABasePlayerState>())
-		{
-			PlayerState = PS;
-		}
-	}
-	// PreConstruct 환경에서는 PlayerState를 가져오지 못함.
-	// RefreshInventory();
+	// if (InventoryLabel)
+	// {
+	// 	InventoryLabel->SetText(InventoryTitle);
+	// }
+	//
+	// // 소유한 PlayerController에서 PlayerState를 가져옵니다.
+	// if (APlayerController* PC = GetOwningPlayer())
+	// {
+	// 	if (ABasePlayerState* PS = PC->GetPlayerState<ABasePlayerState>())
+	// 	{
+	// 		PlayerState = PS;
+	// 	}
+	// 	APlayerCharacter* PlayerCharacter=Cast<APlayerCharacter>(PlayerState->GetOwner());
+	// 	if (PlayerCharacter)
+	// 	{
+	// 		EquipInventoryComponent=PlayerCharacter->GetEquipInventoryComponent();
+	// 	}
+	// }
+	// // PreConstruct 환경에서는 PlayerState를 가져오지 못함.
+	// // RefreshInventory();
 }
 
 void UInventoryWidget::NativeConstruct()
@@ -35,7 +42,7 @@ void UInventoryWidget::NativeConstruct()
 	{
 		InventoryLabel->SetText(InventoryTitle);
 	}
-
+	//GetWorld()
 	// 소유한 PlayerController에서 PlayerState를 가져옵니다.
 	if (APlayerController* PC = GetOwningPlayer())
 	{
@@ -43,9 +50,16 @@ void UInventoryWidget::NativeConstruct()
 		{
 			PlayerState = PS;
 		}
+		APlayerCharacter* PlayerCharacter=Cast<APlayerCharacter>(PlayerState->GetPawn());
+		if (PlayerCharacter)
+		{
+			EquipInventoryComponent=PlayerCharacter->GetEquipInventoryComponent();
+		}
 	}
+	
 
 	RefreshInventory();
+	
 }
 
 void UInventoryWidget::RefreshInventory()
@@ -59,7 +73,24 @@ void UInventoryWidget::RefreshInventory()
 	InventoryGrid->ClearChildren();
 
 	// PlayerState에서 인벤토리 리스트를 가져옵니다.
-	const TArray<FItemMetaInfo>& InventoryList = PlayerState->GetPlayerInventoryList();
+	
+		switch (ItemType)
+		{
+		case EItemType::Consume:
+			InventoryList = PlayerState->GetPlayerInventoryList();
+			break;
+		case EItemType::Weapon:
+			InventoryList = EquipInventoryComponent->GetWeaponInventoryList();
+			break;
+		case EItemType::Armor:
+			InventoryList = EquipInventoryComponent->GetArmorInventoryList();
+			break;
+		case EItemType::Accessory:
+			InventoryList = EquipInventoryComponent->GetAccessoryInventoryList();
+			break;
+		}
+
+	
 		
 	// 예시로 4열 그리드를 만든다고 가정합니다.
 	const int32 NumColumns = 4;
@@ -77,13 +108,14 @@ void UInventoryWidget::RefreshInventory()
 		if (SlotWidget)
 		{
 			// 슬롯 위젯에 인덱스와 아이템 데이터를 전달하여 초기화합니다.
-			if (Index < InventoryList.Num())
+			if (Index < InventoryList->Num())
 			{
-				SlotWidget->SetupSlot(Index, InventoryList[Index]);
+				SlotWidget->SetupSlot(Index, InventoryList,Index);
+				SlotWidget->OnInventorySlotChanged.AddUObject(this, &UInventoryWidget::RefreshInventory);
 			}
 			// 행과 열 계산 (Index를 이용)
-			const int32 Row = Index / NumColumns;
-			const int32 Column = Index % NumColumns;
+			int32 Row = Index / NumColumns;
+			int32 Column = Index % NumColumns;
 
 			// 그리드에 슬롯 위젯 추가
 			InventoryGrid->AddChildToUniformGrid(SlotWidget, Row, Column);

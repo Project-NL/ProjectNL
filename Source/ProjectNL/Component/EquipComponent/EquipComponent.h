@@ -23,6 +23,10 @@ public:
 	void MoveNextComboCount();
 
 	void ClearCurrentComboCount();
+
+	void EquipWeapon(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon);
+
+	void UnequipWeapon(bool bIsMainWeapon);
 	
 	GETTER(uint8, AttackComboIndex)
 	
@@ -47,6 +51,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	void SetAnimationsByWeaponState();
+
 
 private:
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

@@ -8,7 +8,9 @@ enum class EItemType : uint32
 {
 	Undefined,
 	Interactive,
-	Equipment,
+	Weapon,
+	Armor,
+	Accessory,
 	Consume,
 	Ingredient,
 	Build,

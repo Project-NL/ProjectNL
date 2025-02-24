@@ -31,6 +31,7 @@ void ABaseCharacter::Initialize()
 			AbilitySystemComponent->AddLooseGameplayTag(NlGameplayTags::Status_Combat);
 		}
 	}
+
 }
 
 void ABaseCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)

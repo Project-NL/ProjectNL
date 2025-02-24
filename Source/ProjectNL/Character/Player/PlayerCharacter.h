@@ -5,6 +5,7 @@
 #include "ProjectNL/Interface/InteractionInterface.h"
 #include "PlayerCharacter.generated.h"
 
+class UEquipInventoryComponent;
 class UPlayerSpringArmComponent;
 class UPlayerCameraComponent;
 class UPlayerAttributeSet;
@@ -23,6 +24,7 @@ public:
 	UPROPERTY()
 	TObjectPtr<UPlayerAttributeSet> PlayerAttributeSet;
 
+	UEquipInventoryComponent* GetEquipInventoryComponent();
 protected:
 	virtual void BeginPlay() override;
 
@@ -33,6 +35,8 @@ protected:
 
 	void MoveTo(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+
+	
 
 private:
 	UFUNCTION()
@@ -59,6 +63,10 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UPlayerCameraComponent* PlayerCamera;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UEquipInventoryComponent* EquipInventoryComponent;
+
+	
 	FOnMontageEnded MontageEndedDelegate;
 
 	FDamagedResponse DamageResponse;
@@ -66,3 +74,4 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Ability")
 	TSubclassOf<UGameplayAbility> KnockbackAbility;
 };
+

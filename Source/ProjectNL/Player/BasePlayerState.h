@@ -31,7 +31,7 @@ public:
 	FORCEINLINE uint8 GetInventorySlotCount() const  { return InventorySlotCount; }
 	FORCEINLINE uint8 GetHotSlotCount() const  { return HotSlotCount; }
 	FORCEINLINE uint8 GetTotalSlotCount() const  { return HotSlotCount + InventorySlotCount; }
-	FORCEINLINE const TArray<FItemMetaInfo> &GetPlayerInventoryList()  { return PlayerInventoryList; }
+	FORCEINLINE TArray<FItemMetaInfo> *GetPlayerInventoryList()  { return &PlayerInventoryList; }
 	
 	uint32 AddItem(const FItemMetaInfo& ItemInfo);
 
