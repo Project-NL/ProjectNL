@@ -84,14 +84,16 @@ void ABasePlayerController::ToggleInventoryWidget()
 			if (InventoryWidget)
 			{
 				InventoryWidget->AddToViewport();
-				// UI 모드로 입력 전환: 마우스 커서를 보이게 하고, 입력은 UI로만 전달
-				FInputModeGameAndUI InputMode;
-				// 포커스를 인벤토리 위젯에 설정합니다.
-				//UIInputMode.SetWidgetToFocus(nullptr);
-				//UIInputMode.SetWidgetToFocus(InventoryWidget->TakeWidget());
-				// 마우스 커서를 뷰포트에 고정하지 않음
-				InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-				SetInputMode(InputMode);
+				FInputModeGameAndUI  UIInputMode;
+                
+				// 이 위젯에 마우스 포커스가 잡히도록 설정
+				UIInputMode.SetWidgetToFocus(InventoryWidget->TakeWidget());
+                
+				// 마우스를 뷰포트에 고정하지 않음(필요 시 조정)
+				UIInputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+                
+				// UIOnly 모드로 입력 전환
+				SetInputMode(UIInputMode);
 				bShowMouseCursor = true;
 			}
 		}

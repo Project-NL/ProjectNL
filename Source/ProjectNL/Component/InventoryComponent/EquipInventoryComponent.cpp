@@ -164,6 +164,12 @@ uint32 UEquipInventoryComponent::AddEquipmentToInventory(TArray<FItemMetaInfo>& 
 	return RemainCount > 0 ? RemainCount : 0;
 }
 
+void UEquipInventoryComponent::SwapItemToEquipItem(const uint16 Prev, const uint16 Next)
+{
+
+	
+}
+
 bool UEquipInventoryComponent::DropItem(TArray<FItemMetaInfo>& PlayerInventoryList,const uint16 Index, const uint32 Count)
 {
 	// -1은 강제로 다 버리기

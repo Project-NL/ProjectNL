@@ -24,12 +24,12 @@ void ABasePlayerState::BeginPlay()
 	InitializeData();
 
 	// 테스트용 임시코드
-	// for (const uint32 ItemId : InitialItemList)
-	// {
-	// 	FItemMetaInfo NewItemData = FItemHelper::GetInitialItemMetaDataById(GetWorld(), ItemId);
-	// 	NewItemData.SetCurrentCount(FItemHelper::GetItemInfoById(GetWorld(), ItemId).GetMaxItemCount());
-	// 	AddItem(NewItemData);
-	// }
+	for (const uint32 ItemId : InitialItemList)
+	{
+		FItemMetaInfo NewItemData = FItemHelper::GetInitialItemMetaDataById(GetWorld(), ItemId);
+		NewItemData.SetCurrentCount(FItemHelper::GetItemInfoById(GetWorld(), ItemId).GetMaxItemCount());
+		AddItem(NewItemData);
+	}
 }
 
 UAbilitySystemComponent* ABasePlayerState::GetAbilitySystemComponent() const

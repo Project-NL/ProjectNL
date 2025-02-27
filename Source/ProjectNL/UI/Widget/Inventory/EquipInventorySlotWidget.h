@@ -6,13 +6,13 @@
 #include "SlotWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "ProjectNL/DataTable/ItemInfoData.h"
-#include "InventorySlotWidget.generated.h"
+#include "EquipInventorySlotWidget.generated.h"
 
 /**
  * 
- */  
+ */
 UCLASS()
-class PROJECTNL_API UInventorySlotWidget : public USlotWidget
+class PROJECTNL_API UEquipInventorySlotWidget : public USlotWidget
 {
 	GENERATED_BODY()
 
@@ -28,7 +28,7 @@ public:
 	// 초기화 후 호출되는 네이티브 함수
 	virtual void NativeConstruct() override;
 
-	
+	FOnInventorySlotChanged OnInventorySlotChanged;
 protected:
 	// UMG 에디터에서 바인딩할 요소 (예: 아이템 이미지, 개수를 표시할 TextBlock)
 	UPROPERTY(meta = (BindWidget))
@@ -40,7 +40,11 @@ protected:
 	// 새로 추가된 버튼
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ItemButton;
+
+private:
 	
 	void EquipItem();
-
+	
+	
+	
 };

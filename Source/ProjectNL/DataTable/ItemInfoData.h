@@ -40,7 +40,7 @@ struct PROJECTNL_API FItemInfoData : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	
-	FORCEINLINE FString GetDisplayName() const { return DisplayName; }
+	FORCEINLINE FText GetDisplayName() const { return DisplayName; }
 	FORCEINLINE EItemType GetItemType() const { return ItemType; }
 	FORCEINLINE TSoftObjectPtr<UTexture2D> GetThumbnail() const { return Thumbnail; }
 	FORCEINLINE TSubclassOf<AActor> GetShowItemActor() const { return ShowItemActor; }
@@ -50,7 +50,7 @@ struct PROJECTNL_API FItemInfoData : public FTableRowBase
 	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Data", meta=(AllowPrivateAccess = true));
-	FString DisplayName;
+	FText DisplayName;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Data", meta=(AllowPrivateAccess = true));
 	EItemType ItemType = EItemType::Undefined;

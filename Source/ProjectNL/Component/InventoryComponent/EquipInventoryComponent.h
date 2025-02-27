@@ -51,6 +51,8 @@ public:
 
 	void SwapItemInInventory(const uint16 Prev, const uint16 Next);
 
+	void SwapItemToEquipItem(const uint16 Prev, const uint16 Next);
+
 	void SetPlayerHandItemByPS(const uint16 NewIndex);
 
 	FORCEINLINE TMap<uint32, uint32> GetCurrentRemainItemValue() const { return CurrentRemainItemValue; }
