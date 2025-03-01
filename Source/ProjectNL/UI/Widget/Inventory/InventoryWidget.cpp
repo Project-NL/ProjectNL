@@ -134,8 +134,6 @@ void UInventoryWidget::RefreshInventory()
 }
 void UInventoryWidget::UpdateItemDescription(int32 SlotIndex, const FItemInfoData& ItemData,const FVector2D& MousePosition)
 {
-
-
 	
 	if (!ItemDescriptionPanel)
 	{
@@ -171,16 +169,6 @@ void UInventoryWidget::UpdateItemDescription(int32 SlotIndex, const FItemInfoDat
 		}
 
 		ItemDescriptionPanel->SetPositionInViewport(PopUpPosition);
-
-		// // 아이템 정보 표시 (예: 텍스트 위젯)
-		// if (UTextBlock* ItemNameText = Cast<UTextBlock>(ItemDescriptionPanel->GetWidgetFromName("ItemName")))
-		// {
-		// 	ItemNameText->SetText(ItemData.GetName());
-		// }
-		// if (UTextBlock* ItemDescriptionText = Cast<UTextBlock>(ItemDescriptionPanel->GetWidgetFromName("ItemDescription")))
-		// {
-		// 	ItemDescriptionText->SetText(ItemData.GetDescription());
-		// }
 		ItemDescriptionPanel->SetVisibility(ESlateVisibility::Visible);
 	}
 	else

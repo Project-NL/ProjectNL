@@ -66,3 +66,8 @@ void ASpawnableItem::UseItem()
 {
 	// 아이템 사용 인터페이스 구현: 필요에 따라 처리
 }
+
+FItemMetaInfo* ASpawnableItem::GetItemMetainfo()
+{
+	return &ItemMetaInfo;
+}

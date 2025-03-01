@@ -47,6 +47,7 @@ struct PROJECTNL_API FItemInfoData : public FTableRowBase
 	FORCEINLINE int GetMaxItemCount() const { return MaxItemCount; }
 	FORCEINLINE TMap<EMetaDataKey, FString> GetMetaData() const { return MetaData; }
 	FORCEINLINE TMap<EOptionDataKey, FString> GetOptionData() const { return OptionData; }
+	FORCEINLINE FText GetDescription() const { return Description; }
 	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Data", meta=(AllowPrivateAccess = true));
@@ -69,6 +70,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Data", meta = (AllowPrivateAccess = true,
 		ClampMin = 0, ClampMax = 1000, UIMin = 0, UIMax = 1000));
 	int MaxItemCount = 0;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Data", meta=(AllowPrivateAccess = true));
+	FText Description;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Data", meta=(AllowPrivateAccess = true));
 	TMap<EMetaDataKey, FString> MetaData;

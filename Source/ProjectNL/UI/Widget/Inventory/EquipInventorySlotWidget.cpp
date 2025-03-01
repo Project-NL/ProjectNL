@@ -68,6 +68,7 @@ void UEquipInventorySlotWidget::EquipItem()
 			UEquipComponent* EquipComponent = PlayerCharacter->GetEquipComponent();
 			// 아이템 장착 로직
 			EquipComponent->EquipWeapon(CurrentItemData.GetShowItemActor(), true);
+			EquipComponent->EquipInventorySlotChangedDelegate.Broadcast();
 			//UE_LOG(LogTemp, Log, TEXT("Item equipped: %s from slot %d via double-click"), CurrentItemData.GetShowItemActor().Get(), CurrentSlotIndex);
 			// 델리게이트 브로드캐스트
 

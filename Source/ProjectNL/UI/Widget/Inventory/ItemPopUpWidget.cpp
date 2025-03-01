@@ -20,5 +20,7 @@ void UItemPopUpWidget::SetItemData(const FItemInfoData& ItemInfoData)
 	//FString DisplayName = ItemInfoData.GetDisplayName();
 //	UE_LOG(LogTemp, Log, TEXT("DisplayName: %s"), *DisplayName);
 	ItemName->SetText(ItemInfoData.GetDisplayName());
+
+	Description->SetText(ItemInfoData.GetDescription());
 }
 	

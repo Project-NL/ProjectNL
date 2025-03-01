@@ -120,9 +120,7 @@ void UEquipComponent::EquipWeapon(TSubclassOf<AActor> WeaponClass, bool bIsMainW
 				SubWeapon = NewWeapon;
 				SubWeapon->EquipCharacterWeapon(Character, bIsMainWeapon);
 			}
-		
 			UpdateEquipWeaponAnimationData(); // 애니메이션 데이터 갱신
-		
 	}
 }
 

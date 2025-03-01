@@ -40,18 +40,18 @@ void UInventorySlotWidget::OnItemButtonPressed()
 	float CurrentTime = GetWorld()->GetTimeSeconds();
 
 	// 더블클릭 감지
-	if (CurrentTime - LastPressTime <= DoubleClickThreshold)
-	{
-		if (Count > 0)
-		{
-			if (CurrentItemData.GetItemType()==EItemType::Accessory||
-				CurrentItemData.GetItemType()==EItemType::Armor||
-				CurrentItemData.GetItemType()==EItemType::Weapon)//장비 일 때 
-			{
-				EquipItem(); // 더블클릭 확인 시 장착
-			}
-		}
-	}
+	// if (CurrentTime - LastPressTime <= DoubleClickThreshold)
+	// {
+	// 	if (Count > 0)
+	// 	{
+	// 		if (CurrentItemData.GetItemType()==EItemType::Accessory||
+	// 			CurrentItemData.GetItemType()==EItemType::Armor||
+	// 			CurrentItemData.GetItemType()==EItemType::Weapon)//장비 일 때 
+	// 		{
+	// 			EquipItem(); // 더블클릭 확인 시 장착
+	// 		}
+	// 	}
+	// }
 
 	// 마지막 눌림 시간 업데이트
 	LastPressTime = CurrentTime;

@@ -36,11 +36,11 @@ public:
 	virtual void Interact(AActor* Actor) override;
 	virtual void UseItem() override;
 
+	FItemMetaInfo* GetItemMetainfo();
+protected:
 	// 아이템 데이터
 	UPROPERTY(EditAnywhere)
 	FItemMetaInfo ItemMetaInfo;
-protected:
-	
 	
 	// 충돌 처리를 위한 박스 컴포넌트
 	UPROPERTY(VisibleAnywhere)
