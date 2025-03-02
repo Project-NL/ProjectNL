@@ -35,7 +35,7 @@ ASpawnableItem::ASpawnableItem()
     AcquireWidgetComponent->SetDrawSize(FVector2D(200.f, 50.f));
 
     // (옵션) 살짝 위로 띄워서 아이템 상단에 표시하기
-    AcquireWidgetComponent->SetRelativeLocation(FVector(0.f, 200.f, 100.f));
+    AcquireWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 100.f));
     AcquireWidgetComponent->SetWidgetClass(UItemAcquireTextWidget::StaticClass());
     
     // 시작 시에는 보이지 않도록 설정
