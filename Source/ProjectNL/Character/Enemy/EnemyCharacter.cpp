@@ -23,6 +23,10 @@ void AEnemyCharacter::BeginPlay()
 	
 	AbilitySystemComponent->OnDamageReactNotified
 	.AddDynamic(this, &ThisClass::OnDamaged);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			EnemyAttributeSet->GetMovementSpeedAttribute()).AddUObject(
+			this, &ThisClass::MovementSpeedChanged);
 }
 
 void AEnemyCharacter::OnDamaged_Implementation(const FDamagedResponse& DamagedResponse)
