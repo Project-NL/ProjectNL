@@ -34,11 +34,13 @@ public:
 	GETTER_SETTER(FVector, PrevStartLocation)
 	GETTER_SETTER(FVector, PrevEndLocation)
 
-	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+	
+	
 protected:
 	virtual void BeginPlay() override;
 
-
+	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+	virtual void Interact(AActor* Actor) override;
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Assets
 	, meta = (AllowPrivateAccess = "true"))

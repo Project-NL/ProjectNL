@@ -2,6 +2,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "ProjectNL/Item/SpawnableItem.h"
 #include "ProjectNL/UI/Widget/Inventory/InventoryWidget.h"
 #include "ProjectNL/UI/Widget/PlayerStatus/PlayerStatus.h"
 
@@ -49,18 +50,30 @@ void ABasePlayerController::SetupInputComponent()
 				&ABasePlayerController::ToggleInventoryWidget
 			);
 		}
+		if (AcquireSpawnItem)
+		{
+			EnhancedInputComponent->BindAction(
+				AcquireSpawnItem, 
+				ETriggerEvent::Triggered, 
+				this, 
+				&ABasePlayerController::TryInteract
+			);
+		}
 	}
+}
 
-	// Enhanced Input 시스템을 사용하는 경우, 보통 로컬 플레이어 서브시스템에 InputMappingContext를 추가합니다.
-	// 예시 코드:
-	// if (APlayerController* PC = GetLocalPlayerController())
-	// {
-	// 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
-	// 	{
-	// 		// 여기서 인벤토리 토글 액션이 포함된 매핑 컨텍스트를 추가할 수 있습니다.
-	// 		// Subsystem->AddMappingContext(MyMappingContext, 0);
-	// 	}
-	// }
+void ABasePlayerController::SetNearbyItem(ASpawnableItem* NearbyActor)
+{
+	NearbyItem=NearbyActor;
+}
+
+void ABasePlayerController::TryInteract()
+{
+	if (NearbyItem)
+	{
+		// 'this' 플레이어 캐릭터를 InteractingActor로 전달
+		NearbyItem->Interact(this);
+	}
 }
 
 void ABasePlayerController::ToggleInventoryWidget()

@@ -2,13 +2,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "ProjectNL/Helper/UtilHelper.h"
 #include "BasePlayerController.generated.h"
 
 
 class UPlayerStatus;
 class UInventoryWidget;
 class UInputAction;
-
+class ASpawnableItem;
 UCLASS()
 class PROJECTNL_API ABasePlayerController : public APlayerController
 {
@@ -18,8 +19,13 @@ public:
 	virtual void BeginPlay() override;
 	virtual void BeginPlayingState() override;
 	virtual void SetupInputComponent() override;
-	
+
+	void SetNearbyItem(ASpawnableItem* NearbyItem);
+
+private:
+	void TryInteract();
 protected:
+
 
 	// TODO: 임시코드로 추후 HUD class에 이전할 필요 있음
 	UPROPERTY(EditDefaultsOnly)
@@ -39,6 +45,12 @@ protected:
 	// Enhanced Input용 인벤토리 토글 액션
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	UInputAction* ToggleInventoryAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	UInputAction* AcquireSpawnItem;
+
+	UPROPERTY()
+	ASpawnableItem* NearbyItem;
 	
 	// Tab 키 입력 시 호출될 인벤토리 토글 함수
 	UFUNCTION()

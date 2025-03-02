@@ -5,6 +5,7 @@
 #include "ProjectNL/Character/Player/PlayerCharacter.h"
 #include "ProjectNL/Component/InventoryComponent/EquipInventoryComponent.h"
 #include "ProjectNL/Helper/EnumHelper.h"
+#include "ProjectNL/Player/BasePlayerController.h"
 
 
 ABaseWeapon::ABaseWeapon()
@@ -22,24 +23,34 @@ void ABaseWeapon::BeginPlay()
 	Super::BeginPlay();
 }
 
+
 void ABaseWeapon::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	Super::OnOverlapBegin(OverlappedComponent, OtherActor,OtherComp,OtherBodyIndex,bFromSweep,SweepResult);
+
 	
-	if (OtherActor && OtherActor != this)
+}
+
+void ABaseWeapon::Interact(AActor* Actor)
+{
+	ABasePlayerController* BasePlayerController = Cast<ABasePlayerController>(Actor);
+	if (BasePlayerController && OverlappingPlayerController ==BasePlayerController)
 	{
 		// 예시로 APlayerCharacter를 플레이어 캐릭터 클래스로 가정
-		APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(OtherActor);
+		APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(OverlappingPlayerController->GetPawn());
+		if (!PlayerCharacter)
+		{
+			return;
+		}
 		UEquipInventoryComponent* EquipInventoryComponent=PlayerCharacter->GetEquipInventoryComponent();
 		if (EquipInventoryComponent)
 		{
 			// 인벤토리에 아이템 추가 (인벤토리 컴포넌트의 AddItem 함수 구현에 따라 반환값 체크)
 			int8 bAdded = EquipInventoryComponent->AddItemMeta(ItemMetaInfo);
-			if (bAdded>0)
-			{
-				// 아이템 추가에 성공하면, 아이템 액터를 파괴합니다.
-				Destroy();
-			}
+			// 아이템 추가에 성공하면, 아이템 액터를 파괴합니다.
+			Destroy();
+		
 		}
 	}
 	
