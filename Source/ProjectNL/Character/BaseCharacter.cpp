@@ -31,6 +31,7 @@ void ABaseCharacter::Initialize()
 			AbilitySystemComponent->AddLooseGameplayTag(NlGameplayTags::Status_Combat);
 		}
 	}
+
 }
 
 void ABaseCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
@@ -96,3 +97,9 @@ void ABaseCharacter::MovementSpeedChanged(const FOnAttributeChangeData& Data)
 
 	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
 }
+
+void ABaseCharacter::SetViewItemOnHand(const FItemInfoData& NewItemInfo)
+{
+	
+}
+

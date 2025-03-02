@@ -5,6 +5,7 @@
 #include "ProjectNL/Interface/InteractionInterface.h"
 #include "PlayerCharacter.generated.h"
 
+class UEquipInventoryComponent;
 class UPlayerSpringArmComponent;
 class UPlayerCameraComponent;
 class UPlayerAttributeSet;
@@ -23,6 +24,7 @@ public:
 	UPROPERTY()
 	TObjectPtr<UPlayerAttributeSet> PlayerAttributeSet;
 
+	UEquipInventoryComponent* GetEquipInventoryComponent();
 protected:
 	virtual void BeginPlay() override;
 
@@ -34,13 +36,14 @@ protected:
 	void MoveTo(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 
-private:
-	//IInteractionInterface
+	
+
 private:
 	UFUNCTION()
 	virtual void OnDamaged(const FDamagedResponse& DamagedResponse) override;
 	virtual void OnDamagedMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
 	virtual void OnKnockback(const FDamagedResponse& DamagedResponse,float DamageMontageLength) override;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input
 		, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -60,11 +63,15 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UPlayerCameraComponent* PlayerCamera;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UEquipInventoryComponent* EquipInventoryComponent;
+
+	
 	FOnMontageEnded MontageEndedDelegate;
 
 	FDamagedResponse DamageResponse;
 
 	UPROPERTY(EditAnywhere, Category = "Ability")
 	TSubclassOf<UGameplayAbility> KnockbackAbility;
-
 };
+

@@ -8,6 +8,7 @@
 
 class ABaseWeapon;
 enum class EPlayerCombatWeaponState : uint8;
+DECLARE_MULTICAST_DELEGATE(FOnEquipInventorySlotChanged);
 
 // TODO: 해당 컴포넌트의 이름에 대한 고민이 더 필요하다.
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -23,6 +24,10 @@ public:
 	void MoveNextComboCount();
 
 	void ClearCurrentComboCount();
+
+	void EquipWeapon(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon);
+
+	void UnequipWeapon(bool bIsMainWeapon);
 	
 	GETTER(uint8, AttackComboIndex)
 	
@@ -43,10 +48,13 @@ public:
 	GETTER(TObjectPtr<ABaseWeapon>, MainWeapon)
 	GETTER(TObjectPtr<ABaseWeapon>, SubWeapon)
 
+	
+	FOnEquipInventorySlotChanged EquipInventorySlotChangedDelegate;
 protected:
 	virtual void BeginPlay() override;
 
 	void SetAnimationsByWeaponState();
+
 
 private:
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

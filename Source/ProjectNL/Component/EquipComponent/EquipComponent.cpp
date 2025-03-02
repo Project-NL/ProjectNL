@@ -87,3 +87,59 @@ void UEquipComponent::SetAnimationsByWeaponState()
 		DamagedAnim = AnimData->DamagedAnim;
 	}
 }
+
+void UEquipComponent::EquipWeapon(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon)
+{
+	if (ABaseCharacter* Character = Cast<ABaseCharacter>(GetOwner()))
+	{
+		// 기존 무기 해제 및 제거
+		if (bIsMainWeapon && MainWeapon)
+		{
+			MainWeapon->UnEquipCharacterWeapon(Character, true);
+			MainWeapon->Destroy();
+			MainWeapon = nullptr;
+		}
+		else if (!bIsMainWeapon && SubWeapon)
+		{
+			SubWeapon->UnEquipCharacterWeapon(Character, false);
+			SubWeapon->Destroy();
+			SubWeapon = nullptr;
+		}
+			// ItemID를 기반으로 무기 클래스 결정 (예시: 데이터 테이블 활용)
+			if (bIsMainWeapon)
+			{
+				MainWeaponClass=WeaponClass;
+				ABaseWeapon* NewWeapon = GetWorld()->SpawnActor<ABaseWeapon>(MainWeaponClass);
+				MainWeapon = NewWeapon;
+				MainWeapon->EquipCharacterWeapon(Character, bIsMainWeapon);
+			}
+			else
+			{
+				SubWeaponClass=WeaponClass;
+				ABaseWeapon* NewWeapon = GetWorld()->SpawnActor<ABaseWeapon>(SubWeaponClass);
+				SubWeapon = NewWeapon;
+				SubWeapon->EquipCharacterWeapon(Character, bIsMainWeapon);
+			}
+			UpdateEquipWeaponAnimationData(); // 애니메이션 데이터 갱신
+	}
+}
+
+void UEquipComponent::UnequipWeapon(bool bIsMainWeapon)
+{
+	if (ABaseCharacter* Character = Cast<ABaseCharacter>(GetOwner()))
+	{
+		if (bIsMainWeapon && MainWeapon)
+		{
+			MainWeapon->UnEquipCharacterWeapon(Character, true);
+			MainWeapon->Destroy();
+			MainWeapon = nullptr;
+		}
+		else if (!bIsMainWeapon && SubWeapon)
+		{
+			SubWeapon->UnEquipCharacterWeapon(Character, false);
+			SubWeapon->Destroy();
+			SubWeapon = nullptr;
+		}
+		UpdateEquipWeaponAnimationData(); // 애니메이션 데이터 갱신
+	}
+}
