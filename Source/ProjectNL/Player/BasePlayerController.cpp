@@ -72,7 +72,7 @@ void ABasePlayerController::TryInteract()
 	if (NearbyItem)
 	{
 		// 'this' 플레이어 캐릭터를 InteractingActor로 전달
-		NearbyItem->Interact(this);
+		NearbyItem->Interact(GetPawn());
 	}
 }
 

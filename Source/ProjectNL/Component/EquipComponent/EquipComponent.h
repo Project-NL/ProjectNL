@@ -28,6 +28,14 @@ public:
 	void EquipWeapon(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon);
 
 	void UnequipWeapon(bool bIsMainWeapon);
+
+	/** 서버에서 실제 무기를 스폰하고 로직을 실행하는 함수 */
+	UFUNCTION(Server, Reliable, WithValidation)  // WithValidation은 UE5에서 옵션. UE4에서 자주 사용.
+	void ServerEquipWeapon(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon);
+
+	/** 서버에서 실행된 결과를 모든 클라이언트에게 반영하는 함수 */
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastEquipWeapon(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon);
 	
 	GETTER(uint8, AttackComboIndex)
 	
@@ -55,7 +63,8 @@ protected:
 
 	void SetAnimationsByWeaponState();
 
-
+	/** 실제 무기 장착 로직 (공유 함수) */
+	void InternalEquipWeaponLogic(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon);
 private:
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	EPlayerCombatWeaponState PlayerCombatWeaponState;

@@ -88,7 +88,7 @@ void UEquipComponent::SetAnimationsByWeaponState()
 	}
 }
 
-void UEquipComponent::EquipWeapon(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon)
+void UEquipComponent::InternalEquipWeaponLogic(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon)
 {
 	if (ABaseCharacter* Character = Cast<ABaseCharacter>(GetOwner()))
 	{
@@ -105,22 +105,36 @@ void UEquipComponent::EquipWeapon(TSubclassOf<AActor> WeaponClass, bool bIsMainW
 			SubWeapon->Destroy();
 			SubWeapon = nullptr;
 		}
-			// ItemID를 기반으로 무기 클래스 결정 (예시: 데이터 테이블 활용)
-			if (bIsMainWeapon)
-			{
-				MainWeaponClass=WeaponClass;
-				ABaseWeapon* NewWeapon = GetWorld()->SpawnActor<ABaseWeapon>(MainWeaponClass);
-				MainWeapon = NewWeapon;
-				MainWeapon->EquipCharacterWeapon(Character, bIsMainWeapon);
-			}
-			else
-			{
-				SubWeaponClass=WeaponClass;
-				ABaseWeapon* NewWeapon = GetWorld()->SpawnActor<ABaseWeapon>(SubWeaponClass);
-				SubWeapon = NewWeapon;
-				SubWeapon->EquipCharacterWeapon(Character, bIsMainWeapon);
-			}
-			UpdateEquipWeaponAnimationData(); // 애니메이션 데이터 갱신
+		// ItemID를 기반으로 무기 클래스 결정 (예시: 데이터 테이블 활용)
+		if (bIsMainWeapon)
+		{
+			MainWeaponClass=WeaponClass;
+			ABaseWeapon* NewWeapon = GetWorld()->SpawnActor<ABaseWeapon>(MainWeaponClass);
+			MainWeapon = NewWeapon;
+			MainWeapon->EquipCharacterWeapon(Character, bIsMainWeapon);
+		}
+		else
+		{
+			SubWeaponClass=WeaponClass;
+			ABaseWeapon* NewWeapon = GetWorld()->SpawnActor<ABaseWeapon>(SubWeaponClass);
+			SubWeapon = NewWeapon;
+			SubWeapon->EquipCharacterWeapon(Character, bIsMainWeapon);
+		}
+		UpdateEquipWeaponAnimationData(); // 애니메이션 데이터 갱신
+	}
+}
+
+void UEquipComponent::EquipWeapon(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon)
+{
+	// 현재 로컬이 서버 권한이 없는 경우(클라이언트) => 서버로 RPC 호출
+	if (!GetOwner() || !GetOwner()->HasAuthority())
+	{
+		ServerEquipWeapon(WeaponClass, bIsMainWeapon);
+	}
+	else
+	{
+		// 서버이므로 직접 로직 실행
+		MulticastEquipWeapon(WeaponClass, bIsMainWeapon);
 	}
 }
 
@@ -142,4 +156,19 @@ void UEquipComponent::UnequipWeapon(bool bIsMainWeapon)
 		}
 		UpdateEquipWeaponAnimationData(); // 애니메이션 데이터 갱신
 	}
+}
+
+void UEquipComponent::MulticastEquipWeapon_Implementation(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon)
+{
+	InternalEquipWeaponLogic(WeaponClass, bIsMainWeapon);
+}
+
+void UEquipComponent::ServerEquipWeapon_Implementation(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon)
+{
+	MulticastEquipWeapon(WeaponClass, bIsMainWeapon);
+}
+
+bool UEquipComponent::ServerEquipWeapon_Validate(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon)
+{
+	return true;
 }

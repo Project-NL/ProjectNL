@@ -45,6 +45,20 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 
 	void AcquireWidgetComponentLookAtPlayer();
+
+	// 네트워크 복제 활성화
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	// 서버에서만 실행되는 Interact 메서드
+	UFUNCTION(Server, Reliable, WithValidation)
+	virtual void ServerInteract(AActor* InteractingActor);
+
+	// 모든 클라이언트에게 아이템 파괴를 알리는 멀티캐스트 RPC
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastDestroyItem();
+
+	// 아이템 파괴 (서버에서 호출)
+	void DestroyItem();
 public:
 	virtual void Interact(AActor* Actor) override;
 	virtual void UseItem() override;
@@ -73,5 +87,7 @@ protected:
 
 	UPROPERTY()
 	ABasePlayerController *OverlappingPlayerController;
+
+
 
 };
