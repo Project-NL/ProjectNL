@@ -89,7 +89,7 @@ void UNLAbilitySystemComponent::InitializeAbilitySystem(
 void UNLAbilitySystemComponent::ReceiveDamage(const FDamagedResponse& DamagedResponse) const
 {
 	
-	OnDamageStartedNotified.Broadcast(DamagedResponse);
+//	OnDamageStartedNotified.Broadcast(DamagedResponse);
 
 	if (HasMatchingGameplayTag(NlGameplayTags::Status_Block))
 	{

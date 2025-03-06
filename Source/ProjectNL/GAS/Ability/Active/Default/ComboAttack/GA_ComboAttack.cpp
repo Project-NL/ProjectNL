@@ -146,7 +146,7 @@ void UGA_ComboAttack::ExecuteHeavyAttack()
 	AttackAnimTask = UPlayMontageWithEvent::InitialEvent(this, NAME_None
 	                                                      , HeavyAttack
 	                                                      , FGameplayTagContainer());
-	AttackAnimTask->OnCancelled.AddDynamic(this, &UGA_ComboAttack::OnCancelled);
+	AttackAnimTask->OnCancelled.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
 	AttackAnimTask->OnBlendOut.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
 	AttackAnimTask->OnCompleted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
 	AttackAnimTask->OnInterrupted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
