@@ -64,7 +64,7 @@ void ABaseWeapon::EquipCharacterWeapon(ACharacter* Character, const bool IsMain)
 	AttachToComponent(Character->GetMesh()
 								, FAttachmentTransformRules::SnapToTargetIncludingScale
 								, *(AttachSocket + Position));
-	checkitem=true;
+	bcheckitem=true;
 	Multicast_SetCollision();
 	if (HasAuthority())
 	{
