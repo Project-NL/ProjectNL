@@ -16,6 +16,8 @@ ABaseWeapon::ABaseWeapon()
 	
 	EquippedHandType = EUEquippedHandType::Empty;
 	AttachPosition = EWeaponAttachPosition::Back;
+
+	checkitem=false;
 }
 
 void ABaseWeapon::BeginPlay()
@@ -37,7 +39,7 @@ void ABaseWeapon::Interact(AActor* Actor)
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(Actor);
 	UEquipInventoryComponent* EquipInventoryComponent=PlayerCharacter->GetEquipInventoryComponent();
 	int8 nAdded = EquipInventoryComponent->AddItemMeta(ItemMetaInfo);
-	 DestroyItem();
+	ServerInteract(Actor);
 }
 
 
@@ -56,18 +58,22 @@ bool ABaseWeapon::ServerWeaponInteract_Validate(AActor* InteractingActor)
 // TODO: 현재는 Weapon 객체에 저장되어 있으나, Manager로 옮기는 것도 고려해보면 좋을 것 같음.
 void ABaseWeapon::EquipCharacterWeapon(ACharacter* Character, const bool IsMain)
 {
+
 	const FString AttachSocket = "weapon";
 	const FString Position = IsMain ? "_r" : "_l";
-
-	if (CollisionBox)
-	{
-		CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
-	
 	AttachToComponent(Character->GetMesh()
-										, FAttachmentTransformRules::SnapToTargetIncludingScale
-										, *(AttachSocket + Position));
-	
+								, FAttachmentTransformRules::SnapToTargetIncludingScale
+								, *(AttachSocket + Position));
+	checkitem=true;
+	Multicast_SetCollision();
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Error, TEXT("EquipCharacterWeapon()이 서버에서 실행되었습니다! 문제 발생 가능"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("EquipCharacterWeapon()이 클라이언트에서 실행되었습니다! 문제 발생 가능"));
+	}
 }
 
 void ABaseWeapon::UnEquipCharacterWeapon(const bool IsMain)

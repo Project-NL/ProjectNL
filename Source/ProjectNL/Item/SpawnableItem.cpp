@@ -60,13 +60,23 @@ void ASpawnableItem::OnOverlapBegin(
     bool bFromSweep,
     const FHitResult& SweepResult)
 {
+
+    
     if (OtherActor && OtherActor != this)
     {
         APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(OtherActor);
+        UE_LOG(LogTemp, Warning, TEXT("[OnOverlapBegin] PlayerCharacter->CheckItem(): %s (Authority: %s)"), 
+               bcheckitem ? TEXT("True") : TEXT("False"), 
+               HasAuthority() ? TEXT("Server") : TEXT("Client"))
         if (!PlayerCharacter)
         {
             return;
         }
+        
+        // if(!PlayerCharacter->HasAuthority())
+        // {
+        //     return;
+        // }
         ABasePlayerController *BasePlayerController = Cast<ABasePlayerController>(PlayerCharacter->GetController());
         if (BasePlayerController)
         {
@@ -77,7 +87,11 @@ void ASpawnableItem::OnOverlapBegin(
             AcquireWidgetComponent->SetVisibility(true);
             SetOwner(PlayerCharacter);
         }
+        // UE_LOG(LogTemp, Warning, TEXT("OnOverlapBegin CollisionBox 상태: %s"), 
+        //                 *UEnum::GetValueAsString(CollisionBox->GetCollisionEnabled()));
     }
+
+    
 }
 
 void ASpawnableItem::OnOverlapEnd(
@@ -138,7 +152,8 @@ void ASpawnableItem::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     // 복제할 속성 추가 (필요에 따라)
-  //  DOREPLIFETIME(ASpawnableItem, ItemMetaInfo);
+
+    DOREPLIFETIME(ASpawnableItem, bcheckitem);
 }
 
 void ASpawnableItem::Interact(AActor* InteractingActor)
@@ -164,6 +179,12 @@ FItemMetaInfo* ASpawnableItem::GetItemMetainfo()
     return &ItemMetaInfo;
 }
 
+void ASpawnableItem::OnRep_CollisionBox()
+{
+    CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    UE_LOG(LogTemp, Error, TEXT("OnRep_CollisionBox발동."));
+}
+
 
 bool ASpawnableItem::ServerInteract_Validate(AActor* InteractingActor)
 {
@@ -172,7 +193,6 @@ bool ASpawnableItem::ServerInteract_Validate(AActor* InteractingActor)
 
 void ASpawnableItem::ServerInteract_Implementation(AActor* InteractingActor)
 {
-    // 서버에서만 실행
     // 서버에서 아이템 파괴
     DestroyItem();
          
@@ -183,6 +203,18 @@ void ASpawnableItem::MulticastDestroyItem_Implementation()
     Destroy();
 }
 
+void ASpawnableItem::Multicast_SetCollision_Implementation()
+{
+    if (CollisionBox)
+    {
+        CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        UE_LOG(LogTemp, Warning, TEXT("Multicast_SetCollision() 실행됨! (클라이언트)"));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("CollisionBox가 nullptr입니다!"));
+    }
+}
 void ASpawnableItem::DestroyItem()
 {
     // 서버에서 아이템 파괴 후 멀티캐스트

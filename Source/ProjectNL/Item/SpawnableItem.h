@@ -57,22 +57,29 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastDestroyItem();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SetCollision();
+	
 	// 아이템 파괴 (서버에서 호출)
 	void DestroyItem();
+	
+	UFUNCTION()
+	void OnRep_CollisionBox();
+	
 public:
 	virtual void Interact(AActor* Actor) override;
 	virtual void UseItem() override;
 
 	FItemMetaInfo* GetItemMetainfo();
+
+	// 충돌 처리를 위한 박스 컴포넌트
+	UPROPERTY(VisibleAnywhere)
+	UBoxComponent* CollisionBox;
 protected:
 	// 아이템 데이터
 	UPROPERTY(EditAnywhere)
 	FItemMetaInfo ItemMetaInfo;
 	
-	// 충돌 처리를 위한 박스 컴포넌트
-	UPROPERTY(VisibleAnywhere)
-	UBoxComponent* CollisionBox;
-
 	// 아이템 위에 표시할 3D Widget
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="UI")
 	UWidgetComponent* AcquireWidgetComponent;
@@ -88,6 +95,7 @@ protected:
 	UPROPERTY()
 	ABasePlayerController *OverlappingPlayerController;
 
-
+	UPROPERTY(ReplicatedUsing=OnRep_CollisionBox)
+	int8 bcheckitem;
 
 };

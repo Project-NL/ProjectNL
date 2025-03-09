@@ -21,6 +21,7 @@ public:
 
 	void UpdateEquipWeaponAnimationData();
 
+
 	void MoveNextComboCount();
 
 	void ClearCurrentComboCount();
@@ -29,6 +30,9 @@ public:
 
 	void UnequipWeapon(bool bIsMainWeapon);
 
+	UFUNCTION()
+	void OnRep_PlayerCombatWeaponState();
+	
 	/** 서버에서 실제 무기를 스폰하고 로직을 실행하는 함수 */
 	UFUNCTION(Server, Reliable, WithValidation)  // WithValidation은 UE5에서 옵션. UE4에서 자주 사용.
 	void ServerEquipWeapon(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon);
@@ -60,13 +64,18 @@ public:
 	FOnEquipInventorySlotChanged EquipInventorySlotChangedDelegate;
 protected:
 	virtual void BeginPlay() override;
-
+	
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	void SetAnimationsByWeaponState();
 
 	/** 실제 무기 장착 로직 (공유 함수) */
 	void InternalEquipWeaponLogic(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon);
+
+
+
 private:
-	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), ReplicatedUsing = OnRep_PlayerCombatWeaponState)
 	EPlayerCombatWeaponState PlayerCombatWeaponState;
 	
 	UPROPERTY(Category="Property", EditDefaultsOnly, meta = (AllowPrivateAccess = true))
@@ -80,8 +89,9 @@ private:
 	UPROPERTY(Category="Property|Weapon", EditDefaultsOnly, meta = (AllowPrivateAccess = true))
 	TSubclassOf<ABaseWeapon> SubWeaponClass;
 
+	UPROPERTY(Replicated)
 	TObjectPtr<ABaseWeapon> MainWeapon;
-	
+	UPROPERTY(Replicated)
 	TObjectPtr<ABaseWeapon> SubWeapon;
 
 	// 애니메이션 관련 정보 Table
@@ -117,6 +127,8 @@ private:
 	FAnimationBy4RotationWithHeight DamagedAnim;
 
 	// TODO: 추후 코드 분리 필요 (EquipComponent와 맞는 취지는 아님)
+
 	uint8 AttackComboIndex = 0;
+
 	uint8 MaxAttackCombo = 0;
 };

@@ -1,57 +1,59 @@
 ﻿#include "EquipComponent.h"
 
 #include "CombatAnimationData.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/Character.h"
+#include "Net/UnrealNetwork.h"
 #include "ProjectNL/Character/BaseCharacter.h"
 #include "ProjectNL/Helper/StateHelper.h"
 #include "ProjectNL/Weapon/BaseWeapon.h"
 
 UEquipComponent::UEquipComponent()
 {
-	// 혹시 몰라 초기값 할당
+	//bAutoActivate = true; // 🔹 자동 활성화
+	//PrimaryComponentTick.bCanEverTick = true;
+	//bReplicates = true; // 🔹 ActorComponent 리플리케이션 활성화
+	SetIsReplicatedByDefault(true); // 🔹
 	PlayerCombatWeaponState = EPlayerCombatWeaponState::None;
 }
 
 void UEquipComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	if (ABaseCharacter* Character = Cast<ABaseCharacter>(GetOwner()))
+	if (!IsActive())
 	{
-		MainWeapon = GetWorld()->SpawnActor<ABaseWeapon>(MainWeaponClass);
-		SubWeapon = GetWorld()->SpawnActor<ABaseWeapon>(SubWeaponClass);
-		
-		if (IsFirstEquipWeapon)
-		{
-			if (MainWeapon)
-            {
-             	MainWeapon->EquipCharacterWeapon(Character, true);
-            }
-            if (SubWeapon)
-            {
-             	SubWeapon->EquipCharacterWeapon(Character, false);
-            }
-		} else
-		{
-			if (MainWeapon)
-            {
-            	MainWeapon->UnEquipCharacterWeapon(Character, true);
-            }
-            if (SubWeapon)
-            {
-            	SubWeapon->UnEquipCharacterWeapon(Character, false);
-            }	
-		}
+		UE_LOG(LogTemp, Error, TEXT("UEquipComponent is not active!"));
 	}
+	if (MainWeaponClass)
+	InternalEquipWeaponLogic(MainWeaponClass,true);
+	if (SubWeaponClass)
+	InternalEquipWeaponLogic(SubWeaponClass,false);
 	
-	UpdateEquipWeaponAnimationData();
+}
+
+void UEquipComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(UEquipComponent, PlayerCombatWeaponState);
+
+	 DOREPLIFETIME(UEquipComponent, MainWeapon);
+	//
+	 DOREPLIFETIME(UEquipComponent, SubWeapon);
 }
 
 void UEquipComponent::UpdateEquipWeaponAnimationData()
 {
+	
 	PlayerCombatWeaponState = FStateHelper::GetCharacterWeaponState(MainWeapon, SubWeapon);
-	SetAnimationsByWeaponState();
+	 SetAnimationsByWeaponState();
 }
+void UEquipComponent::OnRep_PlayerCombatWeaponState()
+{
+	FString WeaponStateString = UEnum::GetValueAsString(PlayerCombatWeaponState);
+	UE_LOG(LogTemp, Warning, TEXT("[CLIENT] OnRep_PlayerCombatWeaponState called. New State: %s"), *WeaponStateString);
 
+	SetAnimationsByWeaponState(); // 변경된 상태에 맞게 애니메이션 업데이트
+}
 // TODO: 추후 코드 분리 필요 (EquipComponent와 맞는 취지는 아님)
 void UEquipComponent::MoveNextComboCount()
 {
@@ -92,6 +94,10 @@ void UEquipComponent::InternalEquipWeaponLogic(TSubclassOf<AActor> WeaponClass, 
 {
 	if (ABaseCharacter* Character = Cast<ABaseCharacter>(GetOwner()))
 	{
+		if (!Character->HasAuthority())
+		{
+			return;
+		}
 		// 기존 무기 해제 및 제거
 		if (bIsMainWeapon && MainWeapon)
 		{
@@ -124,18 +130,13 @@ void UEquipComponent::InternalEquipWeaponLogic(TSubclassOf<AActor> WeaponClass, 
 	}
 }
 
+
+
 void UEquipComponent::EquipWeapon(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon)
 {
-	// 현재 로컬이 서버 권한이 없는 경우(클라이언트) => 서버로 RPC 호출
-	if (!GetOwner() || !GetOwner()->HasAuthority())
-	{
-		ServerEquipWeapon(WeaponClass, bIsMainWeapon);
-	}
-	else
-	{
-		// 서버이므로 직접 로직 실행
-		MulticastEquipWeapon(WeaponClass, bIsMainWeapon);
-	}
+
+	ServerEquipWeapon(WeaponClass, bIsMainWeapon);
+
 }
 
 void UEquipComponent::UnequipWeapon(bool bIsMainWeapon)
@@ -165,7 +166,7 @@ void UEquipComponent::MulticastEquipWeapon_Implementation(TSubclassOf<AActor> We
 
 void UEquipComponent::ServerEquipWeapon_Implementation(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon)
 {
-	MulticastEquipWeapon(WeaponClass, bIsMainWeapon);
+	InternalEquipWeaponLogic(WeaponClass, bIsMainWeapon);
 }
 
 bool UEquipComponent::ServerEquipWeapon_Validate(TSubclassOf<AActor> WeaponClass, bool bIsMainWeapon)
