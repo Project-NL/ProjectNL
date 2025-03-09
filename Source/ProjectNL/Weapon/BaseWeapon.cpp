@@ -17,7 +17,7 @@ ABaseWeapon::ABaseWeapon()
 	EquippedHandType = EUEquippedHandType::Empty;
 	AttachPosition = EWeaponAttachPosition::Back;
 
-	checkitem=false;
+	bcheckitem=false;
 }
 
 void ABaseWeapon::BeginPlay()
