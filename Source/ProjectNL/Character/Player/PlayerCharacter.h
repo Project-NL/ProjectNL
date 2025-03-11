@@ -66,6 +66,10 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UEquipInventoryComponent* EquipInventoryComponent;
 
+		
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Effect"
+		, meta=(AllowPrivateAccess = true))
+	TSubclassOf<UGameplayEffect> RegenEffect;
 	
 	FOnMontageEnded MontageEndedDelegate;
 

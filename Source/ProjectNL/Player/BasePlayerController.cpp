@@ -33,6 +33,10 @@ void ABasePlayerController::BeginPlayingState()
 	
 	PlayerStatus = CreateWidget<UPlayerStatus>(this, PlayerStatusHUDClass);
 	PlayerStatus->AddToViewport();
+
+		
+	PlayerHotslot = CreateWidget<UUserWidget>(this, PlayerHotslotHUDClass);
+	PlayerHotslot->AddToViewport();
 }
 
 void ABasePlayerController::SetupInputComponent()

@@ -162,9 +162,12 @@ void UPlayMontageWithEvent::OnAbilityCancelled()
 			{
 				AnimInstance->Montage_Stop(0.2f, PlayAnimMontage);
 			}
+			
 			OnCancelled.Broadcast(FGameplayTag(), FGameplayEventData());
+			EndTask();
 		}
 	}
+	
 }
 
 void UPlayMontageWithEvent::OnMontageBlendingOut(
@@ -202,6 +205,7 @@ void UPlayMontageWithEvent::OnMontageBlendingOut(
 			OnBlendOut.Broadcast(FGameplayTag(), FGameplayEventData());
 		}
 	}
+	EndTask();
 }
 
 void UPlayMontageWithEvent::OnMontageEnded(UAnimMontage* Montage

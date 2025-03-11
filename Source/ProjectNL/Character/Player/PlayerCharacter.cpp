@@ -75,7 +75,20 @@ void APlayerCharacter::OnRep_PlayerState()
 		AbilitySystemComponent->OnDamageReactNotified
 		                      .AddDynamic(this, &APlayerCharacter::OnDamaged);
 
+		if (AbilitySystemComponent && RegenEffect)
+		{
+			FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+			FGameplayEffectSpecHandle EffectSpec = AbilitySystemComponent->MakeOutgoingSpec(RegenEffect, 1.0f, EffectContext);
+        
+			if (EffectSpec.IsValid())
+			{
+				AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
+			}
+		}
+		
 		EquipInventoryComponent->InitializeData();
+
+		
 		Initialize();
 	}
 }
@@ -103,6 +116,17 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 		AbilitySystemComponent->OnDamageReactNotified
 		                      .AddDynamic(this, &ThisClass::APlayerCharacter::OnDamaged);
 
+		if (AbilitySystemComponent && RegenEffect)
+		{
+			FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+			FGameplayEffectSpecHandle EffectSpec = AbilitySystemComponent->MakeOutgoingSpec(RegenEffect, 1.0f, EffectContext);
+        
+			if (EffectSpec.IsValid())
+			{
+				AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
+			}
+		}
+		
 		EquipInventoryComponent->InitializeData();
 
 		Initialize();

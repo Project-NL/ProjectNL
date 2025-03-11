@@ -30,9 +30,15 @@ protected:
 	// TODO: 임시코드로 추후 HUD class에 이전할 필요 있음
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UPlayerStatus> PlayerStatusHUDClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> PlayerHotslotHUDClass;
 	
 	UPROPERTY()
 	UPlayerStatus* PlayerStatus;
+
+	UPROPERTY()
+	UUserWidget* PlayerHotslot;
 
 	// 인벤토리 위젯 클래스 (Blueprint에서 지정)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")

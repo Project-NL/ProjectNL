@@ -18,28 +18,7 @@
 void UInventoryWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
-
 	
-	// if (InventoryLabel)
-	// {
-	// 	InventoryLabel->SetText(InventoryTitle);
-	// }
-	//
-	// // 소유한 PlayerController에서 PlayerState를 가져옵니다.
-	// if (APlayerController* PC = GetOwningPlayer())
-	// {
-	// 	if (ABasePlayerState* PS = PC->GetPlayerState<ABasePlayerState>())
-	// 	{
-	// 		PlayerState = PS;
-	// 	}
-	// 	APlayerCharacter* PlayerCharacter=Cast<APlayerCharacter>(PlayerState->GetOwner());
-	// 	if (PlayerCharacter)
-	// 	{
-	// 		EquipInventoryComponent=PlayerCharacter->GetEquipInventoryComponent();
-	// 	}
-	// }
-	// // PreConstruct 환경에서는 PlayerState를 가져오지 못함.
-	// // RefreshInventory();
 }
 
 void UInventoryWidget::NativeConstruct()
