@@ -12,6 +12,7 @@
 #include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 #include "ProjectNL/Player/BasePlayerState.h"
 #include "ProjectNL/Helper/EnumHelper.h"
+#include "ProjectNL/Helper/GameplayTagHelper.h"
 #include "ProjectNL/Player/BasePlayerController.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -180,6 +181,8 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 
 void APlayerCharacter::OnDamaged(const FDamagedResponse& DamagedResponse)
 {
+	NlGameplayTags::RemoveMeAndAllChildGameplayTag(AbilitySystemComponent, NlGameplayTags::State, true);
+	NlGameplayTags::SetGameplayTag(AbilitySystemComponent, NlGameplayTags::State_Idle, 1, true);
 	if (PlayerAttributeSet)
 	{
 		// 체력 감소 처리
@@ -192,7 +195,8 @@ void APlayerCharacter::OnDamaged(const FDamagedResponse& DamagedResponse)
 	if (ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.UnderAttack"))))
 	{
 		return;
-	};
+	}
+	
 	if (HasAuthority())
 	{
 		UE_LOG(LogTemp, Log, TEXT("[Server] ReceiveDamage 호출됨: Damage=%f, IsHitStop=%s, SourceActor=%s"),
