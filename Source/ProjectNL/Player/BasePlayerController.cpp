@@ -1,10 +1,14 @@
 ﻿#include "BasePlayerController.h"
 
+#include "BasePlayerState.h"
 #include "EnhancedInputComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "ProjectNL/Character/Player/PlayerCharacter.h"
+#include "ProjectNL/Helper/ItemHelper.h"
 #include "ProjectNL/Item/SpawnableItem.h"
 #include "ProjectNL/UI/Widget/Inventory/InventoryWidget.h"
 #include "ProjectNL/UI/Widget/PlayerStatus/PlayerStatus.h"
+
 
 void ABasePlayerController::BeginPlay()
 {
@@ -63,6 +67,16 @@ void ABasePlayerController::SetupInputComponent()
 				&ABasePlayerController::TryInteract
 			);
 		}
+		if (ToggleFirstHotSlotItem)
+		{
+			EnhancedInputComponent->BindAction(
+				ToggleFirstHotSlotItem, 
+				ETriggerEvent::Triggered, 
+				this, 
+				&ABasePlayerController::UseFirstHotSlotItem
+			);
+		}
+		
 	}
 }
 
@@ -78,6 +92,16 @@ void ABasePlayerController::TryInteract()
 		// 'this' 플레이어 캐릭터를 InteractingActor로 전달
 		NearbyItem->Interact(GetPawn());
 	}
+}
+
+void ABasePlayerController::Server_UseFirstHotSlotItem_Implementation()
+{
+	UseFirstHotSlotItem(); 
+}
+
+bool ABasePlayerController::Server_UseFirstHotSlotItem_Validate()
+{
+	return true;
 }
 
 void ABasePlayerController::ToggleInventoryWidget()
@@ -113,6 +137,41 @@ void ABasePlayerController::ToggleInventoryWidget()
 				SetInputMode(UIInputMode);
 				bShowMouseCursor = true;
 			}
+		}
+	}
+}
+
+void ABasePlayerController::UseFirstHotSlotItem()
+{
+	if (!HasAuthority()) // 클라이언트라면 서버에 실행 요청
+	{
+		Server_UseFirstHotSlotItem();
+		return;
+	}
+	ABasePlayerState* BasePlayerState = GetPlayerState<ABasePlayerState>();
+	if (BasePlayerState)
+	{
+		TArray<FItemMetaInfo>* HotSlotList = BasePlayerState->GetPlayerHotSlotList();
+		if (HotSlotList && HotSlotList->Num() > 0)
+		{
+
+			FItemMetaInfo FirstItem = (*HotSlotList)[0];
+
+			const FItemInfoData& ItemInfoById = FItemHelper::GetItemInfoById(GetWorld(), FirstItem.GetId());
+			
+			ASpawnableItem* SpawnableItem = GetWorld()->SpawnActor<ASpawnableItem>(ItemInfoById.GetShowItemActor());
+			
+					// 서버 / 클라이언트 체크 로그
+			if (HasAuthority())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[Server] 핫슬롯 아이템 사용 - ID: %d"), FirstItem.GetId());
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[Client] 핫슬롯 아이템 사용 - ID: %d"), FirstItem.GetId());
+			}
+			//AActor* ItemActor=ItemInfoById.GetShowItemActor();
+			SpawnableItem->UseItem(Cast<APlayerCharacter>(GetPawn()));
 		}
 	}
 }

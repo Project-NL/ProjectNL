@@ -170,9 +170,10 @@ void ASpawnableItem::Interact(AActor* InteractingActor)
     }
 }
 
-void ASpawnableItem::UseItem()
+void ASpawnableItem::UseItem(APlayerCharacter* playerCharacter)
 {
 }
+
 
 FItemMetaInfo* ASpawnableItem::GetItemMetainfo()
 {

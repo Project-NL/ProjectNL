@@ -15,13 +15,14 @@ ABasePlayerState::ABasePlayerState()
 		"Ability System Component");
 	AttributeSet = CreateDefaultSubobject<UPlayerAttributeSet>(
 		"Player Attribute Set");
+	InitializeData();
 }
 
 void ABasePlayerState::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitializeData();
+
 
 	// 테스트용 임시코드
 	for (const uint32 ItemId : InitialItemList)
@@ -30,6 +31,18 @@ void ABasePlayerState::BeginPlay()
 		NewItemData.SetCurrentCount(FItemHelper::GetItemInfoById(GetWorld(), ItemId).GetMaxItemCount());
 		AddItem(NewItemData);
 	}
+	int i=0;
+	for (const uint32 ItemId : HotslotInitialItemList)
+	{
+		
+		FItemMetaInfo NewItemData = FItemHelper::GetInitialItemMetaDataById(GetWorld(), ItemId);
+		//NewItemData.SetCurrentCount(FItemHelper::GetItemInfoById(GetWorld(), ItemId).GetMaxItemCount());
+		//AddItem(NewItemData);
+		PlayerHotSlotList[i]=NewItemData;
+		i++;
+	
+	}
+	OnHotSlotUpdatedDelegate.Broadcast();
 }
 
 UAbilitySystemComponent* ABasePlayerState::GetAbilitySystemComponent() const
@@ -43,6 +56,7 @@ void ABasePlayerState::InitializeData()
 	// 아래 부터는 게임을 처음 시작한 경우 초기 아이템을 지급하는 로직
 	const FItemMetaInfo EmptyItem;
 	PlayerInventoryList.Init(EmptyItem, GetTotalSlotCount());
+	PlayerHotSlotList.Init(EmptyItem, GetHotSlotCount());
 	UpdateCurrentRemainItemValue();
 }
 
@@ -135,7 +149,7 @@ uint32 ABasePlayerState::AddItemToInventory(const uint16 Index, const FItemMetaI
 	
 	// 내가 인벤토리에 넣었을 때 핫슬롯인 경우 그리고 내가 현재 선택하고 있는
 	// 핫슬롯인 경우에 액터가 소환되게 처리함.
-	SetPlayerHandItemByPS(Index);
+	//SetPlayerHandItemByPS(Index);
 
 	// 최대 값 만큼 넣어도 남는 경우가 존재한다.
 	int32 RemainCount = CurrentItemCount - ItemInfoById.GetMaxItemCount();

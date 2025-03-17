@@ -68,7 +68,7 @@ protected:
 	
 public:
 	virtual void Interact(AActor* Actor) override;
-	virtual void UseItem() override;
+	virtual void UseItem(APlayerCharacter* playerCharacter) override;
 
 	FItemMetaInfo* GetItemMetainfo();
 

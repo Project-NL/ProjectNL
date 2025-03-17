@@ -45,6 +45,12 @@ void UBaseAttributeSet::OnRepMovementSpeed(
 															, OldMovementSpeed);
 }
 
+void UBaseAttributeSet::PostGameplayEffectExecute(const  FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+	
+}
+
 void UBaseAttributeSet::GetLifetimeReplicatedProps(
 	TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -97,5 +103,10 @@ void UBaseAttributeSet::InitBaseAttribute()
 void UBaseAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	if (NewValue < 0) NewValue = 0;
+	
+	if (Attribute == GetHealthAttribute())
+	{
+		NewValue = FMath::Min(NewValue, GetMaxHealth());
+	}
 }
 

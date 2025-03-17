@@ -20,6 +20,8 @@ class PROJECTNL_API UBaseAttributeSet : public UAttributeSet
 public:
 	virtual void InitBaseAttribute();
 
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+
 	UPROPERTY(BlueprintReadOnly, Category="Attributes"
 		, ReplicatedUsing = OnRepHealth)
 	FGameplayAttributeData Health;
@@ -143,4 +145,6 @@ protected:
 	UFUNCTION()
 	virtual void OnRepMovementSpeed(
 		const FGameplayAttributeData& OldMovementSpeed);
+
+	
 };
