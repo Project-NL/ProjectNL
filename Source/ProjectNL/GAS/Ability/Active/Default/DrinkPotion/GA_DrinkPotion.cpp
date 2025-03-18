@@ -27,6 +27,7 @@ void UGA_DrinkPotion::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 void UGA_DrinkPotion::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
+	if (PotionItem)
 	PotionItem->Destroy();
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

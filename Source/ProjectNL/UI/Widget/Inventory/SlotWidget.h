@@ -42,6 +42,7 @@ protected:
 	const float DoubleClickThreshold = 0.3f; // 더블클릭 간격 (초 단위)
 	
 	int32 Count;
+	int32 HotSlotCount;
 
 	// UMG 에디터에서 바인딩할 요소 (예: 아이템 이미지, 개수를 표시할 TextBlock)
 	UPROPERTY(meta = (BindWidget))

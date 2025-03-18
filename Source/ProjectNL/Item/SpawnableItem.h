@@ -20,6 +20,8 @@ public:
 	// Sets default values for this actor's properties
 	ASpawnableItem();
 
+	// 아이템 파괴 (서버에서 호출)
+	void DestroyItem();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -59,9 +61,8 @@ protected:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_SetCollision();
-	
-	// 아이템 파괴 (서버에서 호출)
-	void DestroyItem();
+
+
 	
 	UFUNCTION()
 	void OnRep_CollisionBox();

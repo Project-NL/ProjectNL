@@ -216,6 +216,8 @@ void ASpawnableItem::Multicast_SetCollision_Implementation()
         UE_LOG(LogTemp, Error, TEXT("CollisionBox가 nullptr입니다!"));
     }
 }
+
+
 void ASpawnableItem::DestroyItem()
 {
     // 서버에서 아이템 파괴 후 멀티캐스트
@@ -224,4 +226,5 @@ void ASpawnableItem::DestroyItem()
         MulticastDestroyItem();
         Super::Destroy(); // 실제 파괴
     }
+
 }

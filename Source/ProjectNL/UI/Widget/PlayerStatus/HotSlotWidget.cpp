@@ -24,7 +24,13 @@ void UHotSlotWidget::SetupSlot(FItemMetaInfo* itemMetaInfo,int32 index)
 	// 아이템 개수를 표시 (개수가 1보다 크면 표시)
 	if (ItemCountText)
 	{
-		Count = index;
+		Count = itemMetaInfo->GetCurrentCount();
 		ItemCountText->SetText(FText::AsNumber(Count));
+	}
+
+	if (ItemHotSlotCountText)
+	{
+		HotSlotCount = index+1;
+		ItemHotSlotCountText->SetText(FText::AsNumber(HotSlotCount));
 	}
 }

@@ -160,7 +160,7 @@ void ABasePlayerController::UseFirstHotSlotItem()
 			const FItemInfoData& ItemInfoById = FItemHelper::GetItemInfoById(GetWorld(), FirstItem.GetId());
 			
 			ASpawnableItem* SpawnableItem = GetWorld()->SpawnActor<ASpawnableItem>(ItemInfoById.GetShowItemActor());
-			
+			FirstItem.SetCurrentCount(FirstItem.GetCurrentCount()-1);
 					// 서버 / 클라이언트 체크 로그
 			if (HasAuthority())
 			{
@@ -170,7 +170,6 @@ void ABasePlayerController::UseFirstHotSlotItem()
 			{
 				UE_LOG(LogTemp, Warning, TEXT("[Client] 핫슬롯 아이템 사용 - ID: %d"), FirstItem.GetId());
 			}
-			//AActor* ItemActor=ItemInfoById.GetShowItemActor();
 			SpawnableItem->UseItem(Cast<APlayerCharacter>(GetPawn()));
 		}
 	}

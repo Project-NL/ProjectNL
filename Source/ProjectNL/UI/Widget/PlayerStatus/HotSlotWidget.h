@@ -15,4 +15,8 @@ class PROJECTNL_API UHotSlotWidget : public USlotWidget
 	GENERATED_BODY()
 public:
 	void SetupSlot(FItemMetaInfo* i1temMetaInfo, int32 index);
+
+private:
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* ItemHotSlotCountText;
 };
