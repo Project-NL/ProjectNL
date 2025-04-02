@@ -9,7 +9,7 @@
 #include "EnemyCharacter.generated.h"
 
 class UBaseAttributeSet;
-
+class	UWidgetComponent;
 /**
  * 
  */
@@ -24,14 +24,21 @@ public:
 
 	// 아이템 위에 표시할 3D Widget
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-class	UWidgetComponent* WidgetComponent;
+	UWidgetComponent* WidgetComponent;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	UFUNCTION()
+	void Die() ;
+
 	void WidgetComponentLookAtPlayer();
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticastDestroy();
+	UFUNCTION(Server, Reliable,WithValidation)
+	void ServerDestroy();
 
 private:
 	UFUNCTION(NetMulticast, Reliable)

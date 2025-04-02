@@ -34,6 +34,7 @@ struct FDamagedResponse
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageStartedNotifiedSignature, const FDamagedResponse&, DamageResponse);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageReactNotifiedSignature, const FDamagedResponse&, DamageResponse);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathNotifiedSignature);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECTNL_API UNLAbilitySystemComponent : public UAbilitySystemComponent
@@ -54,6 +55,7 @@ public:
 
 	FOnDamageStartedNotifiedSignature OnDamageStartedNotified;
 	FOnDamageReactNotifiedSignature OnDamageReactNotified;
+	FOnDeathNotifiedSignature OnDeathReactNotified;
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Options", meta = (AllowPrivateAccess = true))
 	uint16 LevelByDamaged = 10;

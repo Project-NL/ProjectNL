@@ -4,6 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
+#include "ProjectNL/Character/Player/PlayerCharacter.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Attribute/BaseAttributeSet.h"
 #include "ProjectNL/GAS/NLAbilitySystemComponent.h"
@@ -32,10 +33,12 @@ AEnemyCharacter::AEnemyCharacter()
 	WidgetComponent->SetDrawSize(FVector2D(300.f, 30.f));
 
 	// (옵션) 살짝 위로 띄워서 아이템 상단에 표시하기
-	WidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 700.f));
+	WidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 100.f));
     
 	// 시작 시에는 보이지 않도록 설정
 	WidgetComponent->SetVisibility(true);
+
+	bReplicates = true;
 }
 
 void AEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -51,7 +54,8 @@ void AEnemyCharacter::BeginPlay()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	
 	EnemyAttributeSet->InitBaseAttribute();
-	
+	EnemyAttributeSet->OnOutOfHealth.AddDynamic(this, &AEnemyCharacter::Die);
+
 	Initialize();
 	
 	AbilitySystemComponent->OnDamageReactNotified
@@ -87,11 +91,67 @@ void AEnemyCharacter::Tick(float DeltaTime)
 	WidgetComponentLookAtPlayer();
 }
 
+void AEnemyCharacter::Die()
+{
+	//Super::Die();
+
+	UE_LOG(LogTemp, Warning, TEXT("Die() called on %s. Role: %s"), 
+		*GetName(), 
+		*UEnum::GetValueAsString(GetLocalRole())); // 실행된 네트워크 역할 확인
+
+	
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Die on SERVER for %s"), *GetName());
+	//	SetLifeSpan(3.0f);
+		ActiveDeathAbility();
+
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Die from CLIENT for %s"), *GetName());
+		ServerDestroy();
+	}
+}
+void AEnemyCharacter::ServerDestroy_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ServerDestroy_Implementation() called on SERVER for %s"), *GetName());
+	//MulticastDestroy();
+	ActiveDeathAbility();
+	//SetLifeSpan(3.0f);
+}
+void AEnemyCharacter::MulticastDestroy_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("MulticastDestroy() called on %s. Role: %s"), 
+		*GetName(), 
+		*UEnum::GetValueAsString(GetLocalRole()));
+
+	Destroy();
+}
+bool AEnemyCharacter::ServerDestroy_Validate()
+{
+	return true; // 보안 체크가 필요하면 추가 가능
+}
+
 void AEnemyCharacter::OnDamaged_Implementation(const FDamagedResponse& DamagedResponse)
 {
 	if (EnemyAttributeSet)
 	{
 		EnemyAttributeSet->SetHealth(EnemyAttributeSet->GetHealth() - DamagedResponse.Damage);
+	}
+	if (EnemyAttributeSet)
+	{
+		if(EnemyAttributeSet->GetHealth()<=0)
+		{
+			if (DamagedResponse.SourceActor)
+			{
+				APlayerCharacter* PlayerCharacter = (APlayerCharacter*)DamagedResponse.SourceActor;
+				if (PlayerCharacter)
+				{
+					PlayerCharacter->SetTargetingCharacter(nullptr);
+				}
+			}
+		}
 	}
 	// TODO: 이거 별도의 Ability로 빼는 것도 고려할 필요 있음.
 	// 근데 고려만 할 것
