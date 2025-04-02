@@ -235,6 +235,8 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 
 void APlayerCharacter::OnDamaged(const FDamagedResponse& DamagedResponse)
 {
+	NlGameplayTags::RemoveMeAndAllChildGameplayTag(AbilitySystemComponent, NlGameplayTags::State, true);
+	NlGameplayTags::SetGameplayTag(AbilitySystemComponent, NlGameplayTags::State_Idle, 1, true);
 	if (PlayerAttributeSet)
 	{
 		// 플레이어의 경우 스테미나가 30 이상 있어야만 Block 스킬이 발동.
@@ -264,7 +266,8 @@ void APlayerCharacter::OnDamaged(const FDamagedResponse& DamagedResponse)
 	if (ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.UnderAttack"))))
 	{
 		return;
-	};
+	}
+	
 	if (HasAuthority())
 	{
 		UE_LOG(LogTemp, Log, TEXT("[Server] ReceiveDamage 호출됨: Damage=%f, IsHitStop=%s, SourceActor=%s"),

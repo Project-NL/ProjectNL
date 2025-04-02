@@ -5,7 +5,6 @@
 #include "ProjectNL/GAS/NLAbilitySystemComponent.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
 
-
 UGE_DamageExecCalculation::UGE_DamageExecCalculation()
 {
 	//DamageResponse.DamageType = EDamageType::Physical;

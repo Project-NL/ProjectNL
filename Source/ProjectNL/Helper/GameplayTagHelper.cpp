@@ -23,6 +23,25 @@ namespace NlGameplayTags
 		ASC->SetLooseGameplayTagCount(Tag, Count);
 	}
 
+	void RemoveMeAndAllChildGameplayTag(UAbilitySystemComponent* ASC, const FGameplayTag Tag, const bool bIsReplicated)
+	{
+		FGameplayTagContainer TagsToRemove;
+		FGameplayTagContainer OwnedTags = ASC->GetOwnedGameplayTags();
+		for (const FGameplayTag& ASCTag : OwnedTags)
+		{
+			if (ASCTag.MatchesTag(Tag) || ASCTag.MatchesTagDepth(Tag))
+			{
+				TagsToRemove.AddTag(ASCTag);
+			}
+		}
+
+		if (bIsReplicated)
+		{
+			ASC->RemoveReplicatedLooseGameplayTags(TagsToRemove);
+		}
+		ASC->RemoveLooseGameplayTags(TagsToRemove);
+	}
+
 	void SetGameplayTag(UAbilitySystemComponent* ASC, const FGameplayTag Tag, const int32 Count, const bool bIsReplicated)
 	{
 		if (bIsReplicated)

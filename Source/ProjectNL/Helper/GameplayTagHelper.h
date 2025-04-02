@@ -8,6 +8,7 @@ namespace NlGameplayTags
 {
 	PROJECTNL_API void AddGameplayTag(UAbilitySystemComponent* ASC, const FGameplayTag Tag, const int32 Count, const bool bIsReplicated = false);
 	PROJECTNL_API void RemoveGameplayTag(UAbilitySystemComponent* ASC, const FGameplayTag Tag, const int32 Count, const bool bIsReplicated = false);
+	PROJECTNL_API void RemoveMeAndAllChildGameplayTag(UAbilitySystemComponent* ASC, const FGameplayTag Tag, const bool bIsReplicated = false);
 	PROJECTNL_API void SetGameplayTag(UAbilitySystemComponent* ASC, const FGameplayTag Tag, const int32 Count, const bool bIsReplicated = false);
 
 	// Ability 관련 최상위 트리 태그로 하나만 들어갈 수 있음

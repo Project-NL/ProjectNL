@@ -218,6 +218,11 @@ void UGA_ComboAttack::ExecuteJumpAttack()
         return;
     }
 
+	if (CurrentCharacter->GetAbilitySystemComponent()->HasMatchingGameplayTag(NlGameplayTags::Status_UnderAttack))
+	{
+		return;
+	}
+
     // 레이캐스트로 바닥 거리 체크
     const FVector CharacterLocation = CurrentCharacter->GetActorLocation();
     const FVector TraceStart = CharacterLocation;
