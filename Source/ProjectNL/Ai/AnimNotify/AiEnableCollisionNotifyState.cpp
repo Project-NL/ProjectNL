@@ -234,24 +234,25 @@ void UAiEnableCollisionNotifyState::PerformShapeSweepTrace(
 	TArray<FHitResult> TempHitResults;
 	bool bHit = Owner->GetWorld()->SweepMultiByChannel(
 		TempHitResults,
-		Start,
-		End,
+		CurrentStartLocation,
+		CurrentEndLocation,
 		CapsuleQuat,
 		ECC_WorldDynamic, // 동적 월드 채널 사용
 		CollisionShape,
 		QueryParams
 	);
-
+	
 	// 디버그 드로잉: 스윕 경로와 시작/종료 캡슐 표시
 	UWorld* World = Owner->GetWorld();
 	if (World)
 	{
+		FVector CurrentMiddleLocation=(CurrentStartLocation+CurrentEndLocation)/2;
 		// 시작 위치의 캡슐 (녹색)
-		DrawDebugCapsule(World, Start, CapsuleHalfHeight, CapsuleRadius, CapsuleQuat, FColor::Green, false, 2.0f);
+		DrawDebugCapsule(World, CurrentMiddleLocation, CapsuleHalfHeight, CapsuleRadius, CapsuleQuat, FColor::Green, false, 2.0f);
 		// 종료 위치의 캡슐 (빨간색)
-		DrawDebugCapsule(World, End, CapsuleHalfHeight, CapsuleRadius, CapsuleQuat, FColor::Red, false, 2.0f);
+	//	DrawDebugCapsule(World, CurrentEndLocation, CapsuleHalfHeight, CapsuleRadius, CapsuleQuat, FColor::Red, false, 2.0f);
 		// 시작과 종료를 잇는 선 (파란색)
-		DrawDebugLine(World, Start, End, FColor::Blue, false, 2.0f, 0, 1.0f);
+		DrawDebugLine(World, CurrentStartLocation, CurrentEndLocation, FColor::Blue, false, 2.0f, 0, 1.0f);
 	}
 
 	// 히트가 발생했으면 결과를 OutHitResults에 추가하고, 히트 위치에 디버그 포인트 표시
@@ -261,7 +262,7 @@ void UAiEnableCollisionNotifyState::PerformShapeSweepTrace(
 
 		for (const FHitResult& Hit : TempHitResults)
 		{
-			DrawDebugPoint(World, Hit.ImpactPoint, 10.0f, FColor::Yellow, false, 2.0f);
+			DrawDebugPoint(World, Hit.ImpactPoint, 10.0f, FColor::Yellow, false, 1.0f);
 		}
 	}
 }

@@ -4,6 +4,7 @@
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Net/UnrealNetwork.h"
 #include "ProjectNL/Character/Player/PlayerCharacter.h"
 #include "ProjectNL/Player/BasePlayerController.h"
 #include "ProjectNL/Player/BasePlayerState.h"
@@ -12,9 +13,11 @@
 ASpawnableItem::ASpawnableItem()
 {
     PrimaryActorTick.bCanEverTick = true;
-
+    bReplicates=true;
+    
     CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
     RootComponent = CollisionBox;
+
 
     CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     CollisionBox->SetCollisionObjectType(ECC_WorldDynamic);
@@ -57,13 +60,23 @@ void ASpawnableItem::OnOverlapBegin(
     bool bFromSweep,
     const FHitResult& SweepResult)
 {
+
+    
     if (OtherActor && OtherActor != this)
     {
         APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(OtherActor);
+        UE_LOG(LogTemp, Warning, TEXT("[OnOverlapBegin] PlayerCharacter->CheckItem(): %s (Authority: %s)"), 
+               bcheckitem ? TEXT("True") : TEXT("False"), 
+               HasAuthority() ? TEXT("Server") : TEXT("Client"))
         if (!PlayerCharacter)
         {
             return;
         }
+        
+        // if(!PlayerCharacter->HasAuthority())
+        // {
+        //     return;
+        // }
         ABasePlayerController *BasePlayerController = Cast<ABasePlayerController>(PlayerCharacter->GetController());
         if (BasePlayerController)
         {
@@ -72,8 +85,13 @@ void ASpawnableItem::OnOverlapBegin(
             OverlappingPlayerController=BasePlayerController;
             OverlappingPlayerController->SetNearbyItem(this);
             AcquireWidgetComponent->SetVisibility(true);
+            SetOwner(PlayerCharacter);
         }
+        // UE_LOG(LogTemp, Warning, TEXT("OnOverlapBegin CollisionBox 상태: %s"), 
+        //                 *UEnum::GetValueAsString(CollisionBox->GetCollisionEnabled()));
     }
+
+    
 }
 
 void ASpawnableItem::OnOverlapEnd(
@@ -129,32 +147,84 @@ void ASpawnableItem::AcquireWidgetComponentLookAtPlayer()
     AcquireWidgetComponent->SetWorldRotation(LookRot);
 }
 
+void ASpawnableItem::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    // 복제할 속성 추가 (필요에 따라)
+
+    DOREPLIFETIME(ASpawnableItem, bcheckitem);
+}
+
 void ASpawnableItem::Interact(AActor* InteractingActor)
 {
-    // 예: InteractingActor가 플레이어인지 확인
-    ABasePlayerController* BasePlayerController = Cast<ABasePlayerController>(InteractingActor);
-    if (BasePlayerController && OverlappingPlayerController ==BasePlayerController)
+    APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(InteractingActor);
+    if (PlayerCharacter && OverlappingPlayer == PlayerCharacter)
     {
-        // 실제 아이템 획득 로직
         ABasePlayerState* BasePlayerState = Cast<ABasePlayerState>(OverlappingPlayer->GetPlayerState());
         if (BasePlayerState)
         {
             int8 bAdded = BasePlayerState->AddItem(ItemMetaInfo);
-        //    if (bAdded > 0)
-        //    {
-                // 획득 성공 시 아이템 파괴
-                Destroy();
-          //  }
+            ServerInteract(InteractingActor);
         }
-        
     }
 }
 
-void ASpawnableItem::UseItem()
+void ASpawnableItem::UseItem(APlayerCharacter* playerCharacter)
 {
 }
+
 
 FItemMetaInfo* ASpawnableItem::GetItemMetainfo()
 {
     return &ItemMetaInfo;
+}
+
+void ASpawnableItem::OnRep_CollisionBox()
+{
+    CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    UE_LOG(LogTemp, Error, TEXT("OnRep_CollisionBox발동."));
+}
+
+
+bool ASpawnableItem::ServerInteract_Validate(AActor* InteractingActor)
+{
+    return true; // 유효성 검증 (필요에 따라 추가)
+}
+
+void ASpawnableItem::ServerInteract_Implementation(AActor* InteractingActor)
+{
+    // 서버에서 아이템 파괴
+    DestroyItem();
+         
+}
+void ASpawnableItem::MulticastDestroyItem_Implementation()
+{
+    // 모든 클라이언트에서 아이템 파괴 (시각적 효과 등 처리 가능)
+    Destroy();
+}
+
+void ASpawnableItem::Multicast_SetCollision_Implementation()
+{
+    if (CollisionBox)
+    {
+        CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        UE_LOG(LogTemp, Warning, TEXT("Multicast_SetCollision() 실행됨! (클라이언트)"));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("CollisionBox가 nullptr입니다!"));
+    }
+}
+
+
+void ASpawnableItem::DestroyItem()
+{
+    // 서버에서 아이템 파괴 후 멀티캐스트
+    if (HasAuthority())
+    {
+        MulticastDestroyItem();
+        Super::Destroy(); // 실제 파괴
+    }
+
 }

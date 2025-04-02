@@ -59,5 +59,29 @@ void UGE_DamageExecCalculation::Execute_Implementation(
 	if (UNLAbilitySystemComponent* TargetASC = Cast<UNLAbilitySystemComponent>(TargetAbilitySystemComponent))
 	{
 		TargetASC->ReceiveDamage(DamageResponse);
+
+		FGameplayTagContainer CancelTags;
+		CancelTags.AddTag(NlGameplayTags::State_Attack_Combo);
+
+		// 현재 적용된 GameplayEffect 확인 후 제거
+		TArray<FActiveGameplayEffectHandle> ActiveEffectHandles;
+		TargetASC->GetActiveEffectsWithAllTags(CancelTags);
+
+		for (const FActiveGameplayEffectHandle& Handle : ActiveEffectHandles)
+		{
+			TargetASC->RemoveActiveGameplayEffect(Handle, 1);
+		}
+
+		// 활성화된 어빌리티 중 해당 태그를 가진 것 취소
+		TArray<FGameplayAbilitySpec> ActiveAbilities = TargetASC->GetActivatableAbilities();
+		for (FGameplayAbilitySpec AbilitySpec : ActiveAbilities)
+		{
+			if (AbilitySpec.Ability && AbilitySpec.Ability->AbilityTags.HasTagExact(NlGameplayTags::State_Attack_Combo))
+			{
+				TargetASC->CancelAbilityHandle(AbilitySpec.Handle);
+			}
+		}
 	}
 }
+// TargetAbilitySystemComponent->
+// 	RemoveLooseGameplayTag(NlGameplayTags::State_Attack_Combo);

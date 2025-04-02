@@ -25,14 +25,21 @@ public:
 private:
 	void TryInteract();
 protected:
-
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_UseFirstHotSlotItem();
 
 	// TODO: 임시코드로 추후 HUD class에 이전할 필요 있음
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UPlayerStatus> PlayerStatusHUDClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> PlayerHotslotHUDClass;
 	
 	UPROPERTY()
 	UPlayerStatus* PlayerStatus;
+
+	UPROPERTY()
+	UUserWidget* PlayerHotslot;
 
 	// 인벤토리 위젯 클래스 (Blueprint에서 지정)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
@@ -49,10 +56,24 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	UInputAction* AcquireSpawnItem;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	UInputAction* ToggleFirstHotSlotItem;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	UInputAction* ToggleSecondHotSlotItem;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	UInputAction* ToggleThirdHotSlotItem;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	UInputAction* ToggleFourthHotSlotItem;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	UInputAction* ToggleFifthHotSlotItem;
 	UPROPERTY()
 	ASpawnableItem* NearbyItem;
 	
 	// Tab 키 입력 시 호출될 인벤토리 토글 함수
 	UFUNCTION()
 	void ToggleInventoryWidget();
+
+	// Tab 키 입력 시 호출될 인벤토리 토글 함수
+	UFUNCTION()
+	void UseFirstHotSlotItem();
 };

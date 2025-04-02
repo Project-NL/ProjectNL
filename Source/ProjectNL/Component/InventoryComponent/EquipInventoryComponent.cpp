@@ -235,7 +235,7 @@ uint32 UEquipInventoryComponent::AddItem(TArray<FItemMetaInfo>& PlayerInventoryL
 		}
 	}
 
-	if (!bHasInventory && RemainResult > 0)
+	if (!bHasInventory && RemainResult > 0)	
 	{
 		for (int i = 0; i < GetTotalSlotCount(); i++)
 		{

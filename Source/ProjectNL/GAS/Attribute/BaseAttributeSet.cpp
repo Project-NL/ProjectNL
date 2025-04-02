@@ -1,9 +1,18 @@
 ﻿#include "BaseAttributeSet.h"
 #include "Net/UnrealNetwork.h"
+#include "ProjectNL/Character/BaseCharacter.h"
 
 void UBaseAttributeSet::OnRepHealth(const FGameplayAttributeData& OldHealth)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, Health, OldHealth);
+
+	UNLAbilitySystemComponent* ASC = Cast<UNLAbilitySystemComponent>(GetOwningAbilitySystemComponent());
+	if (Health.GetCurrentValue()<=0)
+	{
+		
+		//	ASC->OnDeathReactNotified.Broadcast();
+			
+	}
 }
 
 void UBaseAttributeSet::OnRepMaxHealth(
@@ -43,6 +52,18 @@ void UBaseAttributeSet::OnRepMovementSpeed(
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, MovementSpeed
 															, OldMovementSpeed);
+}
+
+void UBaseAttributeSet::PostGameplayEffectExecute(const  FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+
+	// if ((GetHealth() <= 0.0f) )
+	// {
+	// 	//Data.Target.AddLooseGameplayTag(ABTAG_CHARACTER_ISDEAD);
+	// 	OnOutOfHealth.Broadcast();
+	// }
+
 }
 
 void UBaseAttributeSet::GetLifetimeReplicatedProps(
@@ -97,5 +118,50 @@ void UBaseAttributeSet::InitBaseAttribute()
 void UBaseAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	if (NewValue < 0) NewValue = 0;
+	
+	if (Attribute == GetHealthAttribute())
+	{
+		NewValue = FMath::Min(NewValue, GetMaxHealth());
+
+		// if ((GetHealth() <= 0.0f) )
+		// {
+		// 	//Data.Target.AddLooseGameplayTag(ABTAG_CHARACTER_ISDEAD);
+		// 	OnOutOfHealth.Broadcast();
+		// }
+	}
+
+	
 }
+
+void UBaseAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
+{
+	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+
+	AActor* OwningActor = GetOwningActor();
+	if (!OwningActor)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Owning Actor not found!"));
+		return;
+	}
+	
+	UNLAbilitySystemComponent* ASC = Cast<UNLAbilitySystemComponent>(GetOwningAbilitySystemComponent());
+	if (Attribute == GetHealthAttribute())
+	{
+		if ((GetHealth() <= 0.0f) )
+		{
+			//ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(OwningActor);
+			//BaseCharacter->ActiveDeathAbility();
+			//ASC->OnDeathReactNotified.Broadcast();
+			//Data.Target.AddLooseGameplayTag(ABTAG_CHARACTER_ISDEAD);
+			OnOutOfHealth.Broadcast();
+		}
+	}
+	// if (Health.GetCurrentValue() <= 0.0f)
+	// {
+	// 	
+	// 	OnOutOfHealth.Broadcast();
+	// 	
+	// }
+}
+
 

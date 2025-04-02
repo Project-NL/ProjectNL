@@ -43,16 +43,22 @@ void UAT_TargetingEnemy::TickTask(float DeltaTime)
 }
 void UAT_TargetingEnemy::TargetingNearestEnemy(float DeltaTime)
 {
-	if (!NearestEnemy)
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetAvatarActor());
+	if (!PlayerCharacter)
+	{
+		return;
+	}
+	//UE_LOG(LogTemp, Warning, TEXT("[%s] Locking on to enemy: %s"), PlayerCharacter->HasAuthority() ? TEXT("Server") : TEXT("Client"), *PlayerCharacter->GetTargetingCharacter()->GetName());
+	if (!NearestEnemy||!PlayerCharacter->GetTargetingCharacter())
 	{
 		// NearestEnemy가 없으면 캐릭터 상태 원복
+	
 		BacktoSquareOne(DeltaTime);
 		return;
 	}
 
 	// 플레이어 캐릭터 확인
-	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetAvatarActor()))
-	{
+	
 		// ASC 확인
 		if (UAbilitySystemComponent* ASC = PlayerCharacter->GetAbilitySystemComponent())
 		{
@@ -73,7 +79,7 @@ void UAT_TargetingEnemy::TargetingNearestEnemy(float DeltaTime)
 				LockOnTarget(NearestEnemy, DeltaTime);
 			}
 		}
-	}
+	
 
 	// 플레이어 컨트롤러 회전(카메라 혹은 캐릭터 회전)에 관한 로직
 	PlayerContollerRotation(DeltaTime);
@@ -84,9 +90,10 @@ void UAT_TargetingEnemy::TargetNearestEnemy()
 	if (!NearestEnemy)
 	{
 		NearestEnemy = FindNearestTarget();
-
+		
 		if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetAvatarActor()))
 		{
+			PlayerCharacter->SetTargetingCharacter(Cast<AEnemyCharacter>(NearestEnemy));
 			if (UAbilitySystemComponent* ASC = PlayerCharacter->GetAbilitySystemComponent())
 			{
 				if (TargetingSpeedEffect)
@@ -227,10 +234,7 @@ bool UAT_TargetingEnemy::BacktoSquareOne(float DeltaTime)
 {
 	
 	AActor* AvatarActor = GetAvatarActor();
-	//RestoreCameraRotation(AvatarActor->FindComponentByClass<UPlayerCameraComponent>(),DeltaTime);
 	RestoreSpringArmRotation(AvatarActor->FindComponentByClass<UPlayerSpringArmComponent>(),DeltaTime);
-	
-
 
 	return true;
 }
@@ -276,6 +280,7 @@ void UAT_TargetingEnemy::ReleaseLockOnTarget()
 void UAT_TargetingEnemy::LockOnTarget(AActor* NewTarget,float DeltaTime)
 {
 	CurrentTarget = NewTarget;
+	
 	if (CurrentTarget)
 	{
 		AActor* OwnerActor = GetAvatarActor();

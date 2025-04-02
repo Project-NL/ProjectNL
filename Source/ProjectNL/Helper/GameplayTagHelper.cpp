@@ -76,7 +76,7 @@ namespace NlGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_Sprint, "Status.Sprint", "특정 캐릭터가 현재 스프린트중 인 상태임을 의미함");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_Dodge, "Status.Dodge", "특정 캐릭터가 현재 닷지중 인 상태임을 의미함");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_UnderAttack, "Status.UnderAttack", "특정 캐릭터가 현재 공격 당하는 중 인 상태임을 의미함");
-	
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_DrinkPotion, "Status.DrinkPotion", "특정 캐릭터가 현재 포션을 마시는 상태임을 의미함");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_Utility_HitStop, "GameplayCue.Utility.HitStop", "실행 시 잠시 캐릭터들이 멈췄다가 다시 실행되는 구조");
 
 }

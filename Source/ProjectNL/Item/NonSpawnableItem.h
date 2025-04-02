@@ -20,7 +20,7 @@ class PROJECTNL_API UNonSpawnableItem : public UObject,public IItemInterface,pub
 public:
 	virtual void Interact(AActor* Actor) override;
 
-	virtual void UseItem() override;
+	virtual void UseItem(APlayerCharacter* playerCharacter) override;
 
 private:
 	//아이템 데이터
