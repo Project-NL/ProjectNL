@@ -4,6 +4,7 @@
 #include "ProjectNL/GAS/Ability/Active/Default/Knockback/AT_Knockback.h"
 #include "GameFramework/Actor.h"
 #include "Abilities/GameplayAbility.h"
+#include "ProjectNL/Helper/GameplayTagHelper.h"
 
 UAT_Knockback* UAT_Knockback::InitialEvent(UGameplayAbility* OwningAbility, FDamagedResponse& DamageResponse,float DamageMontageLength)
 {
@@ -11,7 +12,10 @@ UAT_Knockback* UAT_Knockback::InitialEvent(UGameplayAbility* OwningAbility, FDam
 	UAT_Knockback* MyTask = NewAbilityTask<UAT_Knockback>(OwningAbility);
 
 	MyTask->DamagedResponse = DamageResponse;
-	MyTask->KnockbackDuration=DamageMontageLength*0.4;
+
+		MyTask->KnockbackDuration=DamageMontageLength*0.4;
+	
+
 
 	return MyTask;
 }
@@ -51,7 +55,15 @@ void UAT_Knockback::Activate()
 	// 넉백 목표 지점 = 시작 위치 + (방향 벡터 × 거리)
 	// 여기서는 예시로 DamagedResponse.Damage를 곱해 넉백 거리로 사용
 	// (필요에 따라 별도의 KnockDistance 변수를 두어도 됩니다)
-	TargetLocation = StartLocation + (KnockbackDir * DamagedResponse.Damage);
+	if (AbilitySystemComponent->HasMatchingGameplayTag(NlGameplayTags::Status_Guard))
+	{
+		TargetLocation = StartLocation + (KnockbackDir * DamagedResponse.Damage*0.3);
+	}
+	else
+	{
+		TargetLocation = StartLocation + (KnockbackDir * DamagedResponse.Damage);
+	}
+	
 
 	// 넉백 타이머/시간 계산 등에 사용하기 위한 초기화
 	ElapsedTime = 0.f;

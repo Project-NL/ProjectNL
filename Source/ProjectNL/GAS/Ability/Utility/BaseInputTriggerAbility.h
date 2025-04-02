@@ -46,6 +46,8 @@ protected:
 	void CancelAbility(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	                   FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility);
 
+
+
 private:
 	// InputID가 -1인 경우 InputID를 할당받지 않은 상태라고 인지함
 	UPROPERTY(EditAnywhere, Category = "Input", meta=(AllowPrivateAccess="true"))

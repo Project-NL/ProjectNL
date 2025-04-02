@@ -34,6 +34,9 @@ struct FNLAbilitySystemInitializationData
 	TSubclassOf<UGameplayAbility> KnockAbility;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSubclassOf<UGameplayAbility> DeathAbility;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TArray<TSubclassOf<UGameplayEffect>> GameplayEffects;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)

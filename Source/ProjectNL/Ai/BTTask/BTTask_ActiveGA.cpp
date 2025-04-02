@@ -38,7 +38,7 @@ EBTNodeResult::Type UBTTask_ActiveGA::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	{
 		UE_LOG(LogPRBTTaskPlayAbility, Error, TEXT("BaseCharacter  is null."));
 	}
-		UAbilitySystemComponent* TargetASC = BaseCharacter->GetAbilitySystemComponent();
+	UAbilitySystemComponent* TargetASC = BaseCharacter->GetAbilitySystemComponent();
 	
 	if (!TargetASC)
 	{
@@ -52,10 +52,6 @@ EBTNodeResult::Type UBTTask_ActiveGA::ExecuteTask(UBehaviorTreeComponent& OwnerC
 		UE_LOG(LogPRBTTaskPlayAbility, Error, TEXT("Ability to activate is null."));
 		return EBTNodeResult::Failed;
 	}
-
-
-
-
 	// 어빌리티를 실행 시도
 	AbilitySpec = TargetASC->BuildAbilitySpecFromClass(AbilityToActivate, 1, INDEX_NONE);
 	if(!AbilitySpec.Ability)
@@ -127,7 +123,6 @@ EBTNodeResult::Type UBTTask_ActiveGA::AbortTask(UBehaviorTreeComponent& OwnerCom
 	if (ActivatedAbilityInstance && ActivatedAbilityInstance->IsActive())
 	{
 		UE_LOG(LogPRBTTaskPlayAbility, Log, TEXT("어빌리티를 종료합니다"));
-
 		ActivatedAbilityInstance->K2_CancelAbility();
 	}
 	ActivatedAbilityInstance = nullptr;

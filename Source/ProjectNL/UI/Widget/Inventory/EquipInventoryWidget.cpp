@@ -28,6 +28,8 @@ void UEquipInventoryWidget::RefreshInventory()
 				UEquipComponent* EquipComponent= PlayerCharacter->GetEquipComponent();
 				EquipComponent->EquipInventorySlotChangedDelegate.AddUObject(this, &UEquipInventoryWidget::RefreshInventory);
 				ABaseWeapon* MainWeapon=EquipComponent->GetMainWeapon();
+				
+				if (MainWeapon)
 				WeaponSlot->SetupSlot(MainWeapon->GetItemMetainfo());
 			}
 		}

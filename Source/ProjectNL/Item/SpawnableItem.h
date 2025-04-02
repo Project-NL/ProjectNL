@@ -20,6 +20,8 @@ public:
 	// Sets default values for this actor's properties
 	ASpawnableItem();
 
+	// 아이템 파괴 (서버에서 호출)
+	void DestroyItem();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -45,20 +47,40 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 
 	void AcquireWidgetComponentLookAtPlayer();
+
+	// 네트워크 복제 활성화
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	// 서버에서만 실행되는 Interact 메서드
+	UFUNCTION(Server, Reliable, WithValidation)
+	virtual void ServerInteract(AActor* InteractingActor);
+
+	// 모든 클라이언트에게 아이템 파괴를 알리는 멀티캐스트 RPC
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastDestroyItem();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SetCollision();
+
+
+	
+	UFUNCTION()
+	void OnRep_CollisionBox();
+	
 public:
 	virtual void Interact(AActor* Actor) override;
-	virtual void UseItem() override;
+	virtual void UseItem(APlayerCharacter* playerCharacter) override;
 
 	FItemMetaInfo* GetItemMetainfo();
+
+	// 충돌 처리를 위한 박스 컴포넌트
+	UPROPERTY(VisibleAnywhere)
+	UBoxComponent* CollisionBox;
 protected:
 	// 아이템 데이터
 	UPROPERTY(EditAnywhere)
 	FItemMetaInfo ItemMetaInfo;
 	
-	// 충돌 처리를 위한 박스 컴포넌트
-	UPROPERTY(VisibleAnywhere)
-	UBoxComponent* CollisionBox;
-
 	// 아이템 위에 표시할 3D Widget
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="UI")
 	UWidgetComponent* AcquireWidgetComponent;
@@ -73,5 +95,8 @@ protected:
 
 	UPROPERTY()
 	ABasePlayerController *OverlappingPlayerController;
+
+	UPROPERTY(ReplicatedUsing=OnRep_CollisionBox)
+	int8 bcheckitem;
 
 };

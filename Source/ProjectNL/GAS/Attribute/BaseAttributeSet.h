@@ -12,6 +12,9 @@ GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOutOfHealthDelegate);
+
 UCLASS()
 class PROJECTNL_API UBaseAttributeSet : public UAttributeSet
 {
@@ -20,6 +23,10 @@ class PROJECTNL_API UBaseAttributeSet : public UAttributeSet
 public:
 	virtual void InitBaseAttribute();
 
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+
+	mutable FOutOfHealthDelegate OnOutOfHealth;
+	
 	UPROPERTY(BlueprintReadOnly, Category="Attributes"
 		, ReplicatedUsing = OnRepHealth)
 	FGameplayAttributeData Health;
@@ -118,7 +125,7 @@ protected:
 		TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
-	
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 	UFUNCTION()
 	virtual void OnRepHealth(const FGameplayAttributeData& OldHealth);
 	
@@ -143,4 +150,6 @@ protected:
 	UFUNCTION()
 	virtual void OnRepMovementSpeed(
 		const FGameplayAttributeData& OldMovementSpeed);
+
+	
 };

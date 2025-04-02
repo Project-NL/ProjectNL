@@ -41,6 +41,10 @@ protected:
 
 	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	virtual void Interact(AActor* Actor) override;
+
+	// 서버에서만 실행되는 Interact 메서드
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerWeaponInteract(AActor* InteractingActor);
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Assets
 	, meta = (AllowPrivateAccess = "true"))

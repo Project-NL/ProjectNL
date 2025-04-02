@@ -7,6 +7,6 @@ void UNonSpawnableItem::Interact(AActor* Actor)
 {
 }
 
-void UNonSpawnableItem::UseItem()
+void UNonSpawnableItem::UseItem(APlayerCharacter* playerCharacter)
 {
 }

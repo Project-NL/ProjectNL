@@ -35,15 +35,22 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_RemoveActiveGameplayEffectBySourceEffect(
 		TSubclassOf<UGameplayEffect> Effect);
+
+	
 	
 	GETTER(UEquipComponent*, EquipComponent)
 	GETTER(FVector2D, MovementVector)
 	GETTER_SETTER(EEntityCategory, EntityType)
 	GETTER(UTimeRecallComponent*, TimeRecallComponent)
 	GETTER(UInventoryComponent*, InventoryComponent)
+	GETTER(UAnimMontage*, DeathMontage)
+	//UFUNCTION(NetMulticast, Reliable)
+	void ActiveDeathAbility();
 protected:
 	virtual void BeginPlay() override;
 
+
+	
 	UPROPERTY()
 	TObjectPtr<UNLAbilitySystemComponent> AbilitySystemComponent;
 	
@@ -70,12 +77,17 @@ protected:
 	void Initialize();
 
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override;
-
-
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> DamagedMontage;
+
+	// virtual void Die();
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Entity|Category"
 		, meta = (AllowPrivateAccess = "true"))
 	EEntityCategory EntityType;
+
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> DeathMontage;
 
 };
