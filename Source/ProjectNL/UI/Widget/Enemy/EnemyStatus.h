@@ -9,6 +9,7 @@
 class AEnemyCharacter;
 class ABaseCharacter;
 class UValuePercentBar;
+class UProgressBar;
 struct FOnAttributeChangeData;
 /**
  * 
@@ -29,7 +30,7 @@ protected:
 	void HandleMaxHealthChanged(const FOnAttributeChangeData& Data);
 	
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-	TObjectPtr<UValuePercentBar> HealthBar;
+	TObjectPtr<UProgressBar> HealthBar;
 	
 	AEnemyCharacter* EnemyCharacter;
 };

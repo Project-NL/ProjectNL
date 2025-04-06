@@ -5,8 +5,21 @@
 
 FItemInfoData& FItemHelper::GetItemInfoById(const UWorld* World, const uint16 Id)
 {
-	 UBaseGameInstance* GI = static_cast<UBaseGameInstance*>(World->GetGameInstance());
+	UBaseGameInstance* GI = static_cast<UBaseGameInstance*>(World->GetGameInstance());
+	if (!GI)
+	{
+		static FItemInfoData Dummy;
+		UE_LOG(LogTemp, Error, TEXT("Invalid GameInstance"));
+		return Dummy;
+	}
 	TArray<FItemInfoData> ItemInfoDatas =GI->GetItemInfoList();
+
+	if (!ItemInfoDatas.IsValidIndex(Id))
+	{
+		static FItemInfoData Dummy;
+		UE_LOG(LogTemp, Error, TEXT("Invalid ItemId: %d. Array size: %d"), Id, ItemInfoDatas.Num());
+		return Dummy;
+	}
 	return ItemInfoDatas[Id];
 }
 

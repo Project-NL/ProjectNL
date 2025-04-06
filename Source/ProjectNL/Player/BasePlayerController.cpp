@@ -4,10 +4,12 @@
 #include "EnhancedInputComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "ProjectNL/Character/Player/PlayerCharacter.h"
+#include "ProjectNL/Helper/GameplayTagHelper.h"
 #include "ProjectNL/Helper/ItemHelper.h"
 #include "ProjectNL/Item/SpawnableItem.h"
 #include "ProjectNL/UI/Widget/Inventory/InventoryWidget.h"
 #include "ProjectNL/UI/Widget/PlayerStatus/PlayerStatus.h"
+#include "ProjectNL/UI/Manager/UIManager.h"
 
 
 void ABasePlayerController::BeginPlay()
@@ -41,6 +43,11 @@ void ABasePlayerController::BeginPlayingState()
 		
 	PlayerHotslot = CreateWidget<UUserWidget>(this, PlayerHotslotHUDClass);
 	PlayerHotslot->AddToViewport();
+
+	if (UGameInstance* GameInstance = GetGameInstance())
+	{
+		UIManager = GameInstance->GetSubsystem<UUIManager>();
+	}
 }
 
 void ABasePlayerController::SetupInputComponent()
@@ -106,11 +113,20 @@ bool ABasePlayerController::Server_UseFirstHotSlotItem_Validate()
 
 void ABasePlayerController::ToggleInventoryWidget()
 {
-	if (InventoryWidget)
+	if (!UIManager)
 	{
-		// 인벤토리 위젯이 이미 열려 있다면, 제거하여 숨깁니다.
-		InventoryWidget->RemoveFromParent();
-		InventoryWidget = nullptr;
+		UE_LOG(LogTemp, Warning, TEXT("UIManager not found!"));
+		return;
+	}
+
+	// 인벤토리 태그 정의
+	FGameplayTag InventoryTag = NlGameplayTags::UI_GameMenu;
+
+	// 현재 인벤토리 위젯이 열려 있는지 확인 (UIManager에 상태 확인 로직 필요)
+	// 여기서는 Toggle 방식이니까 간단히 Show/Hide로 처리
+	if (UIManager->IsUIActive(InventoryTag)) // IsUIActive는 추가해야 할 함수
+	{
+		UIManager->HideUI(InventoryTag);
 		// 게임 모드로 입력 전환: 마우스 커서 숨김
 		FInputModeGameOnly GameInputMode;
 		SetInputMode(GameInputMode);
@@ -118,29 +134,19 @@ void ABasePlayerController::ToggleInventoryWidget()
 	}
 	else
 	{
-		// 인벤토리 위젯이 없다면, 생성 후 뷰포트에 추가합니다.
-		if (InventoryWidgetClass)
-		{
-			InventoryWidget = CreateWidget<UUserWidget>(this, InventoryWidgetClass);
-			if (InventoryWidget)
-			{
-				InventoryWidget->AddToViewport();
-				FInputModeGameAndUI  UIInputMode;
-                
-				// 이 위젯에 마우스 포커스가 잡히도록 설정
-				UIInputMode.SetWidgetToFocus(InventoryWidget->TakeWidget());
-                
-				// 마우스를 뷰포트에 고정하지 않음(필요 시 조정)
-				UIInputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-                
-				// UIOnly 모드로 입력 전환
-				SetInputMode(UIInputMode);
-				bShowMouseCursor = true;
-			}
-		}
+		UIManager->ShowUI(InventoryTag);
+		// UI 모드로 입력 전환
+		FInputModeGameAndUI UIInputMode;
+		//UUserWidget* InventoryWidget = UIManager->GetActiveWidget(InventoryTag); // GetActiveWidget도 추가 필요
+		//if (InventoryWidget)
+		//{
+//			UIInputMode.SetWidgetToFocus(InventoryWidget->TakeWidget());
+		//	UIInputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			SetInputMode(UIInputMode);
+			bShowMouseCursor = true;
+		
 	}
 }
-
 void ABasePlayerController::UseFirstHotSlotItem()
 {
 	if (!HasAuthority()) // 클라이언트라면 서버에 실행 요청

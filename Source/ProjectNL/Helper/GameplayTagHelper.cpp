@@ -78,5 +78,8 @@ namespace NlGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_UnderAttack, "Status.UnderAttack", "특정 캐릭터가 현재 공격 당하는 중 인 상태임을 의미함");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_DrinkPotion, "Status.DrinkPotion", "특정 캐릭터가 현재 포션을 마시는 상태임을 의미함");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_Utility_HitStop, "GameplayCue.Utility.HitStop", "실행 시 잠시 캐릭터들이 멈췄다가 다시 실행되는 구조");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(UI, "UI", "UI관련 최상위 트리 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(UI_Inventory, "UI.Inventory", "UI관련 인벤토리");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(UI_GameMenu, "UI.GameMenu", "UI관련 게임메뉴");
 
 }

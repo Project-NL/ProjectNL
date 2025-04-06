@@ -10,6 +10,8 @@ class UPlayerStatus;
 class UInventoryWidget;
 class UInputAction;
 class ASpawnableItem;
+class UUIManager;
+
 UCLASS()
 class PROJECTNL_API ABasePlayerController : public APlayerController
 {
@@ -68,6 +70,9 @@ protected:
 	UInputAction* ToggleFifthHotSlotItem;
 	UPROPERTY()
 	ASpawnableItem* NearbyItem;
+	
+	UPROPERTY()
+	UUIManager* UIManager;
 	
 	// Tab 키 입력 시 호출될 인벤토리 토글 함수
 	UFUNCTION()

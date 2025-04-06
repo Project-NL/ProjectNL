@@ -3,6 +3,7 @@
 
 #include "ProjectNL/UI/Widget/Enemy/EnemyStatus.h"
 
+#include "Components/ProgressBar.h"
 #include "ProjectNL/Character/Enemy/EnemyCharacter.h"
 #include "ProjectNL/GAS/NLAbilitySystemComponent.h"
 #include "ProjectNL/GAS/Attribute/BaseAttributeSet.h"
@@ -30,7 +31,7 @@ void UEnemyStatus::SetBaseCharacter(AEnemyCharacter* enemyCharacter)
 			if (const UBaseAttributeSet* PlayerAttributeSet = EnemyCharacter->
 				EnemyAttributeSet)
 			{
-				HealthBar->InitializePercent(PlayerAttributeSet->GetHealth(), PlayerAttributeSet->GetMaxHealth());
+				HealthBar->SetPercent(PlayerAttributeSet->GetHealth()/PlayerAttributeSet->GetMaxHealth());
 				
 				ASC->GetGameplayAttributeValueChangeDelegate(
 					PlayerAttributeSet->GetHealthAttribute()).AddUObject(
@@ -50,10 +51,20 @@ void UEnemyStatus::HandleCurrentHealthChanged(const FOnAttributeChangeData& Data
 		UE_LOG(LogTemp, Log, TEXT("Character: %s, Current Health Changed: %f"), 
 			*EnemyCharacter->GetName(), Data.NewValue);
 	}
-	HealthBar->SetCurrentValue(Data.NewValue/4);
+	if (EnemyCharacter) 
+	{
+		if (UAbilitySystemComponent* ASC = EnemyCharacter->GetAbilitySystemComponent())
+		{
+			if (const UBaseAttributeSet* PlayerAttributeSet = EnemyCharacter->
+				EnemyAttributeSet)
+			{
+				HealthBar->SetPercent(PlayerAttributeSet->GetHealth()/PlayerAttributeSet->GetMaxHealth());
+			}
+		}
+	}
 }
 
 void UEnemyStatus::HandleMaxHealthChanged(const FOnAttributeChangeData& Data)
 {
-	HealthBar->SetMaxValue(Data.NewValue/4);
+	//HealthBar->SetMaxValue(Data.NewValue/4);
 }

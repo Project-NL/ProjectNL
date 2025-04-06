@@ -52,11 +52,10 @@ void UAT_TargetingEnemy::TargetingNearestEnemy(float DeltaTime)
 	if (!NearestEnemy||!PlayerCharacter->GetTargetingCharacter())
 	{
 		// NearestEnemy가 없으면 캐릭터 상태 원복
-	
-		BacktoSquareOne(DeltaTime);
+		ReleaseLockOnTarget();
 		return;
 	}
-
+	
 	// 플레이어 캐릭터 확인
 	
 		// ASC 확인
@@ -232,6 +231,7 @@ void UAT_TargetingEnemy::PlayerContollerRotation(float DeltaTime)
 
 bool UAT_TargetingEnemy::BacktoSquareOne(float DeltaTime)
 {
+
 	
 	AActor* AvatarActor = GetAvatarActor();
 	RestoreSpringArmRotation(AvatarActor->FindComponentByClass<UPlayerSpringArmComponent>(),DeltaTime);
@@ -260,7 +260,11 @@ void UAT_TargetingEnemy::ReleaseLockOnTarget()
 		// 플레이어 컨트롤러의 회전 입력을 다시 활성화
 		PlayerController->SetIgnoreLookInput(false);
 		// 플레이어 컨트롤러의 뷰 타겟을 플레이어로 설정 (필요시)
-		PlayerController->SetViewTarget(OwnerActor);
+		PlayerController->SetViewTargetWithBlend(OwnerActor,0.5);
+		
+		// // 캐릭터가 바라보는 방향을 플레이어 컨트롤러의 회전 방향으로 설정
+		// FRotator NewControlRotation = OwnerActor->GetActorRotation();
+		// PlayerController->SetControlRotation(NewControlRotation);
 	}
 	UPlayerSpringArmComponent* SpringArm = GetAvatarActor()->FindComponentByClass<UPlayerSpringArmComponent>();
 	SpringArm->bEnableCameraLag = false;
@@ -271,8 +275,12 @@ void UAT_TargetingEnemy::ReleaseLockOnTarget()
 		{
 			ASC->RemoveActiveGameplayEffectBySourceEffect(TargetingSpeedEffect, ASC);
 		}
+		if (PlayerCharacter->GetTargetingCharacter())
+		{
+			PlayerCharacter->SetTargetingCharacter(nullptr);
+		}
 	}
-	
+
 	
 	OnCanceled.Broadcast();
 }

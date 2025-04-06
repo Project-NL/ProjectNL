@@ -86,8 +86,10 @@ protected:
 	UWidgetComponent* AcquireWidgetComponent;
 
 	
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* StaticMeshComp;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Assets
+		, meta = (AllowPrivateAccess = "true"))
+	USkeletalMeshComponent* SkeletalMeshComponent;
+
 	// 현재 아이템과 겹쳐있는 플레이어 (상호작용을 위해)
 	UPROPERTY()
 	APlayerCharacter* OverlappingPlayer;

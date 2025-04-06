@@ -29,6 +29,7 @@ public:
 
 	void SetTargetingCharacter(AEnemyCharacter* TargetingCharacter);
 
+	UFUNCTION(BlueprintCallable, Category = "Targeting")
 	AEnemyCharacter* GetTargetingCharacter();
 protected:
 	virtual void BeginPlay() override;
@@ -70,8 +71,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UEquipInventoryComponent* EquipInventoryComponent;
-
-		
+	
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Effect"
 		, meta=(AllowPrivateAccess = true))
 	TSubclassOf<UGameplayEffect> RegenEffect;
@@ -83,6 +83,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Ability")
 	TSubclassOf<UGameplayAbility> KnockbackAbility;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Targeting", meta = (AllowPrivateAccess = "true"))
 	AEnemyCharacter* TargetingCharacter;
 };
 

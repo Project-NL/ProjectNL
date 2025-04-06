@@ -34,7 +34,6 @@ protected:
 	UFUNCTION()
 	void Die() ;
 
-	void WidgetComponentLookAtPlayer();
 	UFUNCTION(NetMulticast,Reliable)
 	void MulticastDestroy();
 	UFUNCTION(Server, Reliable,WithValidation)
