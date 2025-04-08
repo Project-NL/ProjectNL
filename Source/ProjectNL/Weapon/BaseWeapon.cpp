@@ -11,7 +11,6 @@
 ABaseWeapon::ABaseWeapon()
 {
 	SetReplicates(true);
-	SetReplicateMovement(true);
 	WeaponSkeleton = CreateDefaultSubobject<USkeletalMeshComponent>(
 		TEXT("Weapon Bone"));
 	WeaponSkeleton->SetupAttachment(RootComponent);

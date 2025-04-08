@@ -15,11 +15,12 @@ ASpawnableItem::ASpawnableItem()
     PrimaryActorTick.bCanEverTick = true;
     bReplicates = true;
 
+    SetReplicates(true);
     // SkeletalMeshComponent (물리 적용 대상)
     SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
     RootComponent = SkeletalMeshComponent;
 
-    SkeletalMeshComponent->SetSimulatePhysics(true);
+    SkeletalMeshComponent->SetSimulatePhysics(false);
     SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
     SkeletalMeshComponent->SetCollisionObjectType(ECC_PhysicsBody);
     SkeletalMeshComponent->SetCollisionResponseToAllChannels(ECR_Block);
@@ -37,11 +38,13 @@ ASpawnableItem::ASpawnableItem()
     // 위젯 컴포넌트 (획득 UI)
     AcquireWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("AcquireWidgetComponent"));
     AcquireWidgetComponent->SetupAttachment(RootComponent);
-    AcquireWidgetComponent->SetWidgetSpace(EWidgetSpace::World);
+    AcquireWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
     AcquireWidgetComponent->SetDrawSize(FVector2D(200.f, 50.f));
     AcquireWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 100.f));
     AcquireWidgetComponent->SetWidgetClass(UItemAcquireTextWidget::StaticClass());
     AcquireWidgetComponent->SetVisibility(false);
+
+    bcheckitem=false;
 }
 
 void ASpawnableItem::BeginPlay()
@@ -52,7 +55,7 @@ void ASpawnableItem::BeginPlay()
 void ASpawnableItem::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
-    AcquireWidgetComponentLookAtPlayer();
+    //AcquireWidgetComponentLookAtPlayer();
 }
 
 void ASpawnableItem::AcquireWidgetComponentLookAtPlayer()
@@ -112,6 +115,11 @@ void ASpawnableItem::Interact(AActor* InteractingActor)
         ABasePlayerState* BasePlayerState = Cast<ABasePlayerState>(OverlappingPlayer->GetPlayerState());
         if (BasePlayerState)
         {
+            ABasePlayerController* BasePlayerController = Cast<ABasePlayerController>(PlayerCharacter->GetController());
+            if (BasePlayerController)
+            {
+                BasePlayerController->SetNearbyItem(nullptr);
+            }
             int8 bAdded = BasePlayerState->AddItem(ItemMetaInfo);
             ServerInteract(InteractingActor);
         }
@@ -120,6 +128,16 @@ void ASpawnableItem::Interact(AActor* InteractingActor)
 
 void ASpawnableItem::ServerInteract_Implementation(AActor* InteractingActor)
 {
+    APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(InteractingActor);
+    if (PlayerCharacter)
+    {
+        
+        ABasePlayerController* BasePlayerController = Cast<ABasePlayerController>(PlayerCharacter->GetController());
+        if (BasePlayerController)
+        {
+            BasePlayerController->SetNearbyItem(nullptr);
+        }
+    }
     DestroyItem();
 }
 
@@ -139,6 +157,7 @@ void ASpawnableItem::DestroyItem()
 
 void ASpawnableItem::MulticastDestroyItem_Implementation()
 {
+    
     Destroy();
 }
 
