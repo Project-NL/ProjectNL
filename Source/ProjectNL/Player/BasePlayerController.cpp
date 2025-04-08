@@ -126,7 +126,8 @@ void ABasePlayerController::ToggleInventoryWidget()
 	// 여기서는 Toggle 방식이니까 간단히 Show/Hide로 처리
 	if (UIManager->IsUIActive(InventoryTag)) // IsUIActive는 추가해야 할 함수
 	{
-		UIManager->HideUI(InventoryTag);
+		//UIManager->HideUI(InventoryTag);
+		UIManager->Deinitialize();
 		// 게임 모드로 입력 전환: 마우스 커서 숨김
 		FInputModeGameOnly GameInputMode;
 		SetInputMode(GameInputMode);
@@ -137,11 +138,7 @@ void ABasePlayerController::ToggleInventoryWidget()
 		UIManager->ShowUI(InventoryTag);
 		// UI 모드로 입력 전환
 		FInputModeGameAndUI UIInputMode;
-		//UUserWidget* InventoryWidget = UIManager->GetActiveWidget(InventoryTag); // GetActiveWidget도 추가 필요
-		//if (InventoryWidget)
-		//{
-//			UIInputMode.SetWidgetToFocus(InventoryWidget->TakeWidget());
-		//	UIInputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	
 			SetInputMode(UIInputMode);
 			bShowMouseCursor = true;
 		

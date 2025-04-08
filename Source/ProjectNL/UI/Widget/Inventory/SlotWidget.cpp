@@ -23,6 +23,6 @@ void USlotWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointer
 void USlotWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseLeave(InMouseEvent);
-	OnItemHovered.Broadcast(-1, FItemInfoData(), FVector2D::ZeroVector);
+	OnItemDescriptionHide.Broadcast();
 	UE_LOG(LogTemp, Warning, TEXT("NativeOnMouseEnter is not Change"));
 }

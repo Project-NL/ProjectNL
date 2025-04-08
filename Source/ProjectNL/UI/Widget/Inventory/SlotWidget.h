@@ -11,6 +11,7 @@
  * 
  */
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnItemHovered, int32 /*SlotIndex*/, const FItemInfoData& /*ItemData*/, const FVector2D& /*MousePosition*/);
+DECLARE_MULTICAST_DELEGATE(FOnItemDescriptionHide);
 DECLARE_MULTICAST_DELEGATE(FOnInventorySlotChanged);
 UCLASS()
 class PROJECTNL_API USlotWidget : public UUserWidget
@@ -23,7 +24,7 @@ public:
 	// 델리게이트: 아이템 설명창 표시/숨김 요청
 
 	FOnItemHovered OnItemHovered;
-	
+	FOnItemDescriptionHide OnItemDescriptionHide;
 	virtual void SetupSlot(int32 SlotIndex, TArray<FItemMetaInfo>* InventoryList,int32 index);
 
 	// 마우스 이벤트 오버라이드

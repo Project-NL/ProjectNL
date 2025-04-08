@@ -35,7 +35,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UI Manager")
 	bool IsUIActive(FGameplayTag UITag) const;
 
-
+	UUserWidget* GetActiveUI(FGameplayTag UITag);
 private:
 	// 태그와 위젯 클래스를 매핑하는 테이블
 	UPROPERTY(EditAnywhere, Category = "UI Manager")
@@ -47,5 +47,6 @@ private:
 
 	// UI를 생성하고 뷰포트에 추가하는 헬퍼 함수
 	UUserWidget* CreateWidgetForTag(FGameplayTag UITag);
+
 
 };

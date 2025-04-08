@@ -31,7 +31,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void RefreshInventory();
 	void UpdateItemDescription(int32 SlotIndex, const FItemInfoData& ItemData, const FVector2D& MousePosition);
-
+	void HideItemDescription();
 	// Blueprint에서 인벤토리 제목을 수정할 수 있게 만듭니다.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	FText InventoryTitle;

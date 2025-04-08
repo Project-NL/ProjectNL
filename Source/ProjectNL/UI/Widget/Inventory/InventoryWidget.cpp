@@ -12,7 +12,9 @@
 #include "GameFramework/PlayerController.h"
 #include "ProjectNL/Character/Player/PlayerCharacter.h"
 #include "ProjectNL/Component/InventoryComponent/EquipInventoryComponent.h"
+#include "ProjectNL/Helper/GameplayTagHelper.h"
 #include "ProjectNL/Player/BasePlayerState.h"
+#include "ProjectNL/UI/Manager/UIManager.h"
 
 
 void UInventoryWidget::NativePreConstruct()
@@ -29,8 +31,6 @@ void UInventoryWidget::NativeConstruct()
 	{
 		InventoryLabel->SetText(InventoryTitle);
 	}
-	//GetWorld()
-	// 소유한 PlayerController에서 PlayerState를 가져옵니다.
 	if (APlayerController* PC = GetOwningPlayer())
 	{
 		if (ABasePlayerState* PS = PC->GetPlayerState<ABasePlayerState>())
@@ -101,6 +101,7 @@ void UInventoryWidget::RefreshInventory()
 				SlotWidget->SetupSlot(Index, InventoryList,Index);
 				SlotWidget->OnInventorySlotChanged.AddUObject(this, &UInventoryWidget::RefreshInventory);
 				SlotWidget->OnItemHovered.AddUObject(this, &UInventoryWidget::UpdateItemDescription);
+				SlotWidget->OnItemDescriptionHide.AddUObject(this, &UInventoryWidget::HideItemDescription);
 			}
 			// 행과 열 계산 (Index를 이용)
 			int32 Row = Index / NumColumns;
@@ -113,50 +114,57 @@ void UInventoryWidget::RefreshInventory()
 }
 void UInventoryWidget::UpdateItemDescription(int32 SlotIndex, const FItemInfoData& ItemData,const FVector2D& MousePosition)
 {
-	
-	if (!ItemDescriptionPanel)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ItemDescriptionPanel is not set"));
-		return;
-	}
+
+
 
 	if (SlotIndex >= 0 && ItemData.GetThumbnail()) // 유효한 슬롯과 아이템 데이터
 	{
-		// 설명창 생성 및 초기화 (이미 생성된 경우 재사용)
-		if (!ItemDescriptionPanel->IsInViewport())
+		if (UGameInstance* GameInstance = GetGameInstance())
 		{
+			UUIManager* UIManager = GameInstance->GetSubsystem<UUIManager>();
+		
+			// 인벤토리 태그 정의
+			FGameplayTag InventoryTag = NlGameplayTags::UI_ItemDescriptionPanel;
+			UIManager->ShowUI(InventoryTag);
+	
+			ItemDescriptionPanel=Cast<UItemPopUpWidget>(UIManager->GetActiveUI(InventoryTag));
+			//UIManager->ShowUI(InventoryTag);
+			// 설명창 생성 및 초기화 (이미 생성된 경우 재사용)
 			ItemDescriptionPanel->SetItemData(ItemData);
-			ItemDescriptionPanel->AddToViewport();
+			
+
+			// 크기 설정 (300x300 픽셀)
+			ItemDescriptionPanel->SetDesiredSizeInViewport(FVector2D(500.0f, 600.0f));
+
+			// 마우스 위치를 기준으로 설명창 위치 조정 (마우스 오른쪽에 표시, 화면 경계 체크)
+			FVector2D ViewportSize;
+			GEngine->GameViewport->GetViewportSize(ViewportSize);
+			FVector2D PopUpPosition = MousePosition + FVector2D(10.0f, 0.0f); // 마우스 오른쪽 10픽셀
+
+			// 화면 경계 체크
+			if (PopUpPosition.X + 300.0f > ViewportSize.X)
+			{
+				PopUpPosition.X = MousePosition.X +90.0f; // 마우스 왼쪽에 표시
+			}
+			if (PopUpPosition.Y + 200.0f > ViewportSize.Y)
+			{
+				PopUpPosition.Y = ViewportSize.Y - 200.0f; // 화면 아래로 고정
+			}
+
+			ItemDescriptionPanel->SetPositionInViewport(PopUpPosition);
+			ItemDescriptionPanel->SetVisibility(ESlateVisibility::Visible);
 		}
-
-		// 크기 설정 (300x300 픽셀)
-		ItemDescriptionPanel->SetDesiredSizeInViewport(FVector2D(500.0f, 600.0f));
-
-		// 마우스 위치를 기준으로 설명창 위치 조정 (마우스 오른쪽에 표시, 화면 경계 체크)
-		FVector2D ViewportSize;
-		GEngine->GameViewport->GetViewportSize(ViewportSize);
-		FVector2D PopUpPosition = MousePosition + FVector2D(10.0f, 0.0f); // 마우스 오른쪽 10픽셀
-
-		// 화면 경계 체크
-		if (PopUpPosition.X + 300.0f > ViewportSize.X)
-		{
-			PopUpPosition.X = MousePosition.X +90.0f; // 마우스 왼쪽에 표시
-		}
-		if (PopUpPosition.Y + 200.0f > ViewportSize.Y)
-		{
-			PopUpPosition.Y = ViewportSize.Y - 200.0f; // 화면 아래로 고정
-		}
-
-		ItemDescriptionPanel->SetPositionInViewport(PopUpPosition);
-		ItemDescriptionPanel->SetVisibility(ESlateVisibility::Visible);
 	}
-	else
+}
+
+void UInventoryWidget::HideItemDescription()
+{
+	if (UGameInstance* GameInstance = GetGameInstance())
 	{
-		ItemDescriptionPanel->SetVisibility(ESlateVisibility::Hidden);
-		if (ItemDescriptionPanel->IsInViewport())
-		{
-			ItemDescriptionPanel->RemoveFromParent(); // 필요 시 제거
-		}
-	}
+		UUIManager* UIManager = GameInstance->GetSubsystem<UUIManager>();
+		FGameplayTag InventoryTag = NlGameplayTags::UI_ItemDescriptionPanel;
+		UIManager->HideUI(InventoryTag);
 
+	}
+	
 }

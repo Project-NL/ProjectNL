@@ -114,3 +114,11 @@ UUserWidget* UUIManager::CreateWidgetForTag(FGameplayTag UITag)
 
     return CreateWidget<UUserWidget>(World, *WidgetClassPtr);
 }
+UUserWidget* UUIManager::GetActiveUI(FGameplayTag UITag)
+{
+    if (UUserWidget** WidgetPtr = ActiveWidgets.Find(UITag))
+    {
+        return *WidgetPtr;
+    }
+    return nullptr;
+}
