@@ -72,12 +72,6 @@ void UBaseInputTriggerAbility::EndAbility(
 		TriggeredEventHandle = -1;
 	}
 }
-void UBaseInputTriggerAbility::CancelAbility(const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
-	bool bReplicateCancelAbility)
-{
-	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
-}
 
 void UBaseInputTriggerAbility::OnRemoveAbility(
 	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
@@ -123,4 +117,3 @@ void UBaseInputTriggerAbility::OnAbilityInputReleased(
 		Owner->GetAbilitySystemComponent()->ServerSetInputReleased(Spec->Handle);
 	}
 }
-

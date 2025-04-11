@@ -107,31 +107,3 @@ enum class ETargetHeight: uint8
 	Low UMETA(DisplayName = "Low")
 	, Middle UMETA(DisplayName = "Middle")
 	, High UMETA(DisplayName = "High")};
-
-
-UENUM(BlueprintType)
-enum class EActionType: uint8
-{
-	Animation UMETA(DisplayName = "Animation")
-	, Move UMETA(DisplayName = "Move")
-	, Delay UMETA(DisplayName = "Delay")};
-
-UENUM(BlueprintType)
-enum class EBossSkillName: uint8
-{
-	None,
-	Skill1 UMETA(DisplayName = "Animation")
-	, Skill2 UMETA(DisplayName = "Move")
-	, Skill3 UMETA(DisplayName = "Delay")};
-
-UENUM(BlueprintType)
-enum class ECollisionShapeTypes : uint8
-{
-	None,
-	Sphere     UMETA(DisplayName = "Sphere"),
-	Box        UMETA(DisplayName = "Box"),
-	Capsule    UMETA(DisplayName = "Capsule"),
-	Plane	   UMETA(DisplayName = "Plane"),
-	
-	
-};

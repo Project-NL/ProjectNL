@@ -33,14 +33,13 @@ EMovementDirection FLocateHelper::GetDirectionByVector(const FVector2D Vector)
 
 EMovementDirection FLocateHelper::GetDirectionByAngle(const float Angle)
 {
-	if (Angle > -22.5f && Angle <= 22.5f) return EMovementDirection::F;
-	if (Angle > 22.5f && Angle <= 67.5f) return EMovementDirection::FL;
-	if (Angle > 67.5f && Angle <= 112.5f) return EMovementDirection::L;
-	if (Angle > 112.5f && Angle <= 157.5f) return EMovementDirection::BL;
-	if (Angle > 157.5f || Angle <= -157.5f) return EMovementDirection::B;
-	if (Angle > -157.5f && Angle <= -112.5f) return EMovementDirection::BR;
-	if (Angle > -112.5f && Angle <= -67.5f) return EMovementDirection::R;
-	if (Angle > -67.5f && Angle <= -22.5f) return EMovementDirection::FR;
+	if (Angle <= 22.5 && Angle >= -22.5) return EMovementDirection::F;
+	if (Angle <= 22.5 && Angle >= 67.5) return EMovementDirection::FR;
+	if (Angle <= 67.5 && Angle >= 112.5) return EMovementDirection::R;
+	if (Angle <= 112.5 && Angle >= 157.5) return EMovementDirection::BR;
+	if (Angle <= -22.5 && Angle >= -67.5) return EMovementDirection::FL;
+	if (Angle <= -67.5 && Angle >= -112.5) return EMovementDirection::L;
+	if (Angle <= -112.5 && Angle >= -157.5) return EMovementDirection::BL;
 	return EMovementDirection::B;
 }
 
@@ -70,24 +69,3 @@ ETargetHeight FLocateHelper::GetTargetHeightTypeByPoint(const float ActorHeight,
 	if (TargetHeight <= ActorHeight / 3 * 2) return ETargetHeight::Middle;
 	return ETargetHeight::Low;
 }
-
-float FLocateHelper::GetDeltaAngle(const FVector& From, const FVector& To)
-{
-	FVector NormalizedFrom = From.GetSafeNormal();
-	FVector NormalizedTo = To.GetSafeNormal();
-
-	// 내적(Dot Product) 이용해서 두 벡터의 각도 계산
-	float Dot = FVector::DotProduct(NormalizedFrom, NormalizedTo);
-	float Angle = FMath::RadiansToDegrees(FMath::Acos(Dot));
-
-	// 외적(Cross Product) 사용해서 왼쪽/오른쪽 판별
-	FVector Cross = FVector::CrossProduct(NormalizedFrom, NormalizedTo);
-	if (Cross.Z < 0) // Z값이 음수면 왼쪽 방향 (반시계)
-	{
-		Angle *= -1;
-	}
-
-	return Angle; // -180 ~ 180 범위의 각도 반환
-}
-
-

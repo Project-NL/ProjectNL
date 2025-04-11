@@ -31,12 +31,6 @@ struct FNLAbilitySystemInitializationData
 	TSubclassOf<UGameplayAbility> ThirdNameAbility;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	TSubclassOf<UGameplayAbility> KnockAbility;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	TSubclassOf<UGameplayAbility> DeathAbility;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TArray<TSubclassOf<UGameplayEffect>> GameplayEffects;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)

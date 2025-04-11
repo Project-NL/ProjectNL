@@ -17,7 +17,7 @@ void UGA_TargetingEnemy::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	FGameplayTagContainer EventTag;
-	TargetingEnemyTask = UAT_TargetingEnemy::InitialEvent(this,TargetingSpeedEffect);
+	TargetingEnemyTask = UAT_TargetingEnemy::InitialEvent(this);
 	TargetingEnemyTask->OnCanceled.AddDynamic(this, &UGA_TargetingEnemy::OnCancelled);
 	TargetingEnemyTask->ReadyForActivation();
 }
@@ -26,9 +26,6 @@ void UGA_TargetingEnemy::EndAbility(const FGameplayAbilitySpecHandle Handle, con
 	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-
-	GetAbilitySystemComponentFromActorInfo()->
-			RemoveActiveGameplayEffectBySourceEffect(TargetingSpeedEffect, GetAbilitySystemComponentFromActorInfo());
 }
 
 void UGA_TargetingEnemy::InputPressed(const FGameplayAbilitySpecHandle Handle,
