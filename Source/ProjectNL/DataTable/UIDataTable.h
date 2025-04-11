@@ -19,6 +19,6 @@ struct  PROJECTNL_API FUIDataTable : public FTableRowBase
 	FORCEINLINE const TMap<FGameplayTag, TSubclassOf<UUserWidget>>* GetDisplayName() const { return &UIMapping; }
 	// 태그와 위젯 클래스를 매핑하는 테이블
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
-	TMap<FGameplayTag, TSubclassOf<UUserWidget>> UIMapping;
+	TMap<FGameplayTag, TSubclassOf<UUserWidget>>  UIMapping;
 
 };
