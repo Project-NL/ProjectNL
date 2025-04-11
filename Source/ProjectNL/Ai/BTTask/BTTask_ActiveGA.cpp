@@ -9,6 +9,7 @@
 #include "AIController.h"
 #include "Logging/LogMacros.h"
 #include "ProjectNL/Character/BaseCharacter.h"
+#include "ProjectNL/GAS/Ability/Active/Default/Action/GA_Action.h"
 
 
 // 로그 카테고리 정의
@@ -37,7 +38,7 @@ EBTNodeResult::Type UBTTask_ActiveGA::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	{
 		UE_LOG(LogPRBTTaskPlayAbility, Error, TEXT("BaseCharacter  is null."));
 	}
-		UAbilitySystemComponent* TargetASC = BaseCharacter->GetAbilitySystemComponent();
+	UAbilitySystemComponent* TargetASC = BaseCharacter->GetAbilitySystemComponent();
 	
 	if (!TargetASC)
 	{
@@ -51,10 +52,6 @@ EBTNodeResult::Type UBTTask_ActiveGA::ExecuteTask(UBehaviorTreeComponent& OwnerC
 		UE_LOG(LogPRBTTaskPlayAbility, Error, TEXT("Ability to activate is null."));
 		return EBTNodeResult::Failed;
 	}
-
-
-
-
 	// 어빌리티를 실행 시도
 	AbilitySpec = TargetASC->BuildAbilitySpecFromClass(AbilityToActivate, 1, INDEX_NONE);
 	if(!AbilitySpec.Ability)
@@ -69,12 +66,19 @@ EBTNodeResult::Type UBTTask_ActiveGA::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	UGameplayAbility* ActivatedAbility = TargetASC->FindAbilitySpecFromHandle(AbilityHandle)->GetPrimaryInstance();
 	if (ActivatedAbility)
 	{
+		// 이후 OnDestroy 등에서 종료를 위해 멤버 변수에 할당
+		ActivatedAbilityInstance = ActivatedAbility;
 		// 어빌리티 종료 시 호출될 델리게이트 바인딩
 		ActivatedAbility->OnGameplayAbilityEnded.AddUObject(this, &UBTTask_ActiveGA::OnAbilityEndCallback);
 		ActivatedAbility->OnGameplayAbilityCancelled.AddUObject(this, &UBTTask_ActiveGA::OnAbilityCancelCallback);
-
 		UE_LOG(LogPRBTTaskPlayAbility, Log, TEXT("Successfully activated ability: %s"), *AbilityToActivate->GetName());
 	}
+	UGA_Action* ActionAbility = Cast<UGA_Action>(ActivatedAbility);
+	if (ActionAbility)
+	{
+//		ActionAbility->SetSkillName(SkillName);
+	}
+	
 	bool bActivated = TargetASC->TryActivateAbility(AbilityHandle);
 	if (!bActivated)
 	{
@@ -107,4 +111,20 @@ void UBTTask_ActiveGA::OnAbilityEndCallback(UGameplayAbility* GameplayAbility)
 void UBTTask_ActiveGA::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+}
+EBTNodeResult::Type UBTTask_ActiveGA::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+{
+	// 부모 호출: 내부에서 OnTaskFinished를 보통 호출해 줍니다.
+	EBTNodeResult::Type AbortResult = Super::AbortTask(OwnerComp, NodeMemory);
+
+	// 필요하면 별도의 로직 추가
+	// 예: Ability 강제 종료, 로그, 기타 정리 등
+
+	if (ActivatedAbilityInstance && ActivatedAbilityInstance->IsActive())
+	{
+		UE_LOG(LogPRBTTaskPlayAbility, Log, TEXT("어빌리티를 종료합니다"));
+		ActivatedAbilityInstance->K2_CancelAbility();
+	}
+	ActivatedAbilityInstance = nullptr;
+	return AbortResult; 
 }

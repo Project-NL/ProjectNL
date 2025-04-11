@@ -2,6 +2,8 @@
 
 #include "ProjectNL/Character/Player/PlayerCharacter.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
+#include "ProjectNL/GAS/Ability/Active/Default/Knockback/AT_Knockback.h"
+#include "ProjectNL/GAS/Ability/Active/Default/Knockback/GA_Knockback.h"
 #include "ProjectNL/GAS/Ability/Utility/PlayMontageWithEvent.h"
 #include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 #include "ProjectNL/Helper/AbilityHelper.h"
@@ -41,15 +43,12 @@ void UGA_Guard::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 		// TODO: 애니메이션 Binding에 대해 AvatarSet에서 진행해 EquipComponent에 주입하는 것도 좋아보임
 		SetCurrentMontage(EquipComponent->GetBlockAnim());
 		
-		AnimationTask = UPlayMontageWithEvent::InitialEvent(this, NAME_None,
-			GetCurrentMontage(), FGameplayTagContainer());
-		AnimationTask->OnCancelled.AddDynamic(this, &ThisClass::UGA_Guard::EndBlock);
-		AnimationTask->OnCompleted.AddDynamic(this, &ThisClass::UGA_Guard::EndBlock);
-
 		if (UNLAbilitySystemComponent* ASC = Cast<UNLAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo()))
 		{
 			ASC->OnDamageStartedNotified.AddDynamic(this, &ThisClass::StartBlock);
 		}
+
+		
 	}
 }
 
@@ -68,8 +67,10 @@ void UGA_Guard::StartBlock(const FDamagedResponse& DamagedResponse)
 					NlGameplayTags::Status_Guard,
 					NlGameplayTags::Status_Block, true);
 				AttributeSet->SetStamina(AttributeSet->GetStamina() - 30);
-				AnimationTask->ReadyForActivation();
+				//튕겨져 나가며 애니메이션 발동
+				OnKnockBack(DamagedResponse);
 			}
+			
 		} else
 		{
 			EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
@@ -77,24 +78,74 @@ void UGA_Guard::StartBlock(const FDamagedResponse& DamagedResponse)
 	}
 }
 
+void UGA_Guard::OnKnockBack(const FDamagedResponse& DamagedResponse)
+{
+	UAbilitySystemComponent* AbilitySystemComponent=GetAbilitySystemComponentFromActorInfo();
+	FGameplayAbilitySpec AbilitySpec = AbilitySystemComponent->BuildAbilitySpecFromClass(DamagedResponse.KnockbackAbility, 1, INDEX_NONE);
+	FGameplayAbilitySpecHandle AbilityHandle = AbilitySystemComponent->GiveAbility(AbilitySpec);
+
+	// 2. AbilityHandle을 통해 AbilitySpec 포인터를 가져옵니다.
+	FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromHandle(AbilityHandle);
+	if (!Spec)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AbilityHandle에 해당하는 AbilitySpec을 찾을 수 없습니다."));
+		return;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AbilityHandle에 해당하는 AbilitySpec을 찾을 수 있습니다."));
+		//return;
+	}
+	// 3. Spec에서 Primary Instance를 가져옵니다.
+	UGameplayAbility* AbilityInstance = Spec->GetPrimaryInstance();
+    
+	
+	// 4. UGA_Knockback 타입으로 캐스팅합니다.
+	ActivatedKnockbackAbility = Cast<UGA_Knockback>(AbilityInstance);
+	if (!ActivatedKnockbackAbility)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AbilityInstance를 UGA_Knockback으로 캐스팅하는 데 실패했습니다."));
+		return;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AbilityInstance를 UGA_Knockback으로 캐스팅하는 데 성공."));
+		//return;
+	}
+	// 5. Knockback Ability에 데미지 관련 정보 및 애니메이션 길이 설정
+	ActivatedKnockbackAbility->SetDamageResponse(DamagedResponse);
+	ActivatedKnockbackAbility->SetDamageMontageLength(GetCurrentMontage()->GetPlayLength());
+	ActivatedKnockbackAbility->SetDamageMontage(GetCurrentMontage());
+	ActivatedKnockbackAbility->OnPlayMontageWithEventDelegate.AddDynamic(this, &ThisClass::UGA_Guard::EndBlock);
+	// 6. Knockback Ability 활성화 시도
+	bool bActivated = AbilitySystemComponent->TryActivateAbilityByClass(DamagedResponse.KnockbackAbility);
+}
+
 void UGA_Guard::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+
 }
 
 void UGA_Guard::EndBlock(FGameplayTag EventTag, FGameplayEventData EventData)
 {
+	UE_LOG(LogTemp, Warning, TEXT("UGA_Guard EndBlock."));
+	
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+	
 }
 
 void UGA_Guard::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+
+	UE_LOG(LogTemp, Warning, TEXT("UGA_Guard EndAbility."));
 	if (UNLAbilitySystemComponent* ASC = Cast<UNLAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo()))
 	{
 		NlGameplayTags::SetGameplayTag(ASC, NlGameplayTags::Status_Guard, 0, true);
 		NlGameplayTags::SetGameplayTag(ASC, NlGameplayTags::Status_Block, 0, true);
 		ASC->OnDamageStartedNotified.RemoveDynamic(this, &ThisClass::StartBlock);
+		
 	}
 }
 

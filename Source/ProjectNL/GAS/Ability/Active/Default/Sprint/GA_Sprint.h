@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "ProjectNL/GAS/Ability/Utility/BaseInputTriggerAbility.h"
 #include "GA_Sprint.generated.h"
-
+class 	UAbilityTask_WaitDelay;
 UCLASS()
 class PROJECTNL_API UGA_Sprint : public UBaseInputTriggerAbility
 {
@@ -14,14 +14,16 @@ public:
 
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-	
-	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle
-																	, const FGameplayAbilityActorInfo* ActorInfo
-																	, const FGameplayTagContainer* SourceTags
-																	, const FGameplayTagContainer* TargetTags
-																	, FGameplayTagContainer* OptionalRelevantTags)
-	const override;
+	UFUNCTION()
+	void OnWaitTimeFinished();
 
+	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle
+	                                , const FGameplayAbilityActorInfo* ActorInfo
+	                                , const FGameplayTagContainer* SourceTags
+	                                , const FGameplayTagContainer* TargetTags
+	                                , FGameplayTagContainer* OptionalRelevantTags)
+	const override;
+	
 	virtual void CancelAbility(const FGameplayAbilitySpecHandle Handle
 														, const FGameplayAbilityActorInfo* ActorInfo
 														, const FGameplayAbilityActivationInfo
@@ -40,11 +42,18 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Effect"
 		, meta=(AllowPrivateAccess = true))
 	TSubclassOf<UGameplayEffect> BuffEffect;
-
+	//구르기 태그를 부여하는 이펙트입니다.
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Effect"
+		, meta=(AllowPrivateAccess = true))
+	TSubclassOf<UGameplayEffect> RollEffect;
+	
 	FActiveGameplayEffectHandle ActiveHandle;
 
 	FDateTime ActiveTime;
-
+	
+	UAbilityTask_WaitDelay* WaitDelayTask;
+	//UPROPERTY(Replicated)
+	EMovementDirection CurrentDirection;
 	UFUNCTION()
 	void EndEvade(FGameplayTag EventTag, FGameplayEventData EventData);
 };

@@ -37,6 +37,36 @@ void AEnemyAIController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+
+// 	// NearestEnemy가 유효한지 확인
+// 	if (NearestEnemy)
+// 	{
+// 		// 현재 컨트롤 중인 Pawn 가져오기
+// D		APawn* ControlledPawn = GetPawn();
+// 		if (ControlledPawn)
+// 		{
+// 			// Pawn과 NearestEnemy의 위치 가져오기
+// 			FVector PawnLocation = ControlledPawn->GetActorLocation();
+// 			FVector EnemyLocation = NearestEnemy->GetActorLocation();
+//
+// 			// Pawn에서 Enemy를 바라보는 방향 계산
+// 			FVector Direction = EnemyLocation - PawnLocation;
+// 			Direction.Z = 0.0f; // 수평 회전만 고려 (필요에 따라 조정)
+//             
+// 			// LookAt 회전값 계산
+// 			FRotator TargetRotation = Direction.Rotation();
+//
+// 			// 현재 Pawn의 회전값을 부드럽게 TargetRotation으로 보간
+// 			// 보간 속도(예: 5.0f)는 필요에 따라 조절하세요.
+// 			FRotator NewRotation = FMath::RInterpTo(ControlledPawn->GetActorRotation(), TargetRotation, DeltaSeconds, 5.0f);
+//
+// 			// AI 컨트롤러의 회전 업데이트 (Pawn이 컨트롤러의 회전을 따르도록 설정되어 있어야 함)
+// 			SetControlRotation(TargetRotation);
+//             
+// 			// 만약 Pawn 자체의 회전을 직접 적용하고 싶다면 아래와 같이 사용 가능:
+// 			// ControlledPawn->SetActorRotation(NewRotation);
+// 		}
+// 	}
 	//SearchForNearestEnemy();
 }
 
@@ -91,9 +121,8 @@ void AEnemyAIController::SearchForNearestEnemy()
 		QueryParams
 	);
 
-	APlayerCharacter* NearestEnemy = nullptr;
-	float MinDistance = FLT_MAX;
 
+	float MinDistance = FLT_MAX;
 	for (const FOverlapResult& Result : OverlapResults)
 	{
 		AActor* Actor = Result.GetActor();
@@ -140,7 +169,7 @@ void AEnemyAIController::UpdateClosestEnemy()
 		return;
 	}
 
-	APlayerCharacter* NearestEnemy = nullptr;
+	
 	float MinDistance = FLT_MAX;
 
 	for (AActor* Actor : PerceivedActors)

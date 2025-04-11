@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffectExecutionCalculation.h"
+#include "ProjectNL/GAS/NLAbilitySystemComponent.h"
 #include "GE_DamageExecCalculation.generated.h"
 
 // TODO: 현재는 진짜 이곳에서만 쓰여서 enum 선언함
@@ -26,13 +27,8 @@ protected:
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
 
 private:
-
-	UPROPERTY(EditDefaultsOnly, Category="Value", meta = (AllowPrivateAccess = true))
-	EDamageType DamageType;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Value", meta = (AllowPrivateAccess = true))
-	float DamageValue;
-
-	UPROPERTY(EditDefaultsOnly, Category="Value", meta = (AllowPrivateAccess = true))
-	FGameplayTag DamageCalcTag;
+	// 블루프린트에서 수정 가능하도록 BlueprintReadWrite 추가
+	UPROPERTY(EditAnywhere, Category = "Value", meta = (AllowPrivateAccess = "true"))
+	mutable FDamagedResponse DamageResponse;
 };
