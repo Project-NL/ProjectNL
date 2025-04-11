@@ -1,6 +1,8 @@
 ﻿#include "GA_Sprint.h"
 
 #include "AbilitySystemComponent.h"
+#include "Abilities/Tasks/AbilityTask_WaitDelay.h"
+#include "Net/UnrealNetwork.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Ability/Utility/PlayMontageWithEvent.h"
 #include "ProjectNL/Helper/EnumHelper.h"
@@ -34,13 +36,25 @@ void UGA_Sprint::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	ActiveTime = FDateTime::Now();
-	
+
+	UPlayMontageWithEvent* Task = UPlayMontageWithEvent::InitialEvent(this,
+								NAME_None, GetCurrentMontage(), FGameplayTagContainer());
+	Task->OnCompleted.AddDynamic(this, &ThisClass::EndEvade);
+	Task->ReadyForActivation();
+	WaitDelayTask=UAbilityTask_WaitDelay ::WaitDelay(this,HoldExistTime);
+	WaitDelayTask->OnFinish.AddDynamic(this, &UGA_Sprint::OnWaitTimeFinished);
+	WaitDelayTask->ReadyForActivation();
+
+}
+void UGA_Sprint::OnWaitTimeFinished()
+{
+	//아직 끝나지 않은 상태라면, HoldExistTime만큼 누르고 있었다고 판단 -> 버프 효과 적용
 	if (BuffEffect)
 	{
 		FGameplayEffectContextHandle EffectContext = GetAbilitySystemComponentFromActorInfo()->
 			MakeEffectContext();
 		EffectContext.AddSourceObject(GetAvatarActorFromActorInfo());
-
+	
 		FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponentFromActorInfo()->MakeOutgoingSpec(
 			BuffEffect, 1.0f, EffectContext);
 		
@@ -51,7 +65,6 @@ void UGA_Sprint::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 		}
 	}
 }
-
 void UGA_Sprint::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
 	Super::InputReleased(Handle, ActorInfo, ActivationInfo);
@@ -67,19 +80,52 @@ void UGA_Sprint::InputReleased(const FGameplayAbilitySpecHandle Handle, const FG
 	{
 		if (ABaseCharacter* OwnerCharacter = Cast<ABaseCharacter>(ActorInfo->AvatarActor.Get()))
 		{
-			const EMovementDirection CurrentDirection =
-				FStateHelper::GetIsCharacterTargetMode(GetAbilitySystemComponentFromActorInfo())
-					? FLocateHelper::GetDirectionByMovementData(OwnerCharacter->GetMovementVector()) : EMovementDirection::F;
 			
+			float Angle = FLocateHelper::GetDeltaAngle(OwnerCharacter->GetVelocity(),OwnerCharacter->GetActorForwardVector());
+			//if (K2_HasAuthority())
+		//	{
+			
+				CurrentDirection =
+				   FStateHelper::GetIsCharacterTargetMode(GetAbilitySystemComponentFromActorInfo())
+					   ? FLocateHelper::GetDirectionByAngle(Angle) : EMovementDirection::F;
+		//	}
+			// [추가] CurrentDirection 로그 남기기
+			UE_LOG(LogTemp, Log, TEXT("Angle : %f"),
+			Angle);
+			UE_LOG(LogTemp, Log, TEXT("CurrentDirection : %s"),
+				*UEnum::GetValueAsString(CurrentDirection));
+			// MovementVector 로그 남기기
+			FVector2D MovementVector = OwnerCharacter->GetMovementVector();
+			UE_LOG(LogTemp, Log, TEXT("MovementVector : X = %f, Y = %f"), MovementVector.X, MovementVector.Y);
 			if (UAnimMontage* EvadeAnim = OwnerCharacter->GetEquipComponent()
 				->GetEvadeAnim().GetAnimationByDirection(CurrentDirection))
 			{
+				if (RollEffect)
+				{
+					FGameplayEffectContextHandle EffectContext = GetAbilitySystemComponentFromActorInfo()->
+			MakeEffectContext();
+					EffectContext.AddSourceObject(GetAvatarActorFromActorInfo());
+
+					FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponentFromActorInfo()->MakeOutgoingSpec(
+						RollEffect, 1.0f, EffectContext);
+
+					if (SpecHandle.IsValid())
+					{
+						ActiveHandle = GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(
+							*SpecHandle.Data.Get());
+					}
+				}
+				if (WaitDelayTask)
+				{
+					WaitDelayTask->OnFinish.RemoveDynamic(this, &UGA_Sprint::OnWaitTimeFinished);//달리는 테스크를 지우는 코드 이 코드가 없다면 달리는 버프가 활성화 되어서 문제가 됨 
+				}
 				SetCurrentMontage(EvadeAnim);
 				
-				UPlayMontageWithEvent* Task = UPlayMontageWithEvent::InitialEvent(this,
-                				NAME_None, GetCurrentMontage(), FGameplayTagContainer());
-                Task->OnCompleted.AddDynamic(this, &ThisClass::EndEvade);
-                Task->ReadyForActivation();
+					UPlayMontageWithEvent* Task = UPlayMontageWithEvent::InitialEvent(this,
+									NAME_None, GetCurrentMontage(), FGameplayTagContainer());
+					Task->OnCompleted.AddDynamic(this, &ThisClass::EndEvade);
+					Task->ReadyForActivation();
+				
 			} else
 			{
 				EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo,
@@ -105,11 +151,23 @@ void UGA_Sprint::CancelAbility(const FGameplayAbilitySpecHandle Handle
 														ActivationInfo, bool bReplicateCancelAbility)
 {
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
-	GetAbilitySystemComponentFromActorInfo()->
-		RemoveActiveGameplayEffectBySourceEffect(BuffEffect, GetAbilitySystemComponentFromActorInfo());
+	// GetAbilitySystemComponentFromActorInfo()->
+	// 	RemoveActiveGameplayEffectBySourceEffect(BuffEffect, GetAbilitySystemComponentFromActorInfo());
 }
 
 void UGA_Sprint::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
+	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+	GetAbilitySystemComponentFromActorInfo()->
+		RemoveActiveGameplayEffectBySourceEffect(BuffEffect, GetAbilitySystemComponentFromActorInfo());
+	GetAbilitySystemComponentFromActorInfo()->
+		RemoveActiveGameplayEffectBySourceEffect(RollEffect, GetAbilitySystemComponentFromActorInfo());
 }
+// void UGA_Sprint::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+// {
+// 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+//
+// 	DOREPLIFETIME(UGA_Sprint, CurrentDirection);
+// 	
+// }

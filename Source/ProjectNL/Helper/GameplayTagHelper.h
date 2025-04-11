@@ -8,6 +8,7 @@ namespace NlGameplayTags
 {
 	PROJECTNL_API void AddGameplayTag(UAbilitySystemComponent* ASC, const FGameplayTag Tag, const int32 Count, const bool bIsReplicated = false);
 	PROJECTNL_API void RemoveGameplayTag(UAbilitySystemComponent* ASC, const FGameplayTag Tag, const int32 Count, const bool bIsReplicated = false);
+	PROJECTNL_API void RemoveMeAndAllChildGameplayTag(UAbilitySystemComponent* ASC, const FGameplayTag Tag, const bool bIsReplicated = false);
 	PROJECTNL_API void SetGameplayTag(UAbilitySystemComponent* ASC, const FGameplayTag Tag, const int32 Count, const bool bIsReplicated = false);
 
 	// Ability 관련 최상위 트리 태그로 하나만 들어갈 수 있음
@@ -39,7 +40,16 @@ namespace NlGameplayTags
 	PROJECTNL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Combat)
 	PROJECTNL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Targeting)
 	PROJECTNL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_IsFalling)
-
+	PROJECTNL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Sprint)
+	PROJECTNL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Dodge)
+	PROJECTNL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_UnderAttack)
+	PROJECTNL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_DrinkPotion)
 	// GC에 대한 Tag 정보
 	PROJECTNL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Utility_HitStop);
+	// UI에 관련된 태그 정보
+	PROJECTNL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(UI);
+	PROJECTNL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(UI_Inventory);
+	PROJECTNL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(UI_GameMenu);
+	PROJECTNL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(UI_ItemDescriptionPanel);
+	
 }

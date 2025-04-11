@@ -14,60 +14,35 @@ UBTService_Targeting::UBTService_Targeting()
 	RandomDeviation = 0.0f; // 무작위 간격 없음
 }
 
+
 void UBTService_Targeting::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {   Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
 	// AI Controller 가져오기
-	AAIController* AIController = OwnerComp.GetAIOwner();
-	if (!AIController)
+	AAIController* OwnerController = OwnerComp.GetAIOwner();
+	if (!OwnerController)
 	{
 		return;
 	}
 
-	UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
-	if (!BlackboardComp)
+	// 블랙보드에서 TargetActorBBKey에 해당하는 오브젝트를 가져옴
+	UObject* TargetObject = OwnerController->GetBlackboardComponent()->GetValueAsObject(BBKEY_NEAREST_ENEMY);
+	if (!TargetObject)
 	{
 		return;
 	}
 
-	// AI가 제어하는 Pawn 가져오기
-	APawn* ControlledPawn = AIController->GetPawn();
-	if (!ControlledPawn)
+	// 가져온 오브젝트를 AActor로 캐스팅
+	AActor* TargetActor = Cast<AActor>(TargetObject);
+	if (TargetActor)
 	{
-		return;
+		// AIController가 TargetActor에 포커스를 맞추게 함
+		OwnerController->SetFocus(TargetActor);
+
+		// 블루프린트의 Print String 대신 로그 출력
+		UE_LOG(LogTemp, Warning, TEXT("FocusTarget is %s"), *TargetActor->GetName());
 	}
-
-	// Blackboard에서 NearestEnemy 값 가져오기
-	AActor* NearestEnemy = Cast<AActor>(BlackboardComp->GetValueAsObject(BBKEY_NEAREST_ENEMY));
-	if (!NearestEnemy)
-	{
-		return; // 타겟이 없으면 아무 것도 하지 않음
-	}
-
-	// NearestEnemy의 위치 가져오기
-	FVector EnemyLocation = NearestEnemy->GetActorLocation();
-	FVector PawnLocation = ControlledPawn->GetActorLocation();
-
-	// 타겟 방향 계산
-	FVector Direction = (EnemyLocation - PawnLocation).GetSafeNormal();
-	FRotator TargetRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
-
-	// 현재 회전 가져오기
-	FRotator CurrentRotation = ControlledPawn->GetActorRotation();
-
-	// Pitch 고정: TargetRotation의 Pitch를 현재 회전의 Pitch로 대체
-	TargetRotation.Pitch = CurrentRotation.Pitch;
-
-	// Roll 고정: TargetRotation의 Roll을 현재 회전의 Roll로 대체
-	TargetRotation.Roll = CurrentRotation.Roll;
-	
-	// 부드러운 회전 (보간)
-	FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaSeconds, 5.0f);
-
-	// AI Pawn 회전 적용
-	ControlledPawn->SetActorRotation(SmoothRotation);
-
-
 
 
 }
+
