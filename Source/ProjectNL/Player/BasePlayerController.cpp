@@ -83,7 +83,42 @@ void ABasePlayerController::SetupInputComponent()
 				&ABasePlayerController::UseFirstHotSlotItem
 			);
 		}
-		
+		if (ToggleSecondHotSlotItem)
+		{
+			EnhancedInputComponent->BindAction(
+				ToggleSecondHotSlotItem, 
+				ETriggerEvent::Triggered, 
+				this, 
+				&ABasePlayerController::UseSecondHotSlotItem
+			);
+		}
+		if (ToggleThirdHotSlotItem)
+		{
+			EnhancedInputComponent->BindAction(
+				ToggleThirdHotSlotItem, 
+				ETriggerEvent::Triggered, 
+				this, 
+				&ABasePlayerController::UseThirdHotSlotItem
+			);
+		}
+		if (ToggleFourthHotSlotItem)
+		{
+			EnhancedInputComponent->BindAction(
+				ToggleFourthHotSlotItem, 
+				ETriggerEvent::Triggered, 
+				this, 
+				&ABasePlayerController::UseFourthHotSlotItem
+			);
+		}
+		if (ToggleFifthHotSlotItem)
+		{
+			EnhancedInputComponent->BindAction(
+				ToggleFifthHotSlotItem, 
+				ETriggerEvent::Triggered, 
+				this, 
+				&ABasePlayerController::UseFifthHotSlotItem
+			);
+		}
 	}
 }
 
@@ -101,12 +136,12 @@ void ABasePlayerController::TryInteract()
 	}
 }
 
-void ABasePlayerController::Server_UseFirstHotSlotItem_Implementation()
+void ABasePlayerController::Server_UseHotSlotItem_Implementation(int32 ItemSlotInit)
 {
-	UseFirstHotSlotItem(); 
+	UseHotSlotItem(ItemSlotInit); 
 }
 
-bool ABasePlayerController::Server_UseFirstHotSlotItem_Validate()
+bool ABasePlayerController::Server_UseHotSlotItem_Validate(int32 ItemSlotInit)
 {
 	return true;
 }
@@ -146,34 +181,67 @@ void ABasePlayerController::ToggleInventoryWidget()
 }
 void ABasePlayerController::UseFirstHotSlotItem()
 {
+	UseHotSlotItem(1);
+}
+
+void ABasePlayerController::UseSecondHotSlotItem()
+{
+	UseHotSlotItem(2);
+}
+
+void ABasePlayerController::UseThirdHotSlotItem()
+{
+	UseHotSlotItem(3);
+}
+
+void ABasePlayerController::UseFourthHotSlotItem()
+{
+	UseHotSlotItem(4);
+}
+
+void ABasePlayerController::UseFifthHotSlotItem()
+{
+	UseHotSlotItem(5);
+}
+
+void ABasePlayerController::UseHotSlotItem(int32 ItemSlotInit)
+{
+	ItemSlotInit-=1;
 	if (!HasAuthority()) // 클라이언트라면 서버에 실행 요청
 	{
-		Server_UseFirstHotSlotItem();
+		Server_UseHotSlotItem(ItemSlotInit);
 		return;
 	}
 	ABasePlayerState* BasePlayerState = GetPlayerState<ABasePlayerState>();
 	if (BasePlayerState)
 	{
-		TArray<FItemMetaInfo>* HotSlotList = BasePlayerState->GetPlayerHotSlotList();
-		if (HotSlotList && HotSlotList->Num() > 0)
+		TArray<int32> *HotslotInitailItemList = BasePlayerState->GetHotslotInitialItemList();
+		TArray<FItemMetaInfo>* PlayerInventoryList = BasePlayerState->GetPlayerInventoryList();
+		if (PlayerInventoryList && PlayerInventoryList->Num() > 0)
 		{
+			int32 HotslotInitail = (*HotslotInitailItemList)[ItemSlotInit];
+			if (HotslotInitail<0)
+			{
+				return;
+			}
+			FItemMetaInfo *FirstItem = &(*PlayerInventoryList)[HotslotInitail];
 
-			FItemMetaInfo FirstItem = (*HotSlotList)[0];
-
-			const FItemInfoData& ItemInfoById = FItemHelper::GetItemInfoById(GetWorld(), FirstItem.GetId());
+			const FItemInfoData& ItemInfoById = FItemHelper::GetItemInfoById(GetWorld(), FirstItem->GetId());
 			
 			ASpawnableItem* SpawnableItem = GetWorld()->SpawnActor<ASpawnableItem>(ItemInfoById.GetShowItemActor());
-			FirstItem.SetCurrentCount(FirstItem.GetCurrentCount()-1);
-					// 서버 / 클라이언트 체크 로그
+			BasePlayerState->RemoveItem(FirstItem->GetId(),1,ItemSlotInit);
+			if (SpawnableItem)
+			{
+				SpawnableItem->UseItem(Cast<APlayerCharacter>(GetPawn()));
+			}// 서버 / 클라이언트 체크 로그
 			if (HasAuthority())
 			{
-				UE_LOG(LogTemp, Warning, TEXT("[Server] 핫슬롯 아이템 사용 - ID: %d"), FirstItem.GetId());
+				UE_LOG(LogTemp, Warning, TEXT("[Server] 핫슬롯 아이템 사용 - ID: %d"), FirstItem->GetId());
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("[Client] 핫슬롯 아이템 사용 - ID: %d"), FirstItem.GetId());
+				UE_LOG(LogTemp, Warning, TEXT("[Client] 핫슬롯 아이템 사용 - ID: %d"), FirstItem->GetId());
 			}
-			SpawnableItem->UseItem(Cast<APlayerCharacter>(GetPawn()));
 		}
 	}
 }

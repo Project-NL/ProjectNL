@@ -28,7 +28,7 @@ private:
 	void TryInteract();
 protected:
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_UseFirstHotSlotItem();
+	void Server_UseHotSlotItem(int32 ItemSlotInit);
 
 	// TODO: 임시코드로 추후 HUD class에 이전할 필요 있음
 	UPROPERTY(EditDefaultsOnly)
@@ -81,4 +81,20 @@ protected:
 	// Tab 키 입력 시 호출될 인벤토리 토글 함수
 	UFUNCTION()
 	void UseFirstHotSlotItem();
+
+	UFUNCTION()
+	void UseSecondHotSlotItem();
+
+	UFUNCTION()
+	void UseThirdHotSlotItem();
+
+	UFUNCTION()
+	void UseFourthHotSlotItem();
+
+	UFUNCTION()
+	void UseFifthHotSlotItem();
+	
+	UFUNCTION()
+	void UseHotSlotItem(int32 ItemSlotInit);
+	
 };

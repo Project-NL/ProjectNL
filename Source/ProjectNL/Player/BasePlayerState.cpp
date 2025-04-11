@@ -25,23 +25,13 @@ void ABasePlayerState::BeginPlay()
 
 
 	// 테스트용 임시코드
-	for (const uint32 ItemId : InitialItemList)
-	{
-		FItemMetaInfo NewItemData = FItemHelper::GetInitialItemMetaDataById(GetWorld(), ItemId);
-		NewItemData.SetCurrentCount(FItemHelper::GetItemInfoById(GetWorld(), ItemId).GetMaxItemCount());
-		AddItem(NewItemData);
-	}
-	int i=0;
-	for (const uint32 ItemId : HotslotInitialItemList)
-	{
-		
-		FItemMetaInfo NewItemData = FItemHelper::GetInitialItemMetaDataById(GetWorld(), ItemId);
-		//NewItemData.SetCurrentCount(FItemHelper::GetItemInfoById(GetWorld(), ItemId).GetMaxItemCount());
-		//AddItem(NewItemData);
-		PlayerHotSlotList[i]=NewItemData;
-		i++;
-	
-	}
+	// for (const uint32 ItemId : InitialItemList)
+	// {
+	// 	FItemMetaInfo NewItemData = FItemHelper::GetInitialItemMetaDataById(GetWorld(), ItemId);
+	// 	NewItemData.SetCurrentCount(FItemHelper::GetItemInfoById(GetWorld(), ItemId).GetMaxItemCount());
+	// 	AddItem(NewItemData);
+	// }
+
 	OnHotSlotUpdatedDelegate.Broadcast();
 }
 
@@ -57,6 +47,8 @@ void ABasePlayerState::InitializeData()
 	const FItemMetaInfo EmptyItem;
 	PlayerInventoryList.Init(EmptyItem, GetTotalSlotCount());
 	PlayerHotSlotList.Init(EmptyItem, GetHotSlotCount());
+	HotslotInitialItemList.Init(-1, GetHotSlotCount()); // -1로 6개 초기화
+	
 	UpdateCurrentRemainItemValue();
 }
 
@@ -87,7 +79,8 @@ void ABasePlayerState::UpdateCurrentRemainItemValue()
 		}
 	}
 	CurrentRemainItemValue.Empty();
-	CurrentRemainItemValue.Append(NewMap); 
+	CurrentRemainItemValue.Append(NewMap);
+	OnHotSlotUpdatedDelegate.Broadcast();
 }
 
 void ABasePlayerState::SwapItemInInventory(const uint16 Prev, const uint16 Next)
@@ -100,6 +93,20 @@ void ABasePlayerState::SwapItemInInventory(const uint16 Prev, const uint16 Next)
 	SetPlayerHandItemByPS(Next);
 }
 
+void ABasePlayerState::SetPlayerHotSlot(const uint16 NewIndex)
+{
+	if (!HotslotInitialItemList.Contains(NewIndex)) // NewIndex가 리스트에 없을 경우
+	{
+		for (int i = 0; i < HotSlotCount; i++)
+		{
+			if (HotslotInitialItemList[i] == -1)
+			{
+				HotslotInitialItemList[i] = NewIndex;
+				break;
+			}
+		}
+	}
+}
 // TODO: 해당 함수는 리팩토링이 필요하다. 위치에 맞는 역할은 아니다.
 // PlayerController로 옮길 생각 해야함.
 void ABasePlayerState::SetPlayerHandItemByPS(const uint16 NewIndex)
@@ -255,7 +262,7 @@ uint32 ABasePlayerState::AddItem(const FItemMetaInfo& ItemInfo)
 	return 0;
 }
 
-bool ABasePlayerState::RemoveItem(const uint16 Id, const uint32 Count)
+bool ABasePlayerState::RemoveItem(const uint16 Id, const uint32 Count,const int32 HotslotInit)
 {
 	uint32 RemainNum = Count;
 	TArray<uint32> CanRemoveIndexList;
@@ -299,6 +306,7 @@ bool ABasePlayerState::RemoveItem(const uint16 Id, const uint32 Count)
 		{
 			const FItemMetaInfo ClearItemMeta;
 			PlayerInventoryList[RemoveIndex] = ClearItemMeta;
+			HotslotInitialItemList[HotslotInit]=-1;
 		}
 
 		// 어차피 여기서 다 버려서 0이 될 수 밖에 없다.

@@ -33,19 +33,22 @@ public:
 	FORCEINLINE uint8 GetTotalSlotCount() const  { return InventorySlotCount; }
 	FORCEINLINE TArray<FItemMetaInfo> *GetPlayerInventoryList()  { return &PlayerInventoryList; }
 	FORCEINLINE TArray<FItemMetaInfo> *GetPlayerHotSlotList()  { return &PlayerHotSlotList; }
+	FORCEINLINE TArray<int32> *GetHotslotInitialItemList()  { return &HotslotInitialItemList; }
 	uint32 AddItem(const FItemMetaInfo& ItemInfo);
 
 	//uint32 AddItem(const FItemMetaInfo& ItemInfo);
 
 	bool DropItem(const uint16 Index, const uint32 Count);
 	
-	bool RemoveItem(const uint16 Id, const uint32 Count);
+	bool RemoveItem(const uint16 Id, const uint32 Count,int32 HotslotInit);
 
 	uint32 AddItemToInventory(const uint16 Index, const FItemMetaInfo& ItemInfo);
 
 	void SwapItemInInventory(const uint16 Prev, const uint16 Next);
 
 	void SetPlayerHandItemByPS(const uint16 NewIndex);
+
+	void SetPlayerHotSlot(const uint16 NewIndex);
 
 	FORCEINLINE TMap<uint32, uint32> GetCurrentRemainItemValue() const { return CurrentRemainItemValue; }
 
@@ -63,7 +66,7 @@ private:
 	TArray<uint32> InitialItemList;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Options", meta = (AllowPrivateAccess = true))
-	TArray<uint32> HotslotInitialItemList;
+	TArray<int32> HotslotInitialItemList;
 	
 	UPROPERTY()
 	TArray<FItemMetaInfo> PlayerInventoryList;//인벤토리 
@@ -73,7 +76,7 @@ private:
 	
 	// TODO: 아래와 같은 설정은 추후 Data Asset으로 이전해보기
 	UPROPERTY(EditDefaultsOnly, Category = "Options", meta = (AllowPrivateAccess = true))
-	uint8 InventorySlotCount = 10;
+	uint8 InventorySlotCount = 20;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Options", meta = (AllowPrivateAccess = true))
 	uint8 HotSlotCount = 5;
@@ -81,3 +84,4 @@ private:
 	
 	void OnUpdateInventory();
 };
+

@@ -7,6 +7,7 @@
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/DataTable/ItemInfoData.h"
 #include "ProjectNL/Helper/ItemHelper.h"
+#include "ProjectNL/Player/BasePlayerState.h"
 
 void UInventorySlotWidget::SetupSlot(int32 SlotIndex,TArray<FItemMetaInfo>* InventoryList,int32 index)
 {
@@ -38,21 +39,11 @@ void UInventorySlotWidget::OnItemButtonPressed()
 {
 	// 현재 시간 가져오기
 	float CurrentTime = GetWorld()->GetTimeSeconds();
-
 	// 더블클릭 감지
-	// if (CurrentTime - LastPressTime <= DoubleClickThreshold)
-	// {
-	// 	if (Count > 0)
-	// 	{
-	// 		if (CurrentItemData.GetItemType()==EItemType::Accessory||
-	// 			CurrentItemData.GetItemType()==EItemType::Armor||
-	// 			CurrentItemData.GetItemType()==EItemType::Weapon)//장비 일 때 
-	// 		{
-	// 			EquipItem(); // 더블클릭 확인 시 장착
-	// 		}
-	// 	}
-	// }
-
+	if (CurrentTime - LastPressTime <= DoubleClickThreshold)
+	{
+		EquipItem(); // 더블클릭 확인 시 장착
+	}
 	// 마지막 눌림 시간 업데이트
 	LastPressTime = CurrentTime;
 }
@@ -64,22 +55,11 @@ void UInventorySlotWidget::EquipItem()
 	{
 		if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerController->GetPawn()))
 		{
-			UEquipComponent* EquipComponent = PlayerCharacter->GetEquipComponent();
-			// 아이템 장착 로직
-			EquipComponent->EquipWeapon(CurrentItemData.GetShowItemActor(), true);
-			//UE_LOG(LogTemp, Log, TEXT("Item equipped: %s from slot %d via double-click"), CurrentItemData.GetShowItemActor().Get(), CurrentSlotIndex);
-			// 델리게이트 브로드캐스트
-			
+			ABasePlayerState* BasePlayerState = Cast<ABasePlayerState>(PlayerCharacter->GetPlayerState());
+
+			BasePlayerState->SetPlayerHotSlot(CurrentSlotIndex);
+			BasePlayerState->OnHotSlotUpdatedDelegate.Broadcast();
 		}
-	}
-	Count--;
-	if (Count==0)
-	{
-		FItemMetaInfo ItemInfoData{};
-		CurrentMetaInfoData=ItemInfoData;//초기화 시킨다.
-		//CurrentInventoryList->RemoveAt(CurrentSlotIndex);
-		(*CurrentInventoryList)[CurrentSlotIndex]=ItemInfoData;
-		OnInventorySlotChanged.Broadcast();
 	}
 }
 

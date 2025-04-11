@@ -28,36 +28,42 @@ void UPlayerHotSlotWidget::NativeConstruct()
 
 void UPlayerHotSlotWidget::RefreshHotSlot()
 {
+	// 기존 슬롯 제거
+	if (HotSlotGridPanel)
+	{
+		HotSlotGridPanel->ClearChildren();
+	}
+
 	// PlayerState에서 인벤토리 리스트를 가져옵니다.
-
 	HotSlotList = PlayerState->GetPlayerHotSlotList();
+	TArray<int32>* HotslotInitialItemList = PlayerState->GetHotslotInitialItemList();
+	TArray<FItemMetaInfo>* InventoryItemList = PlayerState->GetPlayerInventoryList();
 
-
-	// 예시로 4열 그리드를 만든다고 가정합니다.
-	if (!HotSlotList)
+	if (!HotSlotList || !HotslotInitialItemList || !InventoryItemList)
 	{
 		return;
 	}
 
 	if (!HotSlotWidgetClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("InventorySlotWidgetClass가 설정되지 않음"));
+		UE_LOG(LogTemp, Warning, TEXT("HotSlotWidgetClass가 설정되지 않음"));
+		return;
 	}
 
 	// 슬롯 위젯을 생성합니다.
-
-	for (int32 index = 0; index < 5; index++)
+	for (int32 index = 0; index < HotslotInitialItemList->Num(); index++)
 	{
 		UHotSlotWidget* NewSlot = CreateWidget<UHotSlotWidget>(GetWorld(), HotSlotWidgetClass);
+		int32 HotslotInitial = (*HotslotInitialItemList)[index];
 		if (NewSlot)
 		{
-		
-			if (index < HotSlotList->Num())
+			if (HotslotInitial >= 0 && InventoryItemList->IsValidIndex(HotslotInitial))
 			{
-				NewSlot->SetupSlot(&(*HotSlotList)[index], index);
-				NewSlot->OnInventorySlotChanged.AddUObject(this, &UPlayerHotSlotWidget::RefreshHotSlot);
+				NewSlot->SetupSlot(&(*InventoryItemList)[HotslotInitial], index);
 			}
+			NewSlot->OnInventorySlotChanged.AddUObject(this, &UPlayerHotSlotWidget::RefreshHotSlot);
 			HotSlotGridPanel->AddChildToUniformGrid(NewSlot, 0, index);
 		}
 	}
 }
+
