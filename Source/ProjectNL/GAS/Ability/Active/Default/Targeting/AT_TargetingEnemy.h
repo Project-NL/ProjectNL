@@ -8,6 +8,7 @@
 #include "ProjectNL/Helper/UtilHelper.h"
 #include "AT_TargetingEnemy.generated.h"
 
+class UPlayerCameraComponent;
 /**
  * 
  */
@@ -20,13 +21,13 @@ class PROJECTNL_API UAT_TargetingEnemy : public UAbilityTask
 
 
 public:
-	static UAT_TargetingEnemy* InitialEvent(UGameplayAbility* OwningAbility);
+	static UAT_TargetingEnemy* InitialEvent(UGameplayAbility* OwningAbility,TSubclassOf<UGameplayEffect> TargetingSpeedEffect);
 	
 	virtual void Activate() override;
 	
 	
 
-	GETTER_SETTER(int8,NearestEnemyCheck);
+	
 
 	virtual void TargetNearestEnemy();
 
@@ -35,21 +36,33 @@ public:
 
 protected:
 	virtual void TickTask(float DeltaTime) override;
+	void TargetingNearestEnemy(float DeltaTime);
 	UFUNCTION()
 	void ReleaseLockOnTarget();
 	UFUNCTION()
 	AActor* FindNearestTarget() const;
 	UFUNCTION()
 	void CameraRotation(float DeltaTime);
+
 	UFUNCTION()
-	void LockOnTarget(AActor* NewTarget);
+	bool BacktoSquareOne(float DeltaTime);
+	UFUNCTION()
+	void PlayerContollerRotation(float DeltaTime);
+	UFUNCTION()
+	void LockOnTarget(AActor* NewTarget,float DeltaTime);
 	// 스프링암 설정을 저장하는 함수
 	UFUNCTION()
 	void SaveSpringArmSettings(USpringArmComponent* SpringArm);
-
-	// 스프링암 설정을 복원하는 함수
 	UFUNCTION()
-	void RestoreSpringArmSettings(USpringArmComponent* SpringArm);
+	void SaveCameraSettings(UPlayerCameraComponent* CameraComponent);
+	UFUNCTION()
+	void RestoreCameraRotation(UPlayerCameraComponent* CameraComponent,float DeltaTime);
+
+	UFUNCTION()
+	void RestoreSpringArmRotation(USpringArmComponent* SpringArm,float DeltaTime);
+	bool IsActorOnScreen(AActor* Actor) const;
+	bool HasLineOfSight(AActor* Actor) const;
+	void CheckNearestEnemyDistance(float MaxDistance);
 
 private:
 	UPROPERTY()
@@ -62,9 +75,8 @@ private:
 	float TargetingRange = 1000.0f;
 
 	
-	float OriginalCharacterSpeed;
-
-	int8 NearestEnemyCheck=false;
+	
+	
 	
 	// 저장된 스프링암 설정
 	
@@ -78,4 +90,17 @@ private:
 	int8 bSavedEnableCameraLag;
 	
 
+	FVector SavedCameraWorldLocation;
+	FVector SavedTargetActorWorldLocation;
+	FVector SavedOwnerActorWorldLocation;
+	FRotator SavedSpringArmWorldRotation;
+	FRotator SavedCameraWorldRotation;
+	FRotator SavedLockonActorRotation;
+	
+
+
+	TSubclassOf<UGameplayEffect> TargetingSpeedEffect;
+	FActiveGameplayEffectHandle ActiveHandle;
+	
 };
+

@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameplayCueNotify_Actor.h"
 #include "Components/TimelineComponent.h"
+#include "Engine/OverlapResult.h"
 #include "GC_HitStop.generated.h"
 
 UCLASS()

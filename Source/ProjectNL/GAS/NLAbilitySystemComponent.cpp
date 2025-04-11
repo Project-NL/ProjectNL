@@ -60,7 +60,14 @@ void UNLAbilitySystemComponent::InitializeAbilitySystem(
 			GiveAbility(FGameplayAbilitySpec(
 				Ability, Ability->GetAbilityLevel(), -1, this));
 		}
-
+		if (IsValid(InitData.KnockAbility))
+		{
+			UGameplayAbility* Ability = InitData.KnockAbility->GetDefaultObject<
+				UGameplayAbility>();
+			GiveAbility(FGameplayAbilitySpec(
+				Ability, Ability->GetAbilityLevel(), -1, this));
+		}
+		
 		if (!InitData.GameplayEffects.IsEmpty())
 		{
 			for (TSubclassOf<UGameplayEffect> Effect : InitData.GameplayEffects)
@@ -81,14 +88,10 @@ void UNLAbilitySystemComponent::InitializeAbilitySystem(
 
 void UNLAbilitySystemComponent::ReceiveDamage(const FDamagedResponse& DamagedResponse) const
 {
-	OnDamageStartedNotified.Broadcast(DamagedResponse);
+	
+//	OnDamageStartedNotified.Broadcast(DamagedResponse);
 
-	if (HasMatchingGameplayTag(NlGameplayTags::Status_Block))
-	{
-		const_cast<UNLAbilitySystemComponent*>(this)->
-			RemoveLooseGameplayTag(NlGameplayTags::Status_Block);
-		return;
-	}
+	
 	// TODO: 추후 데미지 제공한 Causer도 같이 전송해도 무방할 듯
 	OnDamageReactNotified.Broadcast(DamagedResponse);
 	if (DamagedResponse.IsHitStop)
@@ -99,3 +102,5 @@ void UNLAbilitySystemComponent::ReceiveDamage(const FDamagedResponse& DamagedRes
 		const_cast<UNLAbilitySystemComponent*>(this)->ExecuteGameplayCue(NlGameplayTags::GameplayCue_Utility_HitStop, Param);
 	}
 }
+
+
