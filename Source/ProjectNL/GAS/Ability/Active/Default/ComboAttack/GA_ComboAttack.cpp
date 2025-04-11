@@ -3,7 +3,6 @@
 #include "ProjectNL/GAS/Ability/Utility/PlayMontageWithEvent.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/Character/Player/PlayerCharacter.h"
-#include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
 #include "ProjectNL/Helper/StateHelper.h"
 
@@ -127,7 +126,7 @@ void UGA_ComboAttack::InputReleased(const FGameplayAbilitySpecHandle Handle, con
 
 void UGA_ComboAttack::ExecuteHeavyAttack()
 {
-	APlayerCharacter* CurrentCharacter = Cast<APlayerCharacter>(GetAvatarActorFromActorInfo());
+	ABaseCharacter* CurrentCharacter = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo());
 
 	check(CurrentCharacter);
 	check(CurrentCharacter->GetEquipComponent());
@@ -141,20 +140,13 @@ void UGA_ComboAttack::ExecuteHeavyAttack()
 		AttackAnimTask->EndTask();
 		AttackAnimTask = nullptr;
 	}
-	if (CurrentCharacter->PlayerAttributeSet->GetStamina() > 10)
-	{
-		CurrentCharacter->PlayerAttributeSet->SetStamina(CurrentCharacter->PlayerAttributeSet->GetStamina() - 10);
-	}
-	else
-	{
-		return;
-	}
+	
 	FStateHelper::ChangePlayerState(GetAbilitySystemComponentFromActorInfo(), NlGameplayTags::State_Idle, NlGameplayTags::State_Attack_Heavy, true);
 
 	AttackAnimTask = UPlayMontageWithEvent::InitialEvent(this, NAME_None
 	                                                      , HeavyAttack
 	                                                      , FGameplayTagContainer());
-	AttackAnimTask->OnCancelled.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
+	AttackAnimTask->OnCancelled.AddDynamic(this, &UGA_ComboAttack::OnCancelled);
 	AttackAnimTask->OnBlendOut.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
 	AttackAnimTask->OnCompleted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
 	AttackAnimTask->OnInterrupted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
@@ -163,7 +155,7 @@ void UGA_ComboAttack::ExecuteHeavyAttack()
 
 void UGA_ComboAttack::ExecuteComboAttack()
 {
-	if (APlayerCharacter* CurrentCharacter = Cast<APlayerCharacter>(GetAvatarActorFromActorInfo()))
+	if (ABaseCharacter* CurrentCharacter = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo()))
 	{
 		if (IsValid(AttackAnimTask))
 		{
@@ -182,18 +174,9 @@ void UGA_ComboAttack::ExecuteComboAttack()
 			EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo
 			           , true, true);
 		}
-		if (CurrentCharacter->PlayerAttributeSet->GetStamina() > 10)
-		{
-			CurrentCharacter->PlayerAttributeSet->SetStamina(CurrentCharacter->PlayerAttributeSet->GetStamina() - 10);
-		}
-		else
-		{
-			return;
-		}
+
 		SetCurrentMontage(ComboAttack[CharEquipInfo->GetAttackComboIndex()]);
 		FStateHelper::ChangePlayerState(GetAbilitySystemComponentFromActorInfo(), NlGameplayTags::State_Idle, NlGameplayTags::State_Attack_Combo, true);
-
-
 		
 		AttackAnimTask = UPlayMontageWithEvent::InitialEvent(this, NAME_None
 		                                                      , GetCurrentMontage()
@@ -211,17 +194,12 @@ void UGA_ComboAttack::ExecuteJumpAttack()
 {
     // 캐릭터 유효성 체크
 	
-	APlayerCharacter* CurrentCharacter = Cast<APlayerCharacter>(GetAvatarActorFromActorInfo());
+	ABaseCharacter* CurrentCharacter = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo());
     if (!CurrentCharacter)
     {
         UE_LOG(LogTemp, Error, TEXT("ExecuteJumpAttack: CurrentCharacter가 null입니다."));
         return;
     }
-
-	if (CurrentCharacter->GetAbilitySystemComponent()->HasMatchingGameplayTag(NlGameplayTags::Status_UnderAttack))
-	{
-		return;
-	}
 
     // 레이캐스트로 바닥 거리 체크
     const FVector CharacterLocation = CurrentCharacter->GetActorLocation();
@@ -272,14 +250,7 @@ void UGA_ComboAttack::ExecuteJumpAttack()
         DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Blue, false, 2.0f, 0, 1.0f);
         return;
     }
-	if (CurrentCharacter->PlayerAttributeSet->GetStamina() > 10)
-	{
-		CurrentCharacter->PlayerAttributeSet->SetStamina(CurrentCharacter->PlayerAttributeSet->GetStamina() - 10);
-	}
-	else
-	{
-		return;
-	}
+
 	// 캐릭터 입력 비활성화
 	if (APlayerController* PlayerController = Cast<APlayerController>(CurrentCharacter->GetController()))
 	{
@@ -289,7 +260,7 @@ void UGA_ComboAttack::ExecuteJumpAttack()
 		// 점프 차단
 		CurrentCharacter->StopJumping();
 	}
-	
+
     // 점프 공격 실행
 	check(CurrentCharacter->
 		GetEquipComponent());

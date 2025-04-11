@@ -4,14 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTService.h"
-#include "BehaviorTree/Services/BTService_BlueprintBase.h"
 #include "BTService_Targeting.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTNL_API UBTService_Targeting : public UBTService_BlueprintBase
+class PROJECTNL_API UBTService_Targeting : public UBTService
 {
 	GENERATED_BODY()
 public:

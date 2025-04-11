@@ -19,6 +19,4 @@ public:
 	static FRotator GetTargetingRotate(const AActor* OwnerActor, const AActor* TargetActor);
 
 	static ETargetHeight GetTargetHeightTypeByPoint(const float ActorHeight, const FVector Point, const FVector TargetLocation);
-
-	static float GetDeltaAngle(const FVector& From, const FVector& To);
 };

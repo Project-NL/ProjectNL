@@ -11,30 +11,20 @@ struct FNLAbilitySystemInitializationData;
 enum class EMovementDirection: uint8;
 enum class ETargetHeight: uint8;
 
-USTRUCT(BlueprintType)
+USTRUCT()
 struct FDamagedResponse
 {
 	GENERATED_BODY()
-	UPROPERTY()
-	AActor* SourceActor;
-	UPROPERTY(EditAnywhere)
-	float Damage;
-	UPROPERTY()
-	EMovementDirection DamagedDirection;
-	UPROPERTY(EditAnywhere)
-	ETargetHeight DamagedHeight;
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UGameplayEffect> DamageEffect;
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UGameplayAbility> KnockbackAbility;
-	UPROPERTY(EditAnywhere)
-	bool IsHitStop;
 
+	AActor* SourceActor;
+	float Damage;
+	EMovementDirection DamagedDirection;
+	ETargetHeight DamagedHeight;
+	bool IsHitStop;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageStartedNotifiedSignature, const FDamagedResponse&, DamageResponse);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageReactNotifiedSignature, const FDamagedResponse&, DamageResponse);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathNotifiedSignature);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECTNL_API UNLAbilitySystemComponent : public UAbilitySystemComponent
@@ -49,17 +39,13 @@ public:
 	
 	void ReceiveDamage(const FDamagedResponse& DamagedResponse) const;
 
-
-
 	GETTER_SETTER(bool, IsInitialized)
 
 	FOnDamageStartedNotifiedSignature OnDamageStartedNotified;
 	FOnDamageReactNotifiedSignature OnDamageReactNotified;
-	FOnDeathNotifiedSignature OnDeathReactNotified;
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Options", meta = (AllowPrivateAccess = true))
 	uint16 LevelByDamaged = 10;
 	
 	bool IsInitialized = false;
-	
 };
