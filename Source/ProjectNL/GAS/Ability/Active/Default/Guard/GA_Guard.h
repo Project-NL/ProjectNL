@@ -7,7 +7,7 @@
 class UBlockStartNotify;
 class UAT_PutDamageWithEvent;
 class UPlayMontageWithEvent;
-class UGA_Knockback;
+
 UCLASS()
 class PROJECTNL_API UGA_Guard : public UBaseInputTriggerAbility
 {
@@ -30,13 +30,9 @@ private:
 
 	TObjectPtr<UBlockStartNotify> BlockStartNotify;
 
-	UGA_Knockback* ActivatedKnockbackAbility;
-
 	UFUNCTION()
 	void StartBlock(const FDamagedResponse& DamagedResponse);
 
-	UFUNCTION()
-	void OnKnockBack(const FDamagedResponse& DamagedResponse);
 	UFUNCTION()
 	void EndBlock(FGameplayTag EventTag, FGameplayEventData EventData);
 };

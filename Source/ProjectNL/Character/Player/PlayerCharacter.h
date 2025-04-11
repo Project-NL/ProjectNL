@@ -2,20 +2,17 @@
 
 #include "CoreMinimal.h"
 #include "ProjectNL/Character/BaseCharacter.h"
-#include "ProjectNL/Interface/InteractionInterface.h"
 #include "PlayerCharacter.generated.h"
 
-class AEnemyCharacter;
-class UEquipInventoryComponent;
 class UPlayerSpringArmComponent;
 class UPlayerCameraComponent;
 class UPlayerAttributeSet;
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
-struct FGameplayAbilitySpec;
+
 UCLASS()
-class PROJECTNL_API APlayerCharacter : public ABaseCharacter,public IInteractionInterface
+class PROJECTNL_API APlayerCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -25,11 +22,6 @@ public:
 	UPROPERTY()
 	TObjectPtr<UPlayerAttributeSet> PlayerAttributeSet;
 
-	UEquipInventoryComponent* GetEquipInventoryComponent();
-
-	void SetTargetingCharacter(AEnemyCharacter* TargetingCharacter);
-
-	AEnemyCharacter* GetTargetingCharacter();
 protected:
 	virtual void BeginPlay() override;
 
@@ -43,12 +35,8 @@ protected:
 
 private:
 	UFUNCTION()
-	virtual void OnDamaged(const FDamagedResponse& DamagedResponse) override;
-	virtual void OnDamagedMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
-	virtual void OnKnockback(const FDamagedResponse& DamagedResponse,float DamageMontageLength) override;
-	UFUNCTION()
-	void Death();
-
+	void OnDamaged(const FDamagedResponse& DamagedResponse);
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input
 		, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -67,22 +55,4 @@ private:
 	/** 플레이어 카메라 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UPlayerCameraComponent* PlayerCamera;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UEquipInventoryComponent* EquipInventoryComponent;
-
-		
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Effect"
-		, meta=(AllowPrivateAccess = true))
-	TSubclassOf<UGameplayEffect> RegenEffect;
-	
-	FOnMontageEnded MontageEndedDelegate;
-
-	FDamagedResponse DamageResponse;
-
-	UPROPERTY(EditAnywhere, Category = "Ability")
-	TSubclassOf<UGameplayAbility> KnockbackAbility;
-
-	AEnemyCharacter* TargetingCharacter;
 };
-

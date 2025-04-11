@@ -11,8 +11,7 @@
 UTimeRecallComponent::UTimeRecallComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	//SetIsReplicated(true);
-	
+	SetIsReplicated(true);
 	RecordInterval = 0.05f; // 예: 0.05초마다 기록
 	MaxRecordTime = 5.0f; // 예: 최대 5초간 기록
 	TimeAccumulator = 0.0f;

@@ -8,8 +8,6 @@
 
 class UAT_TargetingEnemy;
 class UPlayMontageWithEvent;
-
-
 /**
  * 
  */
@@ -20,7 +18,6 @@ class PROJECTNL_API UGA_TargetingEnemy : public UBaseInputTriggerAbility
 public:
 	UGA_TargetingEnemy(const FObjectInitializer& ObjectInitializer);
 
-	
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle
 															, const FGameplayAbilityActorInfo* ActorInfo
@@ -43,13 +40,6 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UAT_TargetingEnemy> TargetingEnemyTask;
-
-	
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Effect"
-		, meta=(AllowPrivateAccess = true))
-	TSubclassOf<UGameplayEffect> TargetingSpeedEffect;
-
-
 
 };
 	
