@@ -15,7 +15,7 @@ class UInputMappingContext;
 struct FInputActionValue;
 struct FGameplayAbilitySpec;
 UCLASS()
-class PROJECTNL_API APlayerCharacter : public ABaseCharacter,public IInteractionInterface
+class PROJECTNL_API APlayerCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -31,6 +31,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Targeting")
 	AEnemyCharacter* GetTargetingCharacter();
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 protected:
 	virtual void BeginPlay() override;
 
@@ -46,7 +48,7 @@ private:
 	UFUNCTION()
 	virtual void OnDamaged(const FDamagedResponse& DamagedResponse) override;
 	virtual void OnDamagedMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
-	virtual void OnKnockback(const FDamagedResponse& DamagedResponse,float DamageMontageLength) override;
+	
 	UFUNCTION()
 	void Death();
 
@@ -83,7 +85,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Ability")
 	TSubclassOf<UGameplayAbility> KnockbackAbility;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Targeting", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Replicated,VisibleAnywhere, BlueprintReadOnly, Category = "Targeting", meta = (AllowPrivateAccess = "true"))
 	AEnemyCharacter* TargetingCharacter;
+
+
 };
 

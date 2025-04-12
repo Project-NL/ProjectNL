@@ -7,6 +7,7 @@
 #include "ProjectNL/GAS/NLAbilitySystemComponent.h"
 #include "ProjectNL/GAS/NLAbilitySystemInitializationData.h"
 #include "ProjectNL/Helper/UtilHelper.h"
+#include "ProjectNL/Interface/InteractionInterface.h"
 #include "BaseCharacter.generated.h"
 
 class UInventoryComponent;
@@ -15,7 +16,7 @@ class UTimeRecallComponent;
 enum class EEntityCategory : uint8;
 
 UCLASS()
-class PROJECTNL_API ABaseCharacter : public ACharacter, public IAbilitySystemInterface
+class PROJECTNL_API ABaseCharacter : public ACharacter, public IAbilitySystemInterface,public IInteractionInterface
 {
 	GENERATED_BODY()
 
@@ -77,6 +78,14 @@ protected:
 	void Initialize();
 
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override;
+
+
+
+public:
+	virtual void OnDamaged(const FDamagedResponse& DamagedResponse) override;
+	virtual void OnDamagedMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
+	virtual void OnKnockback(const FDamagedResponse& DamagedResponse,float DamageMontageLength) override;
+protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> DamagedMontage;
 

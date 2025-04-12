@@ -4,6 +4,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 #include "ProjectNL/Component/CameraComponent/PlayerCameraComponent.h"
 #include "ProjectNL/Component/CameraComponent/PlayerSpringArmComponent.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
@@ -306,68 +307,7 @@ void APlayerCharacter::OnDamagedMontageEnded(UAnimMontage* Montage, bool bInterr
 	}
 }
 
-void APlayerCharacter::OnKnockback(const FDamagedResponse& DamagedResponse, float DamageMontageLength)
-{
-	// 서버에서만 실행 (클라이언트에서 실행 시 바로 리턴)
-	if (!HasAuthority())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("OnKnockback: 클라이언트에서는 실행되지 않습니다."));
-		return;
-	}
 
-	UE_LOG(LogTemp, Log, TEXT("[Server] OnKnockback 호출됨: Damage=%f, IsHitStop=%s, SourceActor=%s"),
-	       DamagedResponse.Damage,
-	       DamagedResponse.IsHitStop ? TEXT("true") : TEXT("false"),
-	       *GetNameSafe(DamagedResponse.SourceActor));
-
-	// 1. AbilitySpec 생성 및 AbilitySystemComponent에 부여
-	FGameplayAbilitySpec AbilitySpec = AbilitySystemComponent->BuildAbilitySpecFromClass(
-		DamagedResponse.KnockbackAbility, 1, INDEX_NONE);
-	FGameplayAbilitySpecHandle AbilityHandle = AbilitySystemComponent->GiveAbility(AbilitySpec);
-
-	// 2. AbilityHandle을 통해 AbilitySpec 포인터를 가져옵니다.
-	FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromHandle(AbilityHandle);
-	if (!Spec)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AbilityHandle에 해당하는 AbilitySpec을 찾을 수 없습니다."));
-		return;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AbilityHandle에 해당하는 AbilitySpec을 찾을 수 있습니다."));
-		//return;
-	}
-	// 3. Spec에서 Primary Instance를 가져옵니다.
-	UGameplayAbility* AbilityInstance = Spec->GetPrimaryInstance();
-
-
-	// 4. UGA_Knockback 타입으로 캐스팅합니다.
-	UGA_Knockback* ActivatedKnockbackAbility = Cast<UGA_Knockback>(AbilityInstance);
-	if (!ActivatedKnockbackAbility)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AbilityInstance를 UGA_Knockback으로 캐스팅하는 데 실패했습니다."));
-		return;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AbilityInstance를 UGA_Knockback으로 캐스팅하는 데 성공."));
-		//return;
-	}
-	// 5. Knockback Ability에 데미지 관련 정보 및 애니메이션 길이 설정
-	ActivatedKnockbackAbility->SetDamageResponse(DamagedResponse);
-	ActivatedKnockbackAbility->SetDamageMontageLength(DamageMontageLength);
-	ActivatedKnockbackAbility->SetDamageMontage(DamagedMontage);
-	//ActivatedKnockbackAbility->OnPlayMontageWithEventDelegate.Clear();
-
-	// 6. Knockback Ability 활성화 시도
-	bool bActivated = AbilitySystemComponent->TryActivateAbilityByClass(DamagedResponse.KnockbackAbility);
-	if (!bActivated)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Knockback Ability 활성화에 실패했습니다."));
-		return;
-	}
-
-}
 
 void APlayerCharacter::Death()
 {
@@ -383,9 +323,18 @@ UEquipInventoryComponent* APlayerCharacter::GetEquipInventoryComponent()
 void APlayerCharacter::SetTargetingCharacter(AEnemyCharacter* targetingCharacter)
 {
 	TargetingCharacter = targetingCharacter;
+
 }
 
 AEnemyCharacter* APlayerCharacter::GetTargetingCharacter()
 {
 	return TargetingCharacter;
+}
+
+
+
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(APlayerCharacter, TargetingCharacter);
 }

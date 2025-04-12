@@ -154,6 +154,16 @@ void AEnemyCharacter::OnDamaged_Implementation(const FDamagedResponse& DamagedRe
 	// 근데 고려만 할 것
 	PlayAnimMontage(EquipComponent->GetDamagedAnim()
 	.GetAnimationByDirection(DamagedResponse.DamagedDirection, DamagedResponse.DamagedHeight));
+
+	DamagedMontage = EquipComponent->GetDamagedAnim()
+							   .GetAnimationByDirection(DamagedResponse.DamagedDirection,
+														DamagedResponse.DamagedHeight);
+	if (DamagedMontage)
+	{
+		float MontageLength = DamagedMontage->GetPlayLength();
+		OnKnockback(DamagedResponse, MontageLength);
+		
+	}
 }
 
 
