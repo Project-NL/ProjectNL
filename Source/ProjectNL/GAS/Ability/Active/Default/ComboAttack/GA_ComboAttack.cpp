@@ -192,8 +192,6 @@ void UGA_ComboAttack::ExecuteComboAttack()
 		}
 		SetCurrentMontage(ComboAttack[CharEquipInfo->GetAttackComboIndex()]);
 		FStateHelper::ChangePlayerState(GetAbilitySystemComponentFromActorInfo(), NlGameplayTags::State_Idle, NlGameplayTags::State_Attack_Combo, true);
-
-
 		
 		AttackAnimTask = UPlayMontageWithEvent::InitialEvent(this, NAME_None
 		                                                      , GetCurrentMontage()

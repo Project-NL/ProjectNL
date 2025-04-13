@@ -8,6 +8,7 @@
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Attribute/BaseAttributeSet.h"
 #include "ProjectNL/GAS/NLAbilitySystemComponent.h"
+#include "ProjectNL/Helper/GameplayTagHelper.h"
 #include "ProjectNL/UI/Widget/Enemy/EnemyStatus.h"
 #include "ProjectNL/UI/Widget/PlayerStatus/PlayerStatus.h"
 
@@ -132,17 +133,26 @@ bool AEnemyCharacter::ServerDestroy_Validate()
 
 void AEnemyCharacter::OnDamaged_Implementation(const FDamagedResponse& DamagedResponse)
 {
+
+	FDamagedResponse DamageResponse=DamagedResponse;
 	if (EnemyAttributeSet)
 	{
-		EnemyAttributeSet->SetHealth(EnemyAttributeSet->GetHealth() - DamagedResponse.Damage);
+		
+		if (AbilitySystemComponent->HasMatchingGameplayTag(NlGameplayTags::Status_Guard))
+		{
+			DamageResponse.Damage =DamagedResponse.Damage/5;
+		}
+		
+		EnemyAttributeSet->SetHealth(EnemyAttributeSet->GetHealth() - DamageResponse.Damage);
+		
 	}
 	if (EnemyAttributeSet)
 	{
 		if(EnemyAttributeSet->GetHealth()<=0)
 		{
-			if (DamagedResponse.SourceActor)
+			if (DamageResponse.SourceActor)
 			{
-				APlayerCharacter* PlayerCharacter = (APlayerCharacter*)DamagedResponse.SourceActor;
+				APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(DamageResponse.SourceActor);
 				if (PlayerCharacter)
 				{
 					PlayerCharacter->SetTargetingCharacter(nullptr);
@@ -153,15 +163,15 @@ void AEnemyCharacter::OnDamaged_Implementation(const FDamagedResponse& DamagedRe
 	// TODO: 이거 별도의 Ability로 빼는 것도 고려할 필요 있음.
 	// 근데 고려만 할 것
 	PlayAnimMontage(EquipComponent->GetDamagedAnim()
-	.GetAnimationByDirection(DamagedResponse.DamagedDirection, DamagedResponse.DamagedHeight));
+	.GetAnimationByDirection(DamageResponse.DamagedDirection, DamageResponse.DamagedHeight));
 
 	DamagedMontage = EquipComponent->GetDamagedAnim()
-							   .GetAnimationByDirection(DamagedResponse.DamagedDirection,
-														DamagedResponse.DamagedHeight);
+							   .GetAnimationByDirection(DamageResponse.DamagedDirection,
+														DamageResponse.DamagedHeight);
 	if (DamagedMontage)
 	{
 		float MontageLength = DamagedMontage->GetPlayLength();
-		OnKnockback(DamagedResponse, MontageLength);
+		OnKnockback(DamageResponse, MontageLength);
 		
 	}
 }
