@@ -20,6 +20,8 @@ public:
 	virtual bool OnExecute_Implementation(AActor* MyTarget, const FGameplayCueParameters& Parameters) const override;
 
 protected:
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Cue")
-	TObjectPtr<UNiagaraSystem> NiagaraSystem; // 변경된 파티클 타입
+
+	UPROPERTY(EditDefaultsOnly, Category = "VFX")
+	TObjectPtr<UNiagaraSystem> NiagaraSystem;
+	// 변경된 파티클 타입
 };

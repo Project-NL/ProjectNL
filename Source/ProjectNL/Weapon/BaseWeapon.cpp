@@ -38,6 +38,8 @@ void ABaseWeapon::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
 	Super::OnOverlapBegin(OverlappedComponent, OtherActor,OtherComp,OtherBodyIndex,bFromSweep,SweepResult);
 
 	
+
+	
 }
 
 void ABaseWeapon::Interact(AActor* Actor)
@@ -138,3 +140,5 @@ TSet<AActor*>& ABaseWeapon::GetHitActorsReference()
 {
 	return HitActors;
 }
+
+

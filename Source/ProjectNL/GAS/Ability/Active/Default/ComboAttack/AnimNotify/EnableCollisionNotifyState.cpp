@@ -309,13 +309,14 @@ void UEnableCollisionNotifyState::ReactToHitActor(AActor* Owner, ABaseWeapon* We
                         CueParams.Instigator = Owner;
                         CueParams.EffectCauser = Owner;
                         CueParams.EffectContext = EffectContext; // ✅ 같이 넘기기
+                        ABaseWeapon* BaseWeapon=SourceCharacter->GetEquipComponent()->GetMainWeapon();
                         if (TargetASC->HasMatchingGameplayTag(NlGameplayTags::Status_Guard))
                         {
-                            SourceASC->ExecuteGameplayCue(NlGameplayTags::GameplayCue_Particle_GaurdHit, CueParams);    
+                            SourceASC->ExecuteGameplayCue(BaseWeapon->GetAttackHitGaurdTag(), CueParams);    
                         }
                         else
                         {
-                            SourceASC->ExecuteGameplayCue(NlGameplayTags::GameplayCue_Particle_Hit, CueParams);    
+                            SourceASC->ExecuteGameplayCue(BaseWeapon->GetAttackHitTag(), CueParams);    
                         }
                         
 

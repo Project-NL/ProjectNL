@@ -82,14 +82,19 @@ void ASpawnableItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AA
     APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(OtherActor);
     if (!PlayerCharacter) return;
 
+    if (HasAuthority()) // 서버 전용 처리
+    {
+        SetOwner(PlayerCharacter); // 🔥 서버에서 소유권 부여
+        UE_LOG(LogTemp, Warning, TEXT("서버: 아이템 소유권을 %s 에게 부여"), *PlayerCharacter->GetName());
+    }
     ABasePlayerController* BasePlayerController = Cast<ABasePlayerController>(PlayerCharacter->GetController());
-    if (BasePlayerController)
+    if (PlayerCharacter->IsLocallyControlled())
     {
         OverlappingPlayer = PlayerCharacter;
         OverlappingPlayerController = BasePlayerController;
         OverlappingPlayerController->SetNearbyItem(this);
         AcquireWidgetComponent->SetVisibility(true);
-        SetOwner(PlayerCharacter);
+        //SetOwner(PlayerCharacter);
     }
 }
 
@@ -128,18 +133,33 @@ void ASpawnableItem::Interact(AActor* InteractingActor)
 
 void ASpawnableItem::ServerInteract_Implementation(AActor* InteractingActor)
 {
+    UE_LOG(LogTemp, Log, TEXT("ServerInteract_Implementation called."));
+
     APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(InteractingActor);
     if (PlayerCharacter)
     {
-        
+        UE_LOG(LogTemp, Log, TEXT("InteractingActor is a valid PlayerCharacter: %s"), *PlayerCharacter->GetName());
+
         ABasePlayerController* BasePlayerController = Cast<ABasePlayerController>(PlayerCharacter->GetController());
         if (BasePlayerController)
         {
+            UE_LOG(LogTemp, Log, TEXT("Found valid BasePlayerController: %s"), *BasePlayerController->GetName());
             BasePlayerController->SetNearbyItem(nullptr);
         }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("BasePlayerController cast failed."));
+        }
     }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("InteractingActor cast to APlayerCharacter failed."));
+    }
+
+    UE_LOG(LogTemp, Log, TEXT("Destroying item: %s"), *GetName());
     DestroyItem();
 }
+
 
 bool ASpawnableItem::ServerInteract_Validate(AActor* InteractingActor)
 {
@@ -182,6 +202,7 @@ void ASpawnableItem::OnRep_CollisionBox()
 
 void ASpawnableItem::UseItem(APlayerCharacter* playerCharacter)
 {
+    Multicast_SetCollision();
     // 아이템 사용 로직이 있다면 여기에 작성
 }
 

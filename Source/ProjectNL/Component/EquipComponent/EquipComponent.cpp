@@ -36,9 +36,9 @@ void UEquipComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(UEquipComponent, PlayerCombatWeaponState);
 
-	 DOREPLIFETIME(UEquipComponent, MainWeapon);
+	DOREPLIFETIME(UEquipComponent, MainWeapon);
 	//
-	 DOREPLIFETIME(UEquipComponent, SubWeapon);
+	DOREPLIFETIME(UEquipComponent, SubWeapon);
 }
 
 void UEquipComponent::UpdateEquipWeaponAnimationData()
