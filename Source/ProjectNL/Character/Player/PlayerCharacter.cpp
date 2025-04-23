@@ -2,9 +2,11 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "ProjectNL/Character/Enemy/EnemyCharacter.h"
 #include "ProjectNL/Component/CameraComponent/PlayerCameraComponent.h"
 #include "ProjectNL/Component/CameraComponent/PlayerSpringArmComponent.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
@@ -323,6 +325,30 @@ UEquipInventoryComponent* APlayerCharacter::GetEquipInventoryComponent()
 void APlayerCharacter::SetTargetingCharacter(AEnemyCharacter* targetingCharacter)
 {
 	TargetingCharacter = targetingCharacter;
+	if (TargetingCharacter)
+	{
+		if (LockedOnWidgetClass)
+		{
+			LockOnWidgetComponent = NewObject<UWidgetComponent>(TargetingCharacter, MakeUniqueObjectName(TargetingCharacter, UWidgetComponent::StaticClass(), FName("TargetLockOn")));
+        
+			if (LockOnWidgetComponent)
+			{
+				UMeshComponent* MeshComponent = TargetingCharacter->FindComponentByClass<UMeshComponent>();
+            
+				if (MeshComponent)
+				{
+					LockOnWidgetComponent->SetWidgetClass(LockedOnWidgetClass);
+					LockOnWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+					LockOnWidgetComponent->SetupAttachment(MeshComponent, FName("pelvis"));
+					LockOnWidgetComponent->SetDrawSize(FVector2D(32.f, 32.f));
+					LockOnWidgetComponent->RegisterComponent();
+				}
+			}
+		}
+	}else
+	{
+		LockOnWidgetComponent->SetWidgetClass(nullptr);
+	}
 
 }
 
