@@ -3,9 +3,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ProjectNL/Helper/UtilHelper.h"
+#include "GameplayTagContainer.h"
 #include "ProjectNL/Item/SpawnableItem.h"
 #include "BaseWeapon.generated.h"
 
+class UNiagaraSystem;
 class UGameplayEffect;
 enum class EUWeaponType : uint8;
 enum class EUEquippedHandType : uint8;
@@ -25,12 +27,15 @@ public:
 	void SwapTwoHandWeapon();
 
 	TSet<AActor*>& GetHitActorsReference();
+	
 	GETTER(EUEquippedHandType, EquippedHandType)
 	GETTER(EWeaponAttachPosition, AttachPosition)
 	GETTER(EUWeaponType, WeaponType)
 	GETTER(USkeletalMeshComponent*, WeaponSkeleton)
 	GETTER(TSubclassOf<UGameplayEffect>, AttackEffect)
-
+	GETTER(TObjectPtr<USoundBase>,SwingSound)
+	GETTER(FGameplayTag,AttackHitTag)
+	GETTER(FGameplayTag,AttackHitGaurdTag)
 	GETTER_SETTER(FVector, PrevStartLocation)
 	GETTER_SETTER(FVector, PrevEndLocation)
 
@@ -67,10 +72,22 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = Ability, meta = (AllowPrivateAccess = true))
 	TSubclassOf<UGameplayEffect> AttackEffect;
+
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Assets
+	, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USoundBase> SwingSound;;
+
 	UPROPERTY()
 	TSet<AActor*> HitActors;
 
+
+	UPROPERTY(EditDefaultsOnly, Category = "ATTACKHITTAG")
+	FGameplayTag AttackHitTag;
+
+	UPROPERTY(EditDefaultsOnly, Category = "ATTACKHITTAG")
+	FGameplayTag AttackHitGaurdTag;
+	
 	// 캐릭터별로 관리할 변수 선언
 	FVector PrevStartLocation;
 	FVector PrevEndLocation;

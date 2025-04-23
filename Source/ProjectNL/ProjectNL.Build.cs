@@ -14,6 +14,6 @@ public class ProjectNL : ModuleRules
 			"UMG", "GameplayAbilities", "GameplayTags", "GameplayTasks"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new[] { "Slate", "SlateCore","AIModule","NavigationSystem" });
+		PrivateDependencyModuleNames.AddRange(new[] { "Slate", "SlateCore","AIModule","NavigationSystem", "Niagara", "Niagara" });
 	}
 }

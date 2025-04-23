@@ -297,8 +297,8 @@ void UAiEnableCollisionNotifyState::ReactToHitActor(
 					TargetCharacter))
 				{
 					
-						const FGameplayEffectContextHandle EffectContext = SourceASC->MakeEffectContext();
-
+						 FGameplayEffectContextHandle EffectContext = SourceASC->MakeEffectContext();
+						EffectContext.AddHitResult(Hit); // 🔥 핵심 추가!
 						FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(Weapon->GetAttackEffect(), 1.0f, EffectContext);
                     
 						const FRotator RotateValue = UKismetMathLibrary::FindLookAtRotation(TargetCharacter->GetActorLocation(), Hit.ImpactPoint);
@@ -309,6 +309,25 @@ void UAiEnableCollisionNotifyState::ReactToHitActor(
 						if (SpecHandle.IsValid())
 						{
 							SourceASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+
+							
+							// CueParams도 동일한 Context를 넘겨줌
+							FGameplayCueParameters CueParams;
+							CueParams.Location = Hit.ImpactPoint;
+							CueParams.Normal = Hit.ImpactNormal;
+							CueParams.Instigator = Owner;
+							CueParams.EffectCauser = Owner;
+							CueParams.EffectContext = EffectContext; // ✅ 같이 넘기기
+							ABaseWeapon* BaseWeapon=SourceCharacter->GetEquipComponent()->GetMainWeapon();
+							if (TargetASC->HasMatchingGameplayTag(NlGameplayTags::Status_Guard))
+							{
+								SourceASC->ExecuteGameplayCue(BaseWeapon->GetAttackHitGaurdTag(), CueParams);    
+							}
+							else
+							{
+								SourceASC->ExecuteGameplayCue(BaseWeapon->GetAttackHitTag(), CueParams);    
+							}
+							
 							DrawDebugSphere(Owner->GetWorld(), Hit.ImpactPoint, 10, 12, FColor::Yellow, false, 1.0f);
 						}
 						// 충돌 지점 시각화

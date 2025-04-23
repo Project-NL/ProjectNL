@@ -13,7 +13,7 @@ UGA_ComboAttack::UGA_ComboAttack(const FObjectInitializer& ObjectInitializer)
 {
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 	ComboClearCooldown = 0;
-	HoldDurationCooldown = 0.8;
+	HoldDurationCooldown = 1.2;
 }
 
 bool UGA_ComboAttack::CanAttack() const
@@ -192,8 +192,6 @@ void UGA_ComboAttack::ExecuteComboAttack()
 		}
 		SetCurrentMontage(ComboAttack[CharEquipInfo->GetAttackComboIndex()]);
 		FStateHelper::ChangePlayerState(GetAbilitySystemComponentFromActorInfo(), NlGameplayTags::State_Idle, NlGameplayTags::State_Attack_Combo, true);
-
-
 		
 		AttackAnimTask = UPlayMontageWithEvent::InitialEvent(this, NAME_None
 		                                                      , GetCurrentMontage()
