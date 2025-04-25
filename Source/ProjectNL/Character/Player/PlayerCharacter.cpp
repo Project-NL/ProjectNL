@@ -347,6 +347,7 @@ void APlayerCharacter::SetTargetingCharacter(AEnemyCharacter* targetingCharacter
 		}
 	}else
 	{
+		if (LockOnWidgetComponent)
 		LockOnWidgetComponent->SetWidgetClass(nullptr);
 	}
 
