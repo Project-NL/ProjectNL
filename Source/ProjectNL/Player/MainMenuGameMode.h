@@ -14,6 +14,7 @@ class PROJECTNL_API AMainMenuGameMode : public AGameModeBase
 public:
 	virtual void BeginPlay() override;
 
+
 protected:
 	// 위젯 클래스는 에디터에서 지정할 수 있도록 BlueprintReadWrite
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")

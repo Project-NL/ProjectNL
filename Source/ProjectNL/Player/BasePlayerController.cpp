@@ -10,6 +10,7 @@
 #include "ProjectNL/UI/Widget/Inventory/InventoryWidget.h"
 #include "ProjectNL/UI/Widget/PlayerStatus/PlayerStatus.h"
 #include "ProjectNL/UI/Manager/UIManager.h"
+#include"ProjectNL/Dutorial/DutorialActor.h"
 
 
 void ABasePlayerController::BeginPlay()
@@ -74,6 +75,15 @@ void ABasePlayerController::SetupInputComponent()
 				&ABasePlayerController::TryInteract
 			);
 		}
+		if (HandleTutorial)
+		{
+			EnhancedInputComponent->BindAction(
+				HandleTutorial, 
+				ETriggerEvent::Triggered, 
+				this, 
+				&ABasePlayerController::HandleNextTutorial
+			);
+		}
 		if (ToggleFirstHotSlotItem)
 		{
 			EnhancedInputComponent->BindAction(
@@ -136,12 +146,14 @@ void ABasePlayerController::TryInteract()
 	}
 }
 
-void ABasePlayerController::Server_UseHotSlotItem_Implementation(int32 ItemSlotInit)
+void ABasePlayerController::Server_UseHotSlotItem_Implementation(int32 ItemSlotInit, const TArray<int32>& HotList, 
+	const TArray<FItemMetaInfo>& InvList)
 {
-	UseHotSlotItem(ItemSlotInit); 
+	ClientUseHotSlotItem(ItemSlotInit,HotList,InvList); 
 }
 
-bool ABasePlayerController::Server_UseHotSlotItem_Validate(int32 ItemSlotInit)
+bool ABasePlayerController::Server_UseHotSlotItem_Validate(int32 ItemSlotInit,  const TArray<int32>& HotList, 
+	const TArray<FItemMetaInfo>& InvList)
 {
 	return true;
 }
@@ -153,10 +165,8 @@ void ABasePlayerController::ToggleInventoryWidget()
 		UE_LOG(LogTemp, Warning, TEXT("UIManager not found!"));
 		return;
 	}
-
 	// 인벤토리 태그 정의
 	FGameplayTag InventoryTag = NlGameplayTags::UI_GameMenu;
-
 	// 현재 인벤토리 위젯이 열려 있는지 확인 (UIManager에 상태 확인 로직 필요)
 	// 여기서는 Toggle 방식이니까 간단히 Show/Hide로 처리
 	if (UIManager->IsUIActive(InventoryTag)) // IsUIActive는 추가해야 할 함수
@@ -170,13 +180,10 @@ void ABasePlayerController::ToggleInventoryWidget()
 	}
 	else
 	{
-		UIManager->ShowUI(InventoryTag);
-		// UI 모드로 입력 전환
+		UIManager->ShowUI(InventoryTag);// UI 모드로 입력 전환
 		FInputModeGameAndUI UIInputMode;
-	
-			SetInputMode(UIInputMode);
-			bShowMouseCursor = true;
-		
+		SetInputMode(UIInputMode);
+		bShowMouseCursor = true;
 	}
 }
 void ABasePlayerController::UseFirstHotSlotItem()
@@ -206,42 +213,77 @@ void ABasePlayerController::UseFifthHotSlotItem()
 
 void ABasePlayerController::UseHotSlotItem(int32 ItemSlotInit)
 {
-	ItemSlotInit-=1;
-	if (!HasAuthority()) // 클라이언트라면 서버에 실행 요청
+	// 1-based → 0-based 변환
+	ItemSlotInit -= 1;
+	
+	ABasePlayerState* PS = GetPlayerState<ABasePlayerState>();
+	if (!PS) return;
+
+	TArray<int32>* HotList = PS->GetHotslotInitialItemList();
+	TArray<FItemMetaInfo>* InvList = PS->GetPlayerInventoryList();
+	
+	Server_UseHotSlotItem(ItemSlotInit,*HotList,*InvList);
+	//return;
+	
+
+	
+}
+void ABasePlayerController::ClientUseHotSlotItem(
+	int32 ItemSlotInit,
+	const TArray<int32>& HotList,
+	const TArray<FItemMetaInfo>& InvList
+)
+{
+	// 1) 빈 배열 체크
+	if (HotList.Num() == 0 || InvList.Num() == 0)
 	{
-		Server_UseHotSlotItem(ItemSlotInit);
+		UE_LOG(LogTemp, Warning, TEXT("UseHotSlotItem: HotList 또는 InvList가 비어있음"));
 		return;
 	}
-	ABasePlayerState* BasePlayerState = GetPlayerState<ABasePlayerState>();
-	if (BasePlayerState)
-	{
-		TArray<int32> *HotslotInitailItemList = BasePlayerState->GetHotslotInitialItemList();
-		TArray<FItemMetaInfo>* PlayerInventoryList = BasePlayerState->GetPlayerInventoryList();
-		if (PlayerInventoryList && PlayerInventoryList->Num() > 0)
-		{
-			int32 HotslotInitail = (*HotslotInitailItemList)[ItemSlotInit];
-			if (HotslotInitail<0)
-			{
-				return;
-			}
-			FItemMetaInfo *FirstItem = &(*PlayerInventoryList)[HotslotInitail];
 
-			const FItemInfoData& ItemInfoById = FItemHelper::GetItemInfoById(GetWorld(), FirstItem->GetId());
-			
-			ASpawnableItem* SpawnableItem = GetWorld()->SpawnActor<ASpawnableItem>(ItemInfoById.GetShowItemActor());
-			BasePlayerState->RemoveItem(FirstItem->GetId(),1,ItemSlotInit);
-			if (SpawnableItem)
+	// 2) 슬롯 범위 검사
+	if (!HotList.IsValidIndex(ItemSlotInit))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UseHotSlotItem: 잘못된 슬롯 인덱스(%d)"), ItemSlotInit);
+		return;
+	}
+
+	int32 HotIndex = HotList[ItemSlotInit];
+	// 3) 인벤토리 범위 검사
+	if (HotIndex < 0 || !InvList.IsValidIndex(HotIndex))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UseHotSlotItem: 인벤토리 인덱스(%d)가 유효하지 않음"), HotIndex);
+		return;
+	}
+
+	// 4) 아이템 사용 로직
+	const FItemMetaInfo& FirstItem = InvList[HotIndex];
+	const FItemInfoData& ItemInfo = FItemHelper::GetItemInfoById(GetWorld(), FirstItem.GetId());
+
+	if (ABasePlayerState* PS = GetPlayerState<ABasePlayerState>())
+	{
+		PS->RemoveItem(FirstItem.GetId(), 1, ItemSlotInit);
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (ASpawnableItem* Spawned = World->SpawnActor<ASpawnableItem>(ItemInfo.GetShowItemActor()))
+		{
+			if (APlayerCharacter* PC = Cast<APlayerCharacter>(GetPawn()))
 			{
-				SpawnableItem->UseItem(Cast<APlayerCharacter>(GetPawn()));
-			}// 서버 / 클라이언트 체크 로그
-			if (HasAuthority())
-			{
-				UE_LOG(LogTemp, Warning, TEXT("[Server] 핫슬롯 아이템 사용 - ID: %d"), FirstItem->GetId());
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("[Client] 핫슬롯 아이템 사용 - ID: %d"), FirstItem->GetId());
+				Spawned->UseItem(PC);
 			}
 		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("핫슬롯 아이템 사용 완료 – ID: %d"), FirstItem.GetId());
+}
+
+
+void ABasePlayerController::HandleNextTutorial()
+{
+	if (CurrentTutorialActor)
+	{
+		CurrentTutorialActor->NextTutorialStep();
 	}
 }

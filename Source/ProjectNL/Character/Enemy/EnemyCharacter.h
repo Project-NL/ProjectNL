@@ -39,6 +39,16 @@ protected:
 	UFUNCTION(Server, Reliable,WithValidation)
 	void ServerDestroy();
 
+protected:
+	UPROPERTY(VisibleAnywhere, Category="UI")
+	class USphereComponent* DetectionSphere;
+
+	UFUNCTION()
+	void OnPlayerEnter(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+					   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Sweep);
+	UFUNCTION()
+	void OnPlayerExit (UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+					   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 private:
 	UFUNCTION(NetMulticast, Reliable)
 	void OnDamaged(const FDamagedResponse& DamagedResponse);

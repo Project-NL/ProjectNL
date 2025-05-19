@@ -314,7 +314,7 @@ void APlayerCharacter::OnDamagedMontageEnded(UAnimMontage* Montage, bool bInterr
 void APlayerCharacter::Death()
 {
 
-	ActiveDeathAbility();
+	//ActiveDeathAbility();
 }
 
 UEquipInventoryComponent* APlayerCharacter::GetEquipInventoryComponent()

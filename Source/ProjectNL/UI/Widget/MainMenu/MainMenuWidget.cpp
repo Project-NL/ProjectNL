@@ -30,7 +30,7 @@ void UMainMenuWidget::HostServer()
 	if (World)
 	{
 		// "YourMapName"을 실제 맵 이름으로 바꿔줘
-		UGameplayStatics::OpenLevel(World, FName("TestMap_Targeting"), true, "listen");
+		UGameplayStatics::OpenLevel(World, FName("DutorialMap1"), true, "listen");
 	}
 }
 

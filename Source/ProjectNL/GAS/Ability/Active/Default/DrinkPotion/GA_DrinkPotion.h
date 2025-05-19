@@ -54,4 +54,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Effect"
 		, meta=(AllowPrivateAccess = true))
 	TSubclassOf<UGameplayEffect> HealEffect;
+
+	// 이동 복구를 위해 저장해 둘 원래 모드
+	EMovementMode PreviousMovementMode;
+
 };

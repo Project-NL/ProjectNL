@@ -3,6 +3,7 @@
 
 #include "ProjectNL/GAS/Ability/Active/Default/DrinkPotion/GA_DrinkPotion.h"
 
+#include "GameFramework/CharacterMovementComponent.h"
 #include "ProjectNL/GAS/Ability/Utility/PlayMontageWithEvent.h"
 #include "ProjectNL/Item/PotionItem.h"
 
@@ -21,6 +22,15 @@ void UGA_DrinkPotion::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
                                       const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	// 1) 움직임 잠그기
+	if (ACharacter* Char = Cast<ACharacter>(GetAvatarActorFromActorInfo()))
+	{
+		if (UCharacterMovementComponent* MoveComp = Char->GetCharacterMovement())
+		{
+			PreviousMovementMode = MoveComp->MovementMode;
+			MoveComp->DisableMovement();
+		}
+	}
 	PlayActionAnimation();
 }
 
@@ -29,6 +39,14 @@ void UGA_DrinkPotion::EndAbility(const FGameplayAbilitySpecHandle Handle, const 
 {
 	if (PotionItem)
 	PotionItem->Destroy();
+	// 3) 움직임 복구
+	if (ACharacter* Char = Cast<ACharacter>(GetAvatarActorFromActorInfo()))
+	{
+		if (UCharacterMovementComponent* MoveComp = Char->GetCharacterMovement())
+		{
+			MoveComp->SetMovementMode(PreviousMovementMode);
+		}
+	}
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 

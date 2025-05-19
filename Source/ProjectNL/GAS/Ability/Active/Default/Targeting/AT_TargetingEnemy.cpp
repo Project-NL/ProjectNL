@@ -334,10 +334,9 @@ void UAT_TargetingEnemy::SaveCameraSettings(UPlayerCameraComponent* CameraCompon
 	// 1. 타겟(캐릭터)의 위치를 구한다.
 	FVector TargetLocation = GetAvatarActor()->GetActorLocation();
 	FVector ForwardVector =  GetAvatarActor()->GetActorForwardVector();
-
 	// 1) 카메라 위치 설정
-	//    - 캐릭터를 바라보는 방향의 반대(-ForwardVector)로 400만큼 뒤로 이동
-	//    - Z축(Up)으로 200만큼 올립니다.
+	// - 캐릭터를 바라보는 방향의 반대(-ForwardVector)로 400만큼 뒤로 이동
+	// - Z축(Up)으로 200만큼 올립니다.
 	 SavedCameraWorldLocation = TargetLocation 
 		- (ForwardVector * 400.0f) // 뒤로 400
 		+ FVector(0.0f, 0.0f, 200.0f); // 위로 200
@@ -345,10 +344,12 @@ void UAT_TargetingEnemy::SaveCameraSettings(UPlayerCameraComponent* CameraCompon
 	  SavedCameraWorldLocation, 
 	  TargetLocation
   );
-
+	
 	SavedTargetActorWorldLocation = GetAvatarActor()->GetActorLocation();
 	SavedTargetActorWorldLocation += GetAvatarActor()->GetActorForwardVector() * 300.0f;
 	SavedOwnerActorWorldLocation= GetAvatarActor()->GetActorLocation();
+
+	
 }
 
 
@@ -365,7 +366,7 @@ void UAT_TargetingEnemy::RestoreCameraRotation(UPlayerCameraComponent* CameraCom
 	// {
 	// 	// 카메라가 보간되는 동안 마우스 Look 입력을 무시
 	// 	PC->SetIgnoreLookInput(true);
-	// }
+	// },
 
 	// 1. 캐릭터 위치 / Forward Vector 구하기
 	FVector TargetLocation = AvatarActor->GetActorLocation();

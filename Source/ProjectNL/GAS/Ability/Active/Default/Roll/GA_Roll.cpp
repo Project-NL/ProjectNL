@@ -23,7 +23,7 @@ void UGA_Roll::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FG
 		const EMovementDirection CurrentDirection =
 			FStateHelper::GetIsCharacterTargetMode(GetAbilitySystemComponentFromActorInfo())
 						? FLocateHelper::GetDirectionByAngle(Angle) : EMovementDirection::F;
-			
+		
 		if (UAnimMontage* StepAnim = OwnerCharacter->GetEquipComponent()
 			->GetEvadeAnim().GetAnimationByDirection(CurrentDirection))
 		{

@@ -1,5 +1,6 @@
 #include "ProjectNL/Character/Enemy/EnemyCharacter.h"
 #include "AbilitySystemComponent.h"
+#include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -38,6 +39,17 @@ AEnemyCharacter::AEnemyCharacter()
 	WidgetComponent->SetVisibility(true);
 
 	bReplicates = true;
+
+	// DetectionSphere 생성
+	DetectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DetectionSphere"));
+	DetectionSphere->SetupAttachment(RootComponent);
+	DetectionSphere->InitSphereRadius(800.f);               // 범위: 800cm
+	DetectionSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+	DetectionSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+  
+	// Overlap 이벤트 바인딩
+	DetectionSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnPlayerEnter);
+	DetectionSphere->OnComponentEndOverlap  .AddDynamic(this, &AEnemyCharacter::OnPlayerExit);
 }
 
 void AEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -46,7 +58,24 @@ void AEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	// Replicated 변수 등록
 	//DOREPLIFETIME(AEnemyCharacter, EnemyStatusHUDClass);
 }
+void AEnemyCharacter::OnPlayerEnter(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+									UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+									bool bFromSweep, const FHitResult& Sweep)
+{
+	if (Cast<APlayerCharacter>(OtherActor) && WidgetComponent)
+	{
+		WidgetComponent->SetVisibility(true);
+	}
+}
 
+void AEnemyCharacter::OnPlayerExit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+								   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (Cast<APlayerCharacter>(OtherActor) && WidgetComponent)
+	{
+		WidgetComponent->SetVisibility(false);
+	}
+}
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -80,6 +109,7 @@ void AEnemyCharacter::BeginPlay()
 		{
 			EnemyStatus->SetBaseCharacter(this);  // ✅ 개별 캐릭터 연결
 			WidgetComponent->SetWidget(EnemyStatus); // ✅ 위젯 설정
+			WidgetComponent->SetVisibility(false);
 		}
 	}
 }

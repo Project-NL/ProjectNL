@@ -14,12 +14,11 @@ ABaseWeapon::ABaseWeapon()
 	WeaponSkeleton = CreateDefaultSubobject<USkeletalMeshComponent>(
 		TEXT("Weapon Bone"));
 	WeaponSkeleton->SetupAttachment(RootComponent);
-	//
 	// WeaponSkeleton->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	// WeaponSkeleton->SetSimulatePhysics(true);
 	// WeaponSkeleton->SetCollisionObjectType(ECC_PhysicsBody);
-	// WeaponSkeleton->SetNotifyRigidBodyCollision(true); // 충돌 이벤트 받기
-	//
+	// WeaponSkeleton->SetNotifyRigidBodyCollision(true);
+	// 충돌 이벤트 받기
 	EquippedHandType = EUEquippedHandType::Empty;
 	AttachPosition = EWeaponAttachPosition::Back;
 
@@ -38,12 +37,14 @@ void ABaseWeapon::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
 	Super::OnOverlapBegin(OverlappedComponent, OtherActor,OtherComp,OtherBodyIndex,bFromSweep,SweepResult);
 
 	
-
-	
 }
 
 void ABaseWeapon::Interact(AActor* Actor)
 {
+	if (bcheckitem)
+	{
+		return;
+	}
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(Actor);
 	UEquipInventoryComponent* EquipInventoryComponent=PlayerCharacter->GetEquipInventoryComponent();
 	int8 nAdded = EquipInventoryComponent->AddItemMeta(ItemMetaInfo);
@@ -81,6 +82,7 @@ void ABaseWeapon::EquipCharacterWeapon(ACharacter* Character, const bool IsMain)
 	AttachToComponent(Character->GetMesh()
 								, FAttachmentTransformRules::SnapToTargetIncludingScale
 								, *(AttachSocket + Position));
+	SetOwner(Character);
 	bcheckitem=true;
 //	Multicast_SetPhysicsAndCollision();
 	Multicast_SetCollision();
@@ -104,7 +106,6 @@ void ABaseWeapon::UnEquipCharacterWeapon(const bool IsMain)
 		const FString Position = IsMain ? "_r" : "_l";
 		const FString AttachSocket = "weapon_" +
 			FEnumHelper::GetClassEnumKeyAsString(GetAttachPosition()).ToLower();
-
 		AttachToComponent(Character->GetMesh()
 											, FAttachmentTransformRules::SnapToTargetIncludingScale
 											, *(AttachSocket + Position));

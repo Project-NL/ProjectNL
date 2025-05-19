@@ -281,7 +281,7 @@ void UGA_ComboAttack::ExecuteJumpAttack()
 	// 캐릭터 입력 비활성화
 	if (APlayerController* PlayerController = Cast<APlayerController>(CurrentCharacter->GetController()))
 	{
-    	PlayerController->SetIgnoreMoveInput(true);
+    	PlayerController->SetIgnoreMoveInput(false);
     	//PlayerController->SetIgnoreLookInput(true);
     	UE_LOG(LogTemp, Warning, TEXT("ExecuteJumpAttack: 캐릭터 입력이 차단되었습니다."));
 		// 점프 차단

@@ -22,10 +22,14 @@ void UGE_RegenStamina::Execute_Implementation(const FGameplayEffectCustomExecuti
 		{
 			return;
 		}
-		UPlayerAttributeSet* Attributes = PlayerCharacter->PlayerAttributeSet;
-		if (Attributes && Attributes->Stamina.GetCurrentValue() < Attributes->MaxStamina.GetBaseValue())  // 80 이상이면 회복 X
+		if (PlayerCharacter)
 		{
-			OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(Attributes->GetStaminaAttribute(), EGameplayModOp::Additive, 3.0f));
+			UPlayerAttributeSet* Attributes = PlayerCharacter->PlayerAttributeSet;
+		
+			if (Attributes && Attributes->Stamina.GetCurrentValue() < Attributes->MaxStamina.GetBaseValue())  // 80 이상이면 회복 X
+			{
+				OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(Attributes->GetStaminaAttribute(), EGameplayModOp::Additive, 15.0f));
+			}
 		}
 	}
 }

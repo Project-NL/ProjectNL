@@ -49,8 +49,6 @@ public:
 	void ActiveDeathAbility();
 protected:
 	virtual void BeginPlay() override;
-
-
 	
 	UPROPERTY()
 	TObjectPtr<UNLAbilitySystemComponent> AbilitySystemComponent;
@@ -79,8 +77,6 @@ protected:
 
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override;
 
-
-
 public:
 	virtual void OnDamaged(const FDamagedResponse& DamagedResponse) override;
 	virtual void OnDamagedMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
@@ -94,9 +90,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Entity|Category"
 		, meta = (AllowPrivateAccess = "true"))
 	EEntityCategory EntityType;
-
-
+	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> DeathMontage;
-
 };

@@ -164,10 +164,4 @@ void UGA_Sprint::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGame
 	GetAbilitySystemComponentFromActorInfo()->
 		RemoveActiveGameplayEffectBySourceEffect(RollEffect, GetAbilitySystemComponentFromActorInfo());
 }
-// void UGA_Sprint::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
-// {
-// 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-//
-// 	DOREPLIFETIME(UGA_Sprint, CurrentDirection);
-// 	
-// }
+

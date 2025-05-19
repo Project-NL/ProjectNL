@@ -11,6 +11,7 @@ class UInventoryWidget;
 class UInputAction;
 class ASpawnableItem;
 class UUIManager;
+class ADutorialActor;
 
 UCLASS()
 class PROJECTNL_API ABasePlayerController : public APlayerController
@@ -24,11 +25,17 @@ public:
 
 	void SetNearbyItem(ASpawnableItem* NearbyItem);
 
+	GETTER_SETTER(ADutorialActor*,CurrentTutorialActor);
+
+public:
+	UPROPERTY()
+	ADutorialActor* CurrentTutorialActor;
 private:
 	void TryInteract();
 protected:
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_UseHotSlotItem(int32 ItemSlotInit);
+	void Server_UseHotSlotItem(int32 ItemSlotInit, const TArray<int32>& HotList, 
+	const TArray<FItemMetaInfo>& InvList );
 
 	// TODO: 임시코드로 추후 HUD class에 이전할 필요 있음
 	UPROPERTY(EditDefaultsOnly)
@@ -46,17 +53,18 @@ protected:
 	// 인벤토리 위젯 클래스 (Blueprint에서 지정)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UUserWidget> InventoryWidgetClass;
-
 	// 생성된 인벤토리 위젯 인스턴스
 	UPROPERTY()
 	UUserWidget* InventoryWidget;
-
 	// Enhanced Input용 인벤토리 토글 액션
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	UInputAction* ToggleInventoryAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	UInputAction* AcquireSpawnItem;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	UInputAction* HandleTutorial;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	UInputAction* ToggleFirstHotSlotItem;
@@ -96,5 +104,11 @@ protected:
 	
 	UFUNCTION()
 	void UseHotSlotItem(int32 ItemSlotInit);
+
+	UFUNCTION()
+	void ClientUseHotSlotItem(int32 ItemSlotInit, const TArray<int32>& HotList, 
+	const TArray<FItemMetaInfo>& InvList);
+
+	void HandleNextTutorial();
 	
 };
