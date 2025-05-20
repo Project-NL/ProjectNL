@@ -45,6 +45,10 @@ void ABasePlayerController::BeginPlayingState()
 	PlayerHotslot = CreateWidget<UUserWidget>(this, PlayerHotslotHUDClass);
 	PlayerHotslot->AddToViewport();
 
+		
+	KeyTutorial = CreateWidget<UUserWidget>(this, KeyTutorialHUDClass);
+	KeyTutorial->AddToViewport();
+
 	if (UGameInstance* GameInstance = GetGameInstance())
 	{
 		UIManager = GameInstance->GetSubsystem<UUIManager>();

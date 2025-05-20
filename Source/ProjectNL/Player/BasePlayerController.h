@@ -43,12 +43,18 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> PlayerHotslotHUDClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> KeyTutorialHUDClass;
 	
 	UPROPERTY()
 	UPlayerStatus* PlayerStatus;
 
 	UPROPERTY()
 	UUserWidget* PlayerHotslot;
+
+	UPROPERTY()
+	UUserWidget* KeyTutorial;
 
 	// 인벤토리 위젯 클래스 (Blueprint에서 지정)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
