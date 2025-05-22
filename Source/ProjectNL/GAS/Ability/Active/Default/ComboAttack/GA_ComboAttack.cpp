@@ -78,6 +78,13 @@ void UGA_ComboAttack::EndAbility(const FGameplayAbilitySpecHandle Handle
                                  ActivationInfo, bool bReplicateEndAbility
                                  , bool bWasCancelled)
 {
+	// 1) 남아 있는 애니메이션 태스크 확실히 종료
+	if (AttackAnimTask)
+	{
+		AttackAnimTask->EndTask();
+		AttackAnimTask = nullptr;
+	}
+	
 	ABaseCharacter* CurrentCharacter = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo());
 	check(CurrentCharacter);
 	if (APlayerController* PlayerController = Cast<APlayerController>(CurrentCharacter->GetController()))
