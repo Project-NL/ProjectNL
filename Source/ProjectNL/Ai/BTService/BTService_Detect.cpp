@@ -37,7 +37,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	// 	return;
 	// }//삭제 or 변경 예정
 
-	float DetectRadius = 400.f;//임의 값
+	//float DetectRadius = 400.f;//임의 값
 
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(SCENE_QUERY_STAT(Detect), false, ControllingPawn);

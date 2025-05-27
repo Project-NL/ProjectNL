@@ -55,6 +55,7 @@ protected:
 
 	UPROPERTY()
 	UUserWidget* KeyTutorial;
+	/** ESC 메뉴 위젯 블루프린트 클래스를 에디터에서 지정 */
 
 	// 인벤토리 위젯 클래스 (Blueprint에서 지정)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
@@ -66,6 +67,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	UInputAction* ToggleInventoryAction;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	UInputAction* EscButtonInputAction;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	UInputAction* AcquireSpawnItem;
 
@@ -87,12 +91,15 @@ protected:
 	
 	UPROPERTY()
 	UUIManager* UIManager;
+
+	// Esc입력시 호출될 Esc메뉴 
+	UFUNCTION()
+	void EscMenuWidget();
 	
 	// Tab 키 입력 시 호출될 인벤토리 토글 함수
 	UFUNCTION()
 	void ToggleInventoryWidget();
 
-	// Tab 키 입력 시 호출될 인벤토리 토글 함수
 	UFUNCTION()
 	void UseFirstHotSlotItem();
 

@@ -70,6 +70,15 @@ void ABasePlayerController::SetupInputComponent()
 				&ABasePlayerController::ToggleInventoryWidget
 			);
 		}
+		if (EscButtonInputAction)
+		{
+			EnhancedInputComponent->BindAction(
+				EscButtonInputAction, 
+				ETriggerEvent::Triggered, 
+				this, 
+				&ABasePlayerController::EscMenuWidget
+			);
+		}
 		if (AcquireSpawnItem)
 		{
 			EnhancedInputComponent->BindAction(
@@ -160,6 +169,34 @@ bool ABasePlayerController::Server_UseHotSlotItem_Validate(int32 ItemSlotInit,  
 	const TArray<FItemMetaInfo>& InvList)
 {
 	return true;
+}
+
+void ABasePlayerController::EscMenuWidget(){
+	if (!UIManager)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UIManager not found!"));
+		return;
+	}
+	// 인벤토리 태그 정의
+	FGameplayTag InventoryTag = NlGameplayTags::UI_EscMenu;
+	// 현재 인벤토리 위젯이 열려 있는지 확인 (UIManager에 상태 확인 로직 필요)
+	// 여기서는 Toggle 방식이니까 간단히 Show/Hide로 처리
+	if (UIManager->IsUIActive(InventoryTag)) // IsUIActive는 추가해야 할 함수
+	{
+		//UIManager->HideUI(InventoryTag);
+		UIManager->Deinitialize();
+		// 게임 모드로 입력 전환:w 마우스 커서 숨김
+		FInputModeGameOnly GameInputMode;
+		SetInputMode(GameInputMode);
+		bShowMouseCursor = false;
+	}
+	else
+	{
+		UIManager->ShowUI(InventoryTag);// UI 모드로 입력 전환
+		FInputModeGameAndUI UIInputMode;
+		SetInputMode(UIInputMode);
+		bShowMouseCursor = true;
+	}
 }
 
 void ABasePlayerController::ToggleInventoryWidget()

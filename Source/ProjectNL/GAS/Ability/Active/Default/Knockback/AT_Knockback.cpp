@@ -89,7 +89,7 @@ void UAT_Knockback::TickTask(float DeltaTime)
 	{
 		// 선형 보간 (Lerp)으로 현재 위치를 계산
 		FVector NewLocation = FMath::Lerp(StartLocation, TargetLocation, Alpha);
-		AvatarActor->SetActorLocation(NewLocation);
+		AvatarActor->SetActorLocation(NewLocation,true);
 	}
 
 	// 넉백이 끝났다면 Task 종료

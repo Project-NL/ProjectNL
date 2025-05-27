@@ -17,5 +17,7 @@ public:
 	UBTService_Detect();
 protected:
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	float DetectRadius = 400.f;
 };

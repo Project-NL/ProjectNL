@@ -8,6 +8,7 @@
 #include "ProjectNL/Component/InventoryComponent/EquipInventoryComponent.h"
 #include "ProjectNL/DataTable/ItemInfoData.h"
 #include "ProjectNL/Helper/ItemHelper.h"
+#include "ProjectNL/Weapon/BaseWeapon.h"
 
 void UEquipInventorySlotWidget::SetupSlot(int32 SlotIndex,TArray<FItemMetaInfo>* InventoryList,int32 index)
 {
@@ -66,6 +67,8 @@ void UEquipInventorySlotWidget::EquipItem()
 		if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerController->GetPawn()))
 		{
 			UEquipComponent* EquipComponent = PlayerCharacter->GetEquipComponent();
+			ABaseWeapon* MainWeapon=EquipComponent->GetMainWeapon();
+			FItemMetaInfo* PrevItemMetaInfo =MainWeapon->GetItemMetainfo();
 			// 아이템 장착 로직
 			EquipComponent->EquipWeapon(CurrentItemData.GetShowItemActor(), true);
 			EquipComponent->EquipInventorySlotChangedDelegate.Broadcast();
@@ -73,7 +76,9 @@ void UEquipInventorySlotWidget::EquipItem()
 			// 델리게이트 브로드캐스트
 
 			UEquipInventoryComponent* EquipInventoryComponent = PlayerCharacter->GetEquipInventoryComponent();
+
 			EquipInventoryComponent->RemoveItemMeta(CurrentMetaInfoData);
+			EquipInventoryComponent->AddItemMeta(*PrevItemMetaInfo);
 			OnInventorySlotChanged.Broadcast();
 		}
 	}

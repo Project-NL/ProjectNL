@@ -303,9 +303,8 @@ void UGA_ComboAttack::ExecuteJumpAttack()
         GetEquipComponent()->GetJumpAttackAnim();
 	check(JumpAttackAnim)
 	
-	GetAbilitySystemComponentFromActorInfo()
-		->SetLooseGameplayTagCount(NlGameplayTags::State_Attack_Jump, 1);
-
+	FStateHelper::ChangePlayerState(GetAbilitySystemComponentFromActorInfo(), NlGameplayTags::State_Idle, NlGameplayTags::State_Attack_Jump, true);
+	
     if (IsValid(AttackAnimTask))
     {
         AttackAnimTask->EndTask();

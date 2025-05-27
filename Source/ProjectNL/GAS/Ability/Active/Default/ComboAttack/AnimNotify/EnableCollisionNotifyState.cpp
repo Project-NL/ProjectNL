@@ -2,6 +2,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "ProjectNL/Character/BaseCharacter.h"
+#include "ProjectNL/Character/Enemy/EnemyCharacter.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/Helper/LocateHelper.h"
 #include "ProjectNL/Helper/StateHelper.h"
@@ -284,7 +285,11 @@ void UEnableCollisionNotifyState::ReactToHitActor(AActor* Owner, ABaseWeapon* We
             if (!HitActors.Contains(HitActor))
             {
                 HitActors.Add(HitActor);
-                ABaseCharacter* TargetCharacter = Cast<ABaseCharacter>(HitActor);
+                AEnemyCharacter* TargetCharacter = Cast<AEnemyCharacter>(HitActor);
+                if (!TargetCharacter)
+                {
+                    return;
+                }
                 // 적에게 충돌 시 효과 적용
                 if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetCharacter))
                 {

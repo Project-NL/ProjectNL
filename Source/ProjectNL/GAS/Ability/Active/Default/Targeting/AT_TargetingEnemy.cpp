@@ -12,6 +12,7 @@
 #include "ProjectNL/Component/CameraComponent/PlayerCameraComponent.h"
 #include "ProjectNL/Component/CameraComponent/PlayerSpringArmComponent.h"
 #include "ProjectNL/GAS/Attribute/BaseAttributeSet.h"
+#include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
 
 UAT_TargetingEnemy* UAT_TargetingEnemy::InitialEvent(UGameplayAbility* OwningAbility,TSubclassOf<UGameplayEffect> TargetingSpeedEffect)
@@ -92,6 +93,17 @@ void UAT_TargetingEnemy::TargetNearestEnemy()
 		
 		if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetAvatarActor()))
 		{
+			
+			AEnemyCharacter* EnemyCharacter =Cast<AEnemyCharacter>(NearestEnemy);
+			if (!EnemyCharacter)
+			{
+				return;
+			}
+			UBaseAttributeSet* Attributes = EnemyCharacter->EnemyAttributeSet;
+			if (Attributes->GetHealth()<=0)
+			{
+				return;
+			}
 			PlayerCharacter->SetTargetingCharacter(Cast<AEnemyCharacter>(NearestEnemy));
 			if (UAbilitySystemComponent* ASC = PlayerCharacter->GetAbilitySystemComponent())
 			{
@@ -162,7 +174,7 @@ AActor* UAT_TargetingEnemy::FindNearestTarget() const
 			CollisionShape,
 			QueryParams
 		);
-
+		
 		// 겹친 액터가 있는 경우
 		if (bOverlapped)
 		{

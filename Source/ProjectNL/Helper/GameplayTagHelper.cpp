@@ -91,6 +91,7 @@ namespace NlGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(UI, "UI", "UI관련 최상위 트리 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(UI_Inventory, "UI.Inventory", "UI관련 인벤토리");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(UI_GameMenu, "UI.GameMenu", "UI관련 게임메뉴");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(UI_EscMenu, "UI.EscMenu", "UI관련 ESC메뉴");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(UI_ItemDescriptionPanel, "UI.ItemDescriptionPanel", "UI관련 아이템 설명 패널");
 
 }

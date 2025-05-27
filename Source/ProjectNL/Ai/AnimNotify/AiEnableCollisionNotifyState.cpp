@@ -8,6 +8,7 @@
 #include "ProjectNL/Weapon/BaseWeapon.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/World.h"
+#include "ProjectNL/Character/Player/PlayerCharacter.h"
 #include "ProjectNL/GAS/Ability/Active/Default/Action/GA_Action.h"
 #include "ProjectNL/Helper/AbilityHelper.h"
 
@@ -292,7 +293,11 @@ void UAiEnableCollisionNotifyState::ReactToHitActor(
 			{
 				HitActors.Add(HitActor);
 
-				ABaseCharacter* TargetCharacter = Cast<ABaseCharacter>(HitActor);
+				APlayerCharacter* TargetCharacter = Cast<APlayerCharacter>(HitActor);
+				if (!TargetCharacter)
+				{
+					return;
+				}
 				if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(
 					TargetCharacter))
 				{
