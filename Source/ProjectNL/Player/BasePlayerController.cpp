@@ -199,6 +199,32 @@ void ABasePlayerController::EscMenuWidget(){
 	}
 }
 
+void ABasePlayerController::InteractWidget(FGameplayTag UITag )
+{
+	if (!UIManager)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UIManager not found!"));
+		return;
+	}
+	// 여기서는 Toggle 방식이니까 간단히 Show/Hide로 처리
+	if (UIManager->IsUIActive(UITag)) // IsUIActive는 추가해야 할 함수
+	{
+		//UIManager->HideUI(InventoryTag);
+		UIManager->Deinitialize();
+		// 게임 모드로 입력 전환:w 마우스 커서 숨김
+		FInputModeGameOnly GameInputMode;
+		SetInputMode(GameInputMode);
+		bShowMouseCursor = false;
+	}
+	else
+	{
+		UIManager->ShowUI(UITag);// UI 모드로 입력 전환
+		FInputModeGameAndUI UIInputMode;
+		SetInputMode(UIInputMode);
+		bShowMouseCursor = true;
+	}
+}
+
 void ABasePlayerController::ToggleInventoryWidget()
 {
 	if (!UIManager)

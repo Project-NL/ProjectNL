@@ -32,4 +32,7 @@ protected:
 	
 	UFUNCTION()
 	void OnCancelled(FGameplayTag EventTag, FGameplayEventData EventData);
+
+	UPROPERTY()
+	TObjectPtr<UPlayMontageWithEvent> AnimDodgeTask;
 };

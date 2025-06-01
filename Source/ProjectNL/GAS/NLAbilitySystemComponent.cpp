@@ -1,5 +1,4 @@
 ﻿#include "NLAbilitySystemComponent.h"
-
 #include "AbilitySystemGlobals.h"
 #include "NLAbilitySystemInitializationData.h"
 #include "Ability/Utility/BaseInputTriggerAbility.h"
@@ -88,10 +87,7 @@ void UNLAbilitySystemComponent::InitializeAbilitySystem(
 
 void UNLAbilitySystemComponent::ReceiveDamage(const FDamagedResponse& DamagedResponse) const
 {
-	
 //	OnDamageStartedNotified.Broadcast(DamagedResponse);
-
-	
 	// TODO: 추후 데미지 제공한 Causer도 같이 전송해도 무방할 듯
 	OnDamageReactNotified.Broadcast(DamagedResponse);
 	if (DamagedResponse.IsHitStop)
@@ -100,6 +96,7 @@ void UNLAbilitySystemComponent::ReceiveDamage(const FDamagedResponse& DamagedRes
 		Param.AbilityLevel = DamagedResponse.Damage / LevelByDamaged;
 		Param.EffectCauser = DamagedResponse.SourceActor;
 		const_cast<UNLAbilitySystemComponent*>(this)->ExecuteGameplayCue(NlGameplayTags::GameplayCue_Utility_HitStop, Param);
+
 	}
 }
 

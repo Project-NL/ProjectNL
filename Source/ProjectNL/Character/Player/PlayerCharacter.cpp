@@ -19,6 +19,7 @@
 #include "ProjectNL/Helper/StateHelper.h"
 #include "ProjectNL/Player/BasePlayerController.h"
 
+
 APlayerCharacter::APlayerCharacter()
 {
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -81,7 +82,7 @@ void APlayerCharacter::OnRep_PlayerState()
 		AbilitySystemComponent->OnDamageReactNotified
 		                      .AddDynamic(this, &APlayerCharacter::OnDamaged);
 
-		//AbilitySystemComponent->OnDeathReactNotified.AddDynamic(this, &APlayerCharacter::Die);
+		AbilitySystemComponent->OnDeathReactNotified.AddDynamic(this, &APlayerCharacter::Die);
 
 		if (AbilitySystemComponent && RegenEffect)
 		{
@@ -95,7 +96,7 @@ void APlayerCharacter::OnRep_PlayerState()
 		}
 		
 		EquipInventoryComponent->InitializeData();
-
+		//NlGameplayTags::AddGameplayTag(AbilitySystemComponent, NlGameplayTags::Status_Invincibile, 1, true);//
 		
 		Initialize();
 	}
@@ -123,7 +124,7 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 
 		AbilitySystemComponent->OnDamageReactNotified
 		.AddDynamic(this, &ThisClass::APlayerCharacter::OnDamaged);
-		//AbilitySystemComponent->OnDeathReactNotified.AddDynamic(this, &ThisClass::APlayerCharacter::Die);
+		AbilitySystemComponent->OnDeathReactNotified.AddDynamic(this, &ThisClass::APlayerCharacter::Die);
 		PlayerAttributeSet->OnOutOfHealth.AddDynamic(this, &APlayerCharacter::Death);
 
 		if (AbilitySystemComponent && RegenEffect)
@@ -138,6 +139,7 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 		}
 		EquipInventoryComponent->InitializeData();
 		Initialize();
+		//NlGameplayTags::AddGameplayTag(AbilitySystemComponent, NlGameplayTags::Status_Invincibile, 1, true);//
 	}
 }
 
@@ -212,32 +214,33 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-// void APlayerCharacter::Die()
-// {
-// 	FString RoleString;
-// 	switch (GetLocalRole())
-// 	{
-// 	case ROLE_Authority:
-// 		RoleString = TEXT("Authority (Server)");
-// 		break;
-// 	case ROLE_AutonomousProxy:
-// 		RoleString = TEXT("AutonomousProxy (Client)");
-// 		break;
-// 	case ROLE_SimulatedProxy:
-// 		RoleString = TEXT("SimulatedProxy (Replicated Client)");
-// 		break;
-// 	default:
-// 		RoleString = TEXT("Unknown Role");
-// 		break;
-// 	}
-//
-// 	UE_LOG(LogTemp, Warning, TEXT("Die() called on %s. Role: %s"), *GetName(), *RoleString);
-//
-// 	ActiveDeathAbility();
-// }
+void APlayerCharacter::Die()
+{
+	FString RoleString;
+	switch (GetLocalRole())
+	{
+	case ROLE_Authority:
+		RoleString = TEXT("Authority (Server)");
+		break;
+	case ROLE_AutonomousProxy:
+		RoleString = TEXT("AutonomousProxy (Client)");
+		break;
+	case ROLE_SimulatedProxy:
+		RoleString = TEXT("SimulatedProxy (Replicated Client)");
+		break;
+	default:
+		RoleString = TEXT("Unknown Role");
+		break;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Die() called on %s. Role: %s"), *GetName(), *RoleString);
+
+	ActiveDeathAbility();
+}
 
 void APlayerCharacter::OnDamaged(const FDamagedResponse& DamagedResponse)
 {
+//	NlGameplayTags::RemoveGameplayTag(AbilitySystemComponent,NlGameplayTags::Status_Invincibile,1,true);
 	NlGameplayTags::RemoveMeAndAllChildGameplayTag(AbilitySystemComponent, NlGameplayTags::State, true);
 	NlGameplayTags::SetGameplayTag(AbilitySystemComponent, NlGameplayTags::State_Idle, 1, true);
 	if (PlayerAttributeSet)
@@ -314,7 +317,13 @@ void APlayerCharacter::OnDamagedMontageEnded(UAnimMontage* Montage, bool bInterr
 void APlayerCharacter::Death()
 {
 
-	//ActiveDeathAbility();
+	ABasePlayerController* PlayerController = Cast<ABasePlayerController>(GetController());
+	if (!PlayerController)
+	{
+		return;
+	}
+	PlayerController->InteractWidget(NlGameplayTags::UI_RestartMenu);
+	ActiveDeathAbility();
 }
 
 UEquipInventoryComponent* APlayerCharacter::GetEquipInventoryComponent()

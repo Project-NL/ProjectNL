@@ -49,8 +49,6 @@ public:
 	
 	void ReceiveDamage(const FDamagedResponse& DamagedResponse) const;
 
-
-
 	GETTER_SETTER(bool, IsInitialized)
 
 	FOnDamageStartedNotifiedSignature OnDamageStartedNotified;

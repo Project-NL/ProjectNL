@@ -1,6 +1,7 @@
 ﻿#include "BaseAttributeSet.h"
 #include "Net/UnrealNetwork.h"
 #include "ProjectNL/Character/BaseCharacter.h"
+#include "ProjectNL/Helper/GameplayTagHelper.h"
 
 void UBaseAttributeSet::OnRepHealth(const FGameplayAttributeData& OldHealth)
 {
@@ -9,9 +10,7 @@ void UBaseAttributeSet::OnRepHealth(const FGameplayAttributeData& OldHealth)
 	UNLAbilitySystemComponent* ASC = Cast<UNLAbilitySystemComponent>(GetOwningAbilitySystemComponent());
 	if (Health.GetCurrentValue()<=0)
 	{
-		
-		//	ASC->OnDeathReactNotified.Broadcast();
-			
+		ASC->OnDeathReactNotified.Broadcast();
 	}
 }
 
@@ -123,11 +122,16 @@ void UBaseAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
 	{
 		NewValue = FMath::Min(NewValue, GetMaxHealth());
 
-		// if ((GetHealth() <= 0.0f) )
-		// {
-		// 	//Data.Target.AddLooseGameplayTag(ABTAG_CHARACTER_ISDEAD);
-		// 	OnOutOfHealth.Broadcast();
-		// }
+		if ((GetHealth() <= 0.0f) )
+		{
+			UNLAbilitySystemComponent* ASC = Cast<UNLAbilitySystemComponent>(GetOwningAbilitySystemComponent());
+			if (ASC->HasMatchingGameplayTag(NlGameplayTags::Status_Invincibile))
+			{
+				return;
+			}
+			//Data.Target.AddLooseGameplayTag(ABTAG_CHARACTER_ISDEAD);
+			OnOutOfHealth.Broadcast();
+		}
 	}
 
 	
@@ -153,6 +157,10 @@ void UBaseAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute,
 			//BaseCharacter->ActiveDeathAbility();
 			//ASC->OnDeathReactNotified.Broadcast();
 			//Data.Target.AddLooseGameplayTag(ABTAG_CHARACTER_ISDEAD);
+			if (ASC->HasMatchingGameplayTag(NlGameplayTags::Status_Invincibile))
+			{
+				return;
+			}
 			OnOutOfHealth.Broadcast();
 		}
 	}

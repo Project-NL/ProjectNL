@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/PlayerController.h"
 #include "ProjectNL/Helper/UtilHelper.h"
 #include "BasePlayerController.generated.h"
@@ -24,12 +25,14 @@ public:
 	virtual void SetupInputComponent() override;
 
 	void SetNearbyItem(ASpawnableItem* NearbyItem);
-
+	void InteractWidget(FGameplayTag UITag);
 	GETTER_SETTER(ADutorialActor*,CurrentTutorialActor);
 
 public:
 	UPROPERTY()
 	ADutorialActor* CurrentTutorialActor;
+
+	
 private:
 	void TryInteract();
 protected:

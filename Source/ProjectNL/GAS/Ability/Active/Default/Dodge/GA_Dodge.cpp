@@ -27,11 +27,11 @@ void UGA_Dodge::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 		{
 			SetCurrentMontage(StepAnim);
 				
-			UPlayMontageWithEvent* Task = UPlayMontageWithEvent::InitialEvent(this,
+			AnimDodgeTask = UPlayMontageWithEvent::InitialEvent(this,
 							NAME_None, GetCurrentMontage(), FGameplayTagContainer());
-			Task->OnCancelled.AddDynamic(this, &ThisClass::OnCancelled);
-			Task->OnCompleted.AddDynamic(this, &ThisClass::OnCompleted);
-			Task->ReadyForActivation();
+			AnimDodgeTask->OnCancelled.AddDynamic(this, &ThisClass::OnCancelled);
+			AnimDodgeTask->OnCompleted.AddDynamic(this, &ThisClass::OnCompleted);
+			AnimDodgeTask->ReadyForActivation();
 		} else
 		{
 			EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo,
@@ -47,6 +47,12 @@ void UGA_Dodge::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 void UGA_Dodge::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
+	if (IsValid(AnimDodgeTask))
+	{
+		AnimDodgeTask->EndTask();
+		AnimDodgeTask = nullptr;
+	}
+
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 

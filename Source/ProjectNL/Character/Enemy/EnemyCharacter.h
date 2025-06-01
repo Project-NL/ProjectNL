@@ -25,6 +25,9 @@ public:
 	// 아이템 위에 표시할 3D Widget
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	UWidgetComponent* WidgetComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	UWidgetComponent* BossWidgetComonent;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -58,6 +61,15 @@ private:
 
 	UPROPERTY()
 	UEnemyStatus* EnemyStatus;
+
+	// 화면에 띄울 위젯 블루프린트 클래스
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UEnemyStatus> BossEnemyStatusWidgetClass;
+
+	// 생성된 위젯 인스턴스
+	UPROPERTY(EditAnywhere)
+	UEnemyStatus* BossEnemyStatusWidget = nullptr;
+
 
 
 };

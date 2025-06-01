@@ -38,12 +38,14 @@ AEnemyCharacter::AEnemyCharacter()
 	// 시작 시에는 보이지 않도록 설정
 	WidgetComponent->SetVisibility(true);
 
+
+
 	bReplicates = true;
 
 	// DetectionSphere 생성
 	DetectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DetectionSphere"));
 	DetectionSphere->SetupAttachment(RootComponent);
-	DetectionSphere->InitSphereRadius(800.f);               // 범위: 800cm
+	DetectionSphere->InitSphereRadius(3000.f);               // 범위: 800cm
 	DetectionSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
 	DetectionSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
   
@@ -65,7 +67,22 @@ void AEnemyCharacter::OnPlayerEnter(UPrimitiveComponent* OverlappedComp, AActor*
 	if (Cast<APlayerCharacter>(OtherActor) && WidgetComponent)
 	{
 		WidgetComponent->SetVisibility(true);
+		// 아직 위젯이 없으면 생성
 	}
+
+
+	if (BossEnemyStatusWidget)
+	{
+		APlayerCharacter* PlayerCharacter=Cast<APlayerCharacter>(OtherActor);
+		if (!PlayerCharacter)
+		{
+			return;
+		}
+	//	NlGameplayTags::RemoveGameplayTag(PlayerCharacter->GetAbilitySystemComponent(),NlGameplayTags::Status_Invincibile,1,true);
+		BossEnemyStatusWidget->AddToViewport();
+		BossEnemyStatusWidget->SetBaseCharacter(this);
+	}
+	
 }
 
 void AEnemyCharacter::OnPlayerExit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -74,6 +91,12 @@ void AEnemyCharacter::OnPlayerExit(UPrimitiveComponent* OverlappedComp, AActor* 
 	if (Cast<APlayerCharacter>(OtherActor) && WidgetComponent)
 	{
 		WidgetComponent->SetVisibility(false);
+
+		if (BossEnemyStatusWidget)
+		{
+			BossEnemyStatusWidget->RemoveFromParent();
+			BossEnemyStatusWidget = nullptr;
+		}
 	}
 }
 void AEnemyCharacter::BeginPlay()
@@ -97,6 +120,7 @@ void AEnemyCharacter::BeginPlay()
 	{
 		return;
 	}
+
 	// ✅ 기존 위젯을 제거하고 개별적으로 생성
 	if (WidgetComponent)
 	{
@@ -105,6 +129,7 @@ void AEnemyCharacter::BeginPlay()
 
 		// 새로운 위젯 생성
 		EnemyStatus = CreateWidget<UEnemyStatus>(GetWorld(), EnemyStatusHUDClass);
+		EnemyStatus = CreateWidget<UEnemyStatus>(GetWorld(), EnemyStatusHUDClass);
 		if (EnemyStatus)
 		{
 			EnemyStatus->SetBaseCharacter(this);  // ✅ 개별 캐릭터 연결
@@ -112,6 +137,8 @@ void AEnemyCharacter::BeginPlay()
 			WidgetComponent->SetVisibility(false);
 		}
 	}
+
+	
 }
 
 void AEnemyCharacter::Tick(float DeltaTime)

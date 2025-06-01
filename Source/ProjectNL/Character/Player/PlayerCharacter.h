@@ -43,6 +43,7 @@ protected:
 
 	void MoveTo(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void Die();
 
 private:
 	UFUNCTION()
@@ -91,6 +92,8 @@ private:
 	// 타겟 위젯 클래스
 	UPROPERTY(EditDefaultsOnly, Category = "Target System")
 	TSubclassOf<UUserWidget> LockedOnWidgetClass;
+
+	
 	// 생성된 위젯 컴포넌트
 	UPROPERTY()
 	class UWidgetComponent* LockOnWidgetComponent;

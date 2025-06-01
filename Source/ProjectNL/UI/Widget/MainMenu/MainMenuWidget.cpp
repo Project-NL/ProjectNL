@@ -52,6 +52,22 @@ void UMainMenuWidget::OnJoinButtonClicked()
 }
 void UMainMenuWidget::JoinServer(const FString& IPAddress)
 {
+	if (IPAddress.IsEmpty())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("JoinServer: IP address is empty. Join canceled."));
+		return;
+	}
+
+	// 간단한 IP 주소 형식 검사 (예: 127.0.0.1:7777)
+	FString Pattern = TEXT("^(\\d{1,3}\\.){3}\\d{1,3}(:\\d+)?$");
+	const FRegexPattern RegexPattern(Pattern);
+	FRegexMatcher Matcher(RegexPattern, IPAddress);
+	if (!Matcher.FindNext())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("JoinServer: Invalid IP address format."));
+		return;
+	}
+
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	if (PlayerController)
 	{

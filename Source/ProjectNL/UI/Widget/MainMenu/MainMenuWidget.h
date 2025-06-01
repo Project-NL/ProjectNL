@@ -17,7 +17,7 @@ class PROJECTNL_API UMainMenuWidget : public UUserWidget
 	GENERATED_BODY()
 		
 public:
-	void NativeOnInitialized();
+	virtual void NativeOnInitialized() override;
 	// 서버 생성
 	UFUNCTION()
 	void HostServer();

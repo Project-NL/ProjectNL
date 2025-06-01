@@ -77,6 +77,7 @@ namespace NlGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_Dodge, "Status.Dodge", "특정 캐릭터가 현재 닷지중 인 상태임을 의미함");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_UnderAttack, "Status.UnderAttack", "특정 캐릭터가 현재 공격 당하는 중 인 상태임을 의미함");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_DrinkPotion, "Status.DrinkPotion", "특정 캐릭터가 현재 포션을 마시는 상태임을 의미함");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_Invincibile, "Status.Invincibile", "특정 캐릭터가 현재 무적인 상태임을 의미함");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_Utility_HitStop, "GameplayCue.Utility.HitStop", "실행 시 잠시 캐릭터들이 멈췄다가 다시 실행되는 구조");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_Particle_SwordHit, "GameplayCue.Particle.SwordHit", "히트 시 파티클 이펙트 발동");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(GameplayCue_Particle_SwordGaurdHit, "GameplayCue.Particle.SwordGaurdHit", "히트 시 파티클 가드이펙트 발동");
@@ -92,6 +93,7 @@ namespace NlGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(UI_Inventory, "UI.Inventory", "UI관련 인벤토리");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(UI_GameMenu, "UI.GameMenu", "UI관련 게임메뉴");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(UI_EscMenu, "UI.EscMenu", "UI관련 ESC메뉴");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(UI_RestartMenu, "UI.RestartMenu", "UI관련 Restart메뉴");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(UI_ItemDescriptionPanel, "UI.ItemDescriptionPanel", "UI관련 아이템 설명 패널");
 
 }

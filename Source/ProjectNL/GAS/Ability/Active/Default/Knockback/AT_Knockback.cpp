@@ -1,82 +1,98 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "ProjectNL/GAS/Ability/Active/Default/Knockback/AT_Knockback.h"
 #include "GameFramework/Actor.h"
 #include "Abilities/GameplayAbility.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
+#include "Kismet/KismetMathLibrary.h"
 
-UAT_Knockback* UAT_Knockback::InitialEvent(UGameplayAbility* OwningAbility, FDamagedResponse& DamageResponse,float DamageMontageLength)
+UAT_Knockback* UAT_Knockback::InitialEvent(UGameplayAbility* OwningAbility, FDamagedResponse& DamageResponse, float DamageMontageLength)
 {
-	// AbilityTask를 생성할 때 호출하는 정적 함수
 	UAT_Knockback* MyTask = NewAbilityTask<UAT_Knockback>(OwningAbility);
-
 	MyTask->DamagedResponse = DamageResponse;
-
-		MyTask->KnockbackDuration=DamageMontageLength*0.4;
-	
-
-
+	MyTask->KnockbackDuration = DamageMontageLength * 0.4f;
 	return MyTask;
 }
+
 void UAT_Knockback::Activate()
 {
 	Super::Activate();
-	// AvatarActor(일반적으로 Character나 Pawn)를 가져온다.
+
 	AActor* AvatarActor = GetAvatarActor();
-	
 	if (!AvatarActor)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UAT_KnockbackAvatarActor 실패."));
+		UE_LOG(LogTemp, Warning, TEXT("UAT_Knockback: AvatarActor 실패."));
 		OnCanceled.Broadcast();
-		EndTask();  // 에러 처리
+		EndTask();
 		return;
 	}
-	// 공격자(혹은 소스) 액터
+
 	AActor* SourceActor = DamagedResponse.SourceActor;
 	if (!SourceActor)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UAT_KnockbackSourceActor 실패."));
+		UE_LOG(LogTemp, Warning, TEXT("UAT_Knockback: SourceActor 실패."));
 		OnCanceled.Broadcast();
-		EndTask();  
+		EndTask();
 		return;
 	}
-	// 넉백 시작 위치(피격자의 현재 위치)
-	StartLocation = AvatarActor->GetActorLocation();
 
-	// 소스 -> 대상 방향 벡터 구하기
-	// (만약 반대로, 대상->소스 방향으로 밀어내고 싶다면 부호를 반대로 해주세요)
+	StartLocation = AvatarActor->GetActorLocation();
 	FVector SourceLocation = SourceActor->GetActorLocation();
 	FVector AvatarLocation = AvatarActor->GetActorLocation();
-
-	// 방향 벡터: 소스에서 대상 쪽
 	FVector KnockbackDir = (AvatarLocation - SourceLocation).GetSafeNormal();
 
-	// 넉백 목표 지점 = 시작 위치 + (방향 벡터 × 거리)
-	// 여기서는 예시로 DamagedResponse.Damage를 곱해 넉백 거리로 사용
-	// (필요에 따라 별도의 KnockDistance 변수를 두어도 됩니다)
-	if (AbilitySystemComponent->HasMatchingGameplayTag(NlGameplayTags::Status_Guard))
-	{
-		TargetLocation = StartLocation + (KnockbackDir * DamagedResponse.Damage*0.3);
-	}
-	else
-	{
-		TargetLocation = StartLocation + (KnockbackDir * DamagedResponse.Damage);
-	}
-	
+	// 기본 넉백 거리
+	float KnockbackDistance = DamagedResponse.Damage;
 
-	// 넉백 타이머/시간 계산 등에 사용하기 위한 초기화
+	// 가드 상태 여부 확인
+	bool bIsGuarding = AbilitySystemComponent->HasMatchingGameplayTag(NlGameplayTags::Status_Guard);
+	bool bInGuardAngle = false;
+
+	if (bIsGuarding)
+	{
+		FVector Forward = AvatarActor->GetActorForwardVector();
+		FVector ToSource = (SourceActor->GetActorLocation() - AvatarActor->GetActorLocation()).GetSafeNormal();
+
+		float Dot = FVector::DotProduct(Forward, ToSource);
+		float AngleDeg = FMath::Acos(Dot) * (180.f / PI);
+
+		if (AngleDeg <= 60.f)
+		{
+			bInGuardAngle = true;
+			UE_LOG(LogTemp, Warning, TEXT("유효 가드: 각도 %f도"), AngleDeg);
+		}
+		else
+		{
+			
+			TArray<FGameplayAbilitySpec> ActiveAbilities = AbilitySystemComponent->GetActivatableAbilities();
+			for (FGameplayAbilitySpec AbilitySpec : ActiveAbilities)
+			{
+				if (AbilitySpec.Ability && AbilitySpec.Ability->AbilityTags.HasTagExact(NlGameplayTags::Status_Guard))
+				{
+					AbilitySystemComponent->CancelAbilityHandle(AbilitySpec.Handle);
+				}
+			}
+			UE_LOG(LogTemp, Warning, TEXT("가드 각도 벗어남: %f도 → 일반 넉백"), AngleDeg);
+		}
+	}
+
+	if (bIsGuarding && bInGuardAngle)
+	{
+		// 유효 가드: 넉백 거리 감소
+		KnockbackDistance *= 0.3f;
+	}
+
+	TargetLocation = StartLocation + (KnockbackDir * KnockbackDistance);
+
 	ElapsedTime = 0.f;
 	bKnockbackActive = true;
-
-	// TickTask를 계속 호출할 수 있게끔 설정 (AbilityTask를 매 프레임 갱신)
 	bTickingTask = true;
 }
 
 void UAT_Knockback::TickTask(float DeltaTime)
 {
 	Super::TickTask(DeltaTime);
-	UE_LOG(LogTemp, Warning, TEXT("UAT_Knockback TickTask 성공."));
+
 	if (!bKnockbackActive)
 	{
 		return;
@@ -87,16 +103,14 @@ void UAT_Knockback::TickTask(float DeltaTime)
 
 	if (AActor* AvatarActor = GetAvatarActor())
 	{
-		// 선형 보간 (Lerp)으로 현재 위치를 계산
 		FVector NewLocation = FMath::Lerp(StartLocation, TargetLocation, Alpha);
-		AvatarActor->SetActorLocation(NewLocation,true);
+		AvatarActor->SetActorLocation(NewLocation, true);
 	}
 
-	// 넉백이 끝났다면 Task 종료
 	if (Alpha >= 1.f)
 	{
 		bKnockbackActive = false;
-		EndTask();
 		OnCanceled.Broadcast();
+		EndTask();
 	}
 }
