@@ -6,6 +6,8 @@
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "ProjectNL/Helper/GameplayTagHelper.h"
+#include "ProjectNL/UI/Manager/UIManager.h"
 
 void URestartMenuWidget::NativeOnInitialized()
 {
@@ -31,13 +33,29 @@ void URestartMenuWidget::OnQuitButtonClicked()
 
 void URestartMenuWidget::OnRespawnButtonClicked()
 {
-	// 현재 레벨 이름을 가져와서 다시 로드
+	if (APlayerController* PC = GetOwningPlayer())          // 위젯을 띄웠던 컨트롤러
+	{
+		// 1) UI 전용 → 게임 전용으로 복구
+		PC->SetInputMode(FInputModeGameOnly());
+		PC->bShowMouseCursor = false;
+
+		// 혹시 메뉴 열 때 Look/Move 입력을 막았다면 다시 풀기
+		PC->SetIgnoreLookInput(false);
+		PC->SetIgnoreMoveInput(false);
+	}
+
+	RemoveFromParent();   // 위젯 닫기
+
+	// 2) 레벨 다시 로드
 	UWorld* World = GetWorld();
 	if (!World) return;
 
 	FString CurrentLevel = World->GetMapName();
-	// MapName 에 접두사(UEDPIE_X_)가 붙는 경우 제거
 	CurrentLevel.RemoveFromStart(World->StreamingLevelsPrefix);
-
+	if (UGameInstance* GameInstance = GetGameInstance())
+	{
+		UUIManager* UIManager = GameInstance->GetSubsystem<UUIManager>();
+		UIManager->Deinitialize();
+	}
 	UGameplayStatics::OpenLevel(this, FName(*CurrentLevel));
 }

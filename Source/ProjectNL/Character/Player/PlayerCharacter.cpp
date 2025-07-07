@@ -38,9 +38,18 @@ APlayerCharacter::APlayerCharacter()
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	if (GetMesh())
+	{
+		GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	}
+	
 	//플레이어 스프링 암을 만듭니다
 	PlayerCameraSpringArm = CreateDefaultSubobject<UPlayerSpringArmComponent>(TEXT("PlayerCameraSpringArm"));
 	PlayerCameraSpringArm->SetupAttachment(RootComponent);
+	PlayerCameraSpringArm->bDoCollisionTest = true;    // 충돌 시 카메라 앞으로 당김
+	PlayerCameraSpringArm->ProbeSize        = 12.f;    // 캡슐보다 살짝 작게
+	PlayerCameraSpringArm->ProbeChannel     = ECC_Camera;
 	PlayerCameraSpringArm->TargetArmLength = 400.0f;
 	PlayerCameraSpringArm->bUsePawnControlRotation = true;
 
@@ -94,9 +103,19 @@ void APlayerCharacter::OnRep_PlayerState()
 				AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
 			}
 		}
+		// if (AbilitySystemComponent && InvincibilityEffect)
+		// {
+		// 	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+		// 	FGameplayEffectSpecHandle EffectSpec = AbilitySystemComponent->MakeOutgoingSpec(InvincibilityEffect, 1.0f, EffectContext);
+  //       
+		// 	if (EffectSpec.IsValid())
+		// 	{
+		// 		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
+		// 	}
+		// }
 		
 		EquipInventoryComponent->InitializeData();
-		//NlGameplayTags::AddGameplayTag(AbilitySystemComponent, NlGameplayTags::Status_Invincibile, 1, true);//
+	
 		
 		Initialize();
 	}
@@ -137,9 +156,20 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 				AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
 			}
 		}
+		// if (AbilitySystemComponent && InvincibilityEffect)
+		// {
+		// 	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+		// 	FGameplayEffectSpecHandle EffectSpec = AbilitySystemComponent->MakeOutgoingSpec(InvincibilityEffect, 1.0f, EffectContext);
+  //       
+		// 	if (EffectSpec.IsValid())
+		// 	{
+		// 		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
+		// 	}
+		// }
+		
 		EquipInventoryComponent->InitializeData();
 		Initialize();
-		//NlGameplayTags::AddGameplayTag(AbilitySystemComponent, NlGameplayTags::Status_Invincibile, 1, true);//
+	//	NlGameplayTags::AddGameplayTag(AbilitySystemComponent, NlGameplayTags::Status_Invincibile, 1, true);//
 	}
 }
 
@@ -157,6 +187,7 @@ void APlayerCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+	
 //	Die();
 }
 
@@ -246,7 +277,7 @@ void APlayerCharacter::OnDamaged(const FDamagedResponse& DamagedResponse)
 	if (PlayerAttributeSet)
 	{
 		// 플레이어의 경우 스테미나가 30 이상 있어야만 Block 스킬이 발동.
-		if (AbilitySystemComponent->HasMatchingGameplayTag(NlGameplayTags::Status_Guard))
+		if (AbilitySystemComponent->HasMatchingGameplayTag(NlGameplayTags::Status_GuardReady))
 			{
 				if (PlayerAttributeSet->GetStamina() > 30)
 				{
@@ -373,4 +404,23 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(APlayerCharacter, TargetingCharacter);
+}
+/* 2초 뒤 실행 */
+void APlayerCharacter::UnlockInput()
+{
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		/* 1) 입력 다시 허용 */
+		PC->SetIgnoreMoveInput(false);
+		PC->SetIgnoreLookInput(false);
+		PC->bShowMouseCursor = true;   // 필요하면 다시 표시
+
+		/* 2) 이제야 매핑 컨텍스트 추가 */
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
+			ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+				PC->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
 }

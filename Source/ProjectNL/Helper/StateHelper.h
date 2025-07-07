@@ -125,7 +125,7 @@ public:
 
 	FORCEINLINE static bool IsPlayerStatusGuard(const UAbilitySystemComponent* Ability)
 	{
-		return Ability->HasMatchingGameplayTag(NlGameplayTags::Status_Guard);
+		return Ability->HasMatchingGameplayTag(NlGameplayTags::Status_GuardReady);
 	}
 
 	FORCEINLINE static void ChangePlayerState(UAbilitySystemComponent* Ability

@@ -50,4 +50,8 @@ public:
 	/** 튜토리얼 넘어갈 때 재생할 사운드 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial|Sound")
 	USoundBase* NextTutorialSound;
+
+	/** 플레이어가 Overlap 시 적용할 Gameplay Effect 클래스 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect")
+	TSubclassOf<class UGameplayEffect> OverlapGameplayEffect;
 };

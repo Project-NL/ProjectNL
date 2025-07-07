@@ -16,7 +16,20 @@ void UGA_DrinkPotion::SetPotionItem(APotionItem* potionItem)
 {
 	PotionItem = potionItem;
 }
-
+bool UGA_DrinkPotion::CanActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayTagContainer* SourceTags,
+	const FGameplayTagContainer* TargetTags,
+	FGameplayTagContainer* OptionalRelevantTags) const
+{
+	// 이미 Active 상태면 거부
+	if (IsActive())
+	{
+		return false;
+	}
+	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
+}
 void UGA_DrinkPotion::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
                                       const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
                                       const FGameplayEventData* TriggerEventData)

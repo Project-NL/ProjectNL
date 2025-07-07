@@ -200,9 +200,10 @@ void ASpawnableItem::OnRep_CollisionBox()
     UE_LOG(LogTemp, Error, TEXT("OnRep_CollisionBox 발동."));
 }
 
-void ASpawnableItem::UseItem(APlayerCharacter* playerCharacter)
+bool ASpawnableItem::UseItem(APlayerCharacter* playerCharacter)
 {
     Multicast_SetCollision();
+    return true;
     // 아이템 사용 로직이 있다면 여기에 작성
 }
 

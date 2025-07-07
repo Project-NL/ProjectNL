@@ -45,7 +45,7 @@ void UAT_Knockback::Activate()
 	float KnockbackDistance = DamagedResponse.Damage;
 
 	// 가드 상태 여부 확인
-	bool bIsGuarding = AbilitySystemComponent->HasMatchingGameplayTag(NlGameplayTags::Status_Guard);
+	bool bIsGuarding = AbilitySystemComponent->HasMatchingGameplayTag(NlGameplayTags::Status_GuardReady);
 	bool bInGuardAngle = false;
 
 	if (bIsGuarding)
@@ -67,7 +67,7 @@ void UAT_Knockback::Activate()
 			TArray<FGameplayAbilitySpec> ActiveAbilities = AbilitySystemComponent->GetActivatableAbilities();
 			for (FGameplayAbilitySpec AbilitySpec : ActiveAbilities)
 			{
-				if (AbilitySpec.Ability && AbilitySpec.Ability->AbilityTags.HasTagExact(NlGameplayTags::Status_Guard))
+				if (AbilitySpec.Ability && AbilitySpec.Ability->AbilityTags.HasTagExact(NlGameplayTags::Status_GuardReady))
 				{
 					AbilitySystemComponent->CancelAbilityHandle(AbilitySpec.Handle);
 				}

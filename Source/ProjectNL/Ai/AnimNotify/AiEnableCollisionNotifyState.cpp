@@ -324,7 +324,7 @@ void UAiEnableCollisionNotifyState::ReactToHitActor(
 							CueParams.EffectCauser = Owner;
 							CueParams.EffectContext = EffectContext; // ✅ 같이 넘기기
 							ABaseWeapon* BaseWeapon=SourceCharacter->GetEquipComponent()->GetMainWeapon();
-							if (TargetASC->HasMatchingGameplayTag(NlGameplayTags::Status_Guard))
+							if (TargetASC->HasMatchingGameplayTag(NlGameplayTags::Status_GuardReady))
 							{
 								SourceASC->ExecuteGameplayCue(BaseWeapon->GetAttackHitGaurdTag(), CueParams);    
 							}

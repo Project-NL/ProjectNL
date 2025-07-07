@@ -315,7 +315,7 @@ void UEnableCollisionNotifyState::ReactToHitActor(AActor* Owner, ABaseWeapon* We
                         CueParams.EffectCauser = Owner;
                         CueParams.EffectContext = EffectContext; // ✅ 같이 넘기기
                         ABaseWeapon* BaseWeapon=SourceCharacter->GetEquipComponent()->GetMainWeapon();
-                        if (TargetASC->HasMatchingGameplayTag(NlGameplayTags::Status_Guard))
+                        if (TargetASC->HasMatchingGameplayTag(NlGameplayTags::Status_GuardReady))
                         {
                             SourceASC->ExecuteGameplayCue(BaseWeapon->GetAttackHitGaurdTag(), CueParams);    
                         }

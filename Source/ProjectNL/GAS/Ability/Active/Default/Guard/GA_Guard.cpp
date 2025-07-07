@@ -1,5 +1,6 @@
 ﻿#include "GA_Guard.h"
 
+#include "Abilities/Tasks/AbilityTask_WaitDelay.h"
 #include "ProjectNL/Character/Player/PlayerCharacter.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Ability/Active/Default/Knockback/AT_Knockback.h"
@@ -48,9 +49,24 @@ void UGA_Guard::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 			ASC->OnDamageStartedNotified.AddDynamic(this, &ThisClass::StartBlock);
 		}
 
-		
+		// ② 0.2 초 뒤에 GuardReady 처리
+		if (auto* WaitTask = UAbilityTask_WaitDelay::WaitDelay(this, 0.17f))
+		{
+			WaitTask->OnFinish.AddDynamic(this, &ThisClass::OnGuardReady);
+			WaitTask->ReadyForActivation();
+		}
 	}
 }
+void UGA_Guard::OnGuardReady()
+{
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
+	if (!ASC) return;
+	
+	NlGameplayTags::SetGameplayTag(ASC, NlGameplayTags::Status_GuardReady, 1, /*bAdd=*/true);
+
+	// 필요하다면 여기서 추가 로직(사운드, VFX 등) 호출
+}
+
 
 void UGA_Guard::StartBlock(const FDamagedResponse& DamagedResponse)
 {
@@ -60,11 +76,11 @@ void UGA_Guard::StartBlock(const FDamagedResponse& DamagedResponse)
 		if (AttributeSet->GetStamina() > 30)
 		{
 			
-			if (GetAbilitySystemComponentFromActorInfo()->HasMatchingGameplayTag(NlGameplayTags::Status_Guard))
+			if (GetAbilitySystemComponentFromActorInfo()->HasMatchingGameplayTag(NlGameplayTags::Status_GuardReady))
 			{
 				FStateHelper::ChangePlayerState(
 					GetAbilitySystemComponentFromActorInfo(),
-					NlGameplayTags::Status_Guard,
+					NlGameplayTags::Status_GuardReady,
 					NlGameplayTags::Status_Block, true);
 				AttributeSet->SetStamina(AttributeSet->GetStamina() - 30);
 				//튕겨져 나가며 애니메이션 발동
@@ -144,6 +160,7 @@ void UGA_Guard::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGamep
 	{
 		NlGameplayTags::SetGameplayTag(ASC, NlGameplayTags::Status_Guard, 0, true);
 		NlGameplayTags::SetGameplayTag(ASC, NlGameplayTags::Status_Block, 0, true);
+		NlGameplayTags::SetGameplayTag(ASC, NlGameplayTags::Status_GuardReady, 0, true);
 		ASC->OnDamageStartedNotified.RemoveDynamic(this, &ThisClass::StartBlock);
 		
 	}

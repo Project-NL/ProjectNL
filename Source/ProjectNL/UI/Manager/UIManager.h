@@ -27,13 +27,16 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "UI Manager")
 	void HideUI(FGameplayTag UITag);
+	void LockLookInput();
 
+	void UnlockLookInput();
 	UFUNCTION(BlueprintCallable, Category = "UI Manager")
 	void ToggleUI(FGameplayTag UITag); 
 
 	// UI가 활성화되어 있는지 확인
 	UFUNCTION(BlueprintCallable, Category = "UI Manager")
 	bool IsUIActive(FGameplayTag UITag) const;
+	bool IsAnyUIActive() const;
 
 	UUserWidget* GetActiveUI(FGameplayTag UITag);
 private:
@@ -48,5 +51,7 @@ private:
 	// UI를 생성하고 뷰포트에 추가하는 헬퍼 함수
 	UUserWidget* CreateWidgetForTag(FGameplayTag UITag);
 
+	/** 동시에 여러 UI가 켜질 때 대비해 레퍼런스 카운트 */
+	int32 LookInputLockCount = 0;
 
 };

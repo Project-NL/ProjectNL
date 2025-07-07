@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ProjectNL/Character/BaseCharacter.h"
 #include "ProjectNL/UI/Widget/Enemy/EnemyStatus.h"
+#include "ProjectNL/UI/Widget/MainMenu/RestartMenuWidget.h"
 
 #include "EnemyCharacter.generated.h"
 
@@ -62,13 +63,12 @@ private:
 	UPROPERTY()
 	UEnemyStatus* EnemyStatus;
 
-	// 화면에 띄울 위젯 블루프린트 클래스
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UEnemyStatus> BossEnemyStatusWidgetClass;
-
-	// 생성된 위젯 인스턴스
+	
 	UPROPERTY(EditAnywhere)
 	UEnemyStatus* BossEnemyStatusWidget = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	URestartMenuWidget* RestartGameWidget;
 
 
 

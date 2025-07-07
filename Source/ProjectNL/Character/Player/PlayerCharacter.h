@@ -33,6 +33,8 @@ public:
 	AEnemyCharacter* GetTargetingCharacter();
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	void UnlockInput();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -52,6 +54,9 @@ private:
 	
 	UFUNCTION()
 	void Death();
+
+	/** 입력 잠금 해제용 */
+	FTimerHandle InputUnlockHandle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input
 		, meta = (AllowPrivateAccess = "true"))
@@ -93,7 +98,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Target System")
 	TSubclassOf<UUserWidget> LockedOnWidgetClass;
 
-	
+	// (신규) 무적으로 만들 때 적용할 Gameplay Effect 클래스
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Effect"
+		, meta=(AllowPrivateAccess = true))
+	TSubclassOf<UGameplayEffect> InvincibilityEffect;
 	// 생성된 위젯 컴포넌트
 	UPROPERTY()
 	class UWidgetComponent* LockOnWidgetComponent;

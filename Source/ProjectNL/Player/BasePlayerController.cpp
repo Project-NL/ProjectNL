@@ -181,7 +181,7 @@ void ABasePlayerController::EscMenuWidget(){
 	FGameplayTag InventoryTag = NlGameplayTags::UI_EscMenu;
 	// 현재 인벤토리 위젯이 열려 있는지 확인 (UIManager에 상태 확인 로직 필요)
 	// 여기서는 Toggle 방식이니까 간단히 Show/Hide로 처리
-	if (UIManager->IsUIActive(InventoryTag)) // IsUIActive는 추가해야 할 함수
+	if (UIManager->IsAnyUIActive()) // IsUIActive는 추가해야 할 함수
 	{
 		//UIManager->HideUI(InventoryTag);
 		UIManager->Deinitialize();
@@ -327,10 +327,7 @@ void ABasePlayerController::ClientUseHotSlotItem(
 	const FItemMetaInfo& FirstItem = InvList[HotIndex];
 	const FItemInfoData& ItemInfo = FItemHelper::GetItemInfoById(GetWorld(), FirstItem.GetId());
 
-	if (ABasePlayerState* PS = GetPlayerState<ABasePlayerState>())
-	{
-		PS->RemoveItem(FirstItem.GetId(), 1, ItemSlotInit);
-	}
+
 
 	if (UWorld* World = GetWorld())
 	{
@@ -338,7 +335,29 @@ void ABasePlayerController::ClientUseHotSlotItem(
 		{
 			if (APlayerCharacter* PC = Cast<APlayerCharacter>(GetPawn()))
 			{
-				Spawned->UseItem(PC);
+				UAbilitySystemComponent* ASC =PC->GetAbilitySystemComponent();
+				if (ASC->HasMatchingGameplayTag(NlGameplayTags::Status_DrinkPotion))
+				{
+					return;
+				}
+				if (Spawned->UseItem(PC))
+				{
+					if (!ASC)return;
+					if (
+						ASC->HasMatchingGameplayTag(NlGameplayTags::Status_Action)||
+						ASC->HasMatchingGameplayTag(NlGameplayTags::Status_Block)||
+						ASC->HasMatchingGameplayTag(NlGameplayTags::Status_Guard)||
+						ASC->HasMatchingGameplayTag(NlGameplayTags::Status_GuardReady)||
+						ASC->HasMatchingGameplayTag(NlGameplayTags::Status_IsFalling)||
+						ASC->HasMatchingGameplayTag(NlGameplayTags::Status_UnderAttack))
+					{
+						return;
+					}
+					if (ABasePlayerState* PS = GetPlayerState<ABasePlayerState>())
+					{
+						PS->RemoveItem(FirstItem.GetId(), 1, ItemSlotInit);
+					}
+				}
 			}
 		}
 	}

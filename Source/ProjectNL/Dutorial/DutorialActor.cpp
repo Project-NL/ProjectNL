@@ -47,6 +47,31 @@ void ADutorialActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 				}
 			}
 		}
+	
+			UAbilitySystemComponent* AbilitySystemComponent =Player->GetAbilitySystemComponent();
+			if (AbilitySystemComponent && OverlapGameplayEffect)
+			{
+				// EffectContext 생성 (소스 오브젝트를 this로 지정)
+				FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+				EffectContext.AddSourceObject(this);
+
+				// Level 은 1.0f로 가정
+				const float EffectLevel = 1.0f;
+				FGameplayEffectSpecHandle EffectSpec = AbilitySystemComponent->MakeOutgoingSpec(
+					OverlapGameplayEffect,  // 헤더에서 지정한 클래스
+					EffectLevel,
+					EffectContext
+				);
+
+				if (EffectSpec.IsValid() && EffectSpec.Data.IsValid())
+				{
+					// 자기 자신에게 즉시 적용
+					AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(
+						*EffectSpec.Data.Get()
+					);
+				}
+		}
+		
 	}
 }
 

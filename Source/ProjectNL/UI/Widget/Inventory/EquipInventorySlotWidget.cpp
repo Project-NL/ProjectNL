@@ -7,15 +7,16 @@
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/Component/InventoryComponent/EquipInventoryComponent.h"
 #include "ProjectNL/DataTable/ItemInfoData.h"
+#include "ProjectNL/Helper/GameplayTagHelper.h"
 #include "ProjectNL/Helper/ItemHelper.h"
 #include "ProjectNL/Weapon/BaseWeapon.h"
 
-void UEquipInventorySlotWidget::SetupSlot(int32 SlotIndex,TArray<FItemMetaInfo>* InventoryList,int32 index)
+void UEquipInventorySlotWidget::SetupSlot(int32 SlotIndex, TArray<FItemMetaInfo>* InventoryList, int32 index)
 {
 	// FItemHelper를 이용해 아이템의 정보를 가져옵니다.
-	CurrentInventoryList=InventoryList;
-	CurrentSlotIndex=index;
-	CurrentMetaInfoData=(*CurrentInventoryList)[index];
+	CurrentInventoryList = InventoryList;
+	CurrentSlotIndex = index;
+	CurrentMetaInfoData = (*CurrentInventoryList)[index];
 	CurrentItemData = FItemHelper::GetItemInfoById(GetWorld(), CurrentMetaInfoData.GetId());
 	// 썸네일 이미지 설정 (아이템 정보에 따라)
 	if (CurrentItemData.GetThumbnail().LoadSynchronous())
@@ -46,9 +47,9 @@ void UEquipInventorySlotWidget::OnItemButtonPressed()
 	{
 		if (Count > 0)
 		{
-			if (CurrentItemData.GetItemType()==EItemType::Accessory||
-				CurrentItemData.GetItemType()==EItemType::Armor||
-				CurrentItemData.GetItemType()==EItemType::Weapon)//장비 일 때 
+			if (CurrentItemData.GetItemType() == EItemType::Accessory ||
+				CurrentItemData.GetItemType() == EItemType::Armor ||
+				CurrentItemData.GetItemType() == EItemType::Weapon) //장비 일 때 
 			{
 				EquipItem(); // 더블클릭 확인 시 장착
 			}
@@ -66,9 +67,27 @@ void UEquipInventorySlotWidget::EquipItem()
 	{
 		if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerController->GetPawn()))
 		{
+			UAbilitySystemComponent* ASC = PlayerCharacter->GetAbilitySystemComponent();
+			if (ASC->HasMatchingGameplayTag(NlGameplayTags::Status_DrinkPotion))
+			{
+				return;
+			}
+
+			if (!ASC)return;
+			if (
+				ASC->HasMatchingGameplayTag(NlGameplayTags::Status_Action) ||
+				ASC->HasMatchingGameplayTag(NlGameplayTags::Status_Block) ||
+				ASC->HasMatchingGameplayTag(NlGameplayTags::Status_Guard) ||
+				ASC->HasMatchingGameplayTag(NlGameplayTags::Status_GuardReady) ||
+				ASC->HasMatchingGameplayTag(NlGameplayTags::Status_IsFalling) ||
+				ASC->HasMatchingGameplayTag(NlGameplayTags::Status_UnderAttack))
+			{
+				return;
+			}
+
 			UEquipComponent* EquipComponent = PlayerCharacter->GetEquipComponent();
-			ABaseWeapon* MainWeapon=EquipComponent->GetMainWeapon();
-			FItemMetaInfo* PrevItemMetaInfo =MainWeapon->GetItemMetainfo();
+			ABaseWeapon* MainWeapon = EquipComponent->GetMainWeapon();
+			FItemMetaInfo* PrevItemMetaInfo = MainWeapon->GetItemMetainfo();
 			// 아이템 장착 로직
 			EquipComponent->EquipWeapon(CurrentItemData.GetShowItemActor(), true);
 			EquipComponent->EquipInventorySlotChangedDelegate.Broadcast();

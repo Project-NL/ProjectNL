@@ -28,16 +28,21 @@ public:
 	
 protected:
 	virtual void OnWidgetRebuilt() override;
-	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UProgressBar> ViewPercentBar;
-	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UProgressBar> DelayViewPercentBar;
+	virtual void NativeDestruct() override;
+	// .h
+	UPROPERTY(meta = (BindWidget), BlueprintReadOnly, Category = "PercentBar")
+	TObjectPtr<UProgressBar> ViewPercentBar = nullptr;
+
+	UPROPERTY(meta = (BindWidget), BlueprintReadOnly, Category = "PercentBar")
+	TObjectPtr<UProgressBar> DelayViewPercentBar = nullptr;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UOverlay> PercentBarOverlay;
-	
+
+	FORCEINLINE float SafeDiv(float Numerator, float Denominator) const
+	{
+		return FMath::IsNearlyZero(Denominator) ? 0.f : Numerator / Denominator;
+	}
 private:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
 	FLinearColor MainColor;
@@ -56,7 +61,8 @@ private:
 
 	FDecreaseDelayPercentInfo DelayPercentInfo;
 	void DecreaseDelayPercentBar();
-	
+
+
 	// 0번째 현재 값, 1번째 최대 값
 	TPair<float, float> PercentNum;
 };

@@ -12,12 +12,47 @@ APotionItem::APotionItem()
 	PotionSkeleton->SetupAttachment(RootComponent);
 }
 
-void APotionItem::UseItem(APlayerCharacter* playerCharacter)//포션을 먹어 채력을 사용합니다
+bool APotionItem::UseItem(APlayerCharacter* playerCharacter)//포션을 먹어 채력을 사용합니다
 {
 	if (HasAuthority())
 	ServerUseItem_Implementation(playerCharacter);
-	
+	// else
+	// {
+	// 	if (!DrinkPotionAbility)
+	// 	{
+	// 		return false;
+	// 	}
+	//
+	// 	UAbilitySystemComponent* AbilitySystemComponent = playerCharacter->GetAbilitySystemComponent();
+	// 	if (!AbilitySystemComponent)
+	// 	{
+	// 		return false;
+	// 	}
+	// 	// 어빌리티를 실행 시도
+	// 	FGameplayAbilitySpec AbilitySpec = playerCharacter->GetAbilitySystemComponent()->BuildAbilitySpecFromClass(DrinkPotionAbility, 1, INDEX_NONE);
+	// 	if(!AbilitySpec.Ability)
+	// 	{
+	// 		return false;
+	// 	}
+	//
+	//
+	//
+	// 	//AbilitySystemComponent->GetActivatableAbilities();
+	//
+	// 	FGameplayAbilitySpecHandle AbilityHandle = AbilitySystemComponent->GiveAbility(AbilitySpec);
+	// 	UGameplayAbility* ActivatedAbility = AbilitySystemComponent->FindAbilitySpecFromHandle(AbilityHandle)->GetPrimaryInstance();
+	// 	UGA_DrinkPotion* GADrinkPotion= Cast<UGA_DrinkPotion>(ActivatedAbility);
+	// 	GADrinkPotion->SetPotionItem(this);
+	// 	bool bActivated = AbilitySystemComponent->TryActivateAbility(AbilityHandle);
+	// 	if (!bActivated)
+	// 	{
+	// 		return false;
+	// 	}
+	// }
+
 	Super::UseItem(playerCharacter);
+
+	return true;
 }
 
 void APotionItem::ServerUseItem_Implementation(APlayerCharacter* playerCharacter)

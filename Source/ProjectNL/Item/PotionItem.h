@@ -18,7 +18,7 @@ class PROJECTNL_API APotionItem : public ASpawnableItem
 public:
 	APotionItem();
 	
-	virtual void UseItem(APlayerCharacter* playerCharacter) override;
+	virtual bool UseItem(APlayerCharacter* playerCharacter) override;
 
 
 private:

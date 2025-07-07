@@ -10,6 +10,8 @@
 #include "ProjectNL/GAS/Attribute/BaseAttributeSet.h"
 #include "ProjectNL/GAS/NLAbilitySystemComponent.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
+#include "ProjectNL/Player/BasePlayerController.h"
+#include "ProjectNL/UI/Manager/UIManager.h"
 #include "ProjectNL/UI/Widget/Enemy/EnemyStatus.h"
 #include "ProjectNL/UI/Widget/PlayerStatus/PlayerStatus.h"
 
@@ -154,6 +156,35 @@ void AEnemyCharacter::Die()
 		*GetName(), 
 		*UEnum::GetValueAsString(GetLocalRole())); // 실행된 네트워크 역할 확인
 
+	if (BossEnemyStatusWidget && RestartGameWidget)
+	{
+		//RestartGameWidget->AddToViewport();
+		// if (ABasePlayerController* PC = Cast<ABasePlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
+		// {
+		// 	PC->InteractWidget(NlGameplayTags::UI_RestartMenu);
+		// }
+		if (UGameInstance* GameInstance = GetGameInstance())
+		{
+			UUIManager* UIManager = GameInstance->GetSubsystem<UUIManager>();
+			UIManager->ShowUI(NlGameplayTags::UI_RestartMenu);
+		}
+		
+		if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+		{
+			// 1) UI 전용 입력 모드
+			//FInputModeUIOnly Mode;
+			//Mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			//Mode.SetWidgetToFocus(RestartGameWidget->TakeWidget());   // 포커스 지정
+			//PC->SetInputMode(Mode);
+		
+			// 2) 마우스 커서 ON
+			PC->bShowMouseCursor = true;
+		
+			// 3) 캐릭터 입력 차단
+			//PC->SetIgnoreLookInput(true);
+			//PC->SetIgnoreMoveInput(true);
+		}
+	}
 	
 	if (HasAuthority())
 	{
@@ -195,7 +226,7 @@ void AEnemyCharacter::OnDamaged_Implementation(const FDamagedResponse& DamagedRe
 	if (EnemyAttributeSet)
 	{
 		
-		if (AbilitySystemComponent->HasMatchingGameplayTag(NlGameplayTags::Status_Guard))
+		if (AbilitySystemComponent->HasMatchingGameplayTag(NlGameplayTags::Status_GuardReady))
 		{
 			DamageResponse.Damage =DamagedResponse.Damage/5;
 		}

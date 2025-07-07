@@ -18,6 +18,10 @@ public:
 	UGA_DrinkPotion(const FObjectInitializer& ObjectInitializer);
 
 	void SetPotionItem(APotionItem* PotionItem);
+	virtual bool CanActivateAbility(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+	                        const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags,
+	                        FGameplayTagContainer* OptionalRelevantTags) const;
+
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle
 															, const FGameplayAbilityActorInfo* ActorInfo

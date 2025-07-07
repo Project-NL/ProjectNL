@@ -33,7 +33,7 @@ void UMainMenuWidget::HostServer()
 		UGameplayStatics::OpenLevel(World, FName("DutorialMap1"), true, "listen");
 	}
 }
-
+ 
 void UMainMenuWidget::OnJoinButtonClicked()
 {
 	if (!IPAddressInput) return;
